@@ -12,4 +12,4 @@ env:
 script:
   - env
   - trial cycy
-  - python `pwd`/../pypy-src/rpython/bin/rpython --output=bin/cycy cycy/target.py
+  - python `pwd`/../pypy-src/rpython/bin/rpython --output=cycy-c cycy/target.py
