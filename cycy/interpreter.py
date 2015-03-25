@@ -12,5 +12,6 @@ class CyCy(object):
 
 
 def interpret(source):
-    bytecode = compiler.Context.to_bytecode(parse(source))
-    CyCy().run(bytecode)
+    ast = parse(source)
+    bytecode = compiler.compile(ast=ast)
+    CyCy().run(bytecode=bytecode)
