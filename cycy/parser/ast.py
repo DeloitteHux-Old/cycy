@@ -45,3 +45,11 @@ class PostOperation(Node):
 class Assignment(Node):
     def __init__(self):
         assert isinstance(self.left, Variable)
+
+@attributes([
+    Attribute(name="array"),
+    Attribute(name="index"),
+    ])
+class ArrayDereference(Node):
+    def __init__(self):
+        pass

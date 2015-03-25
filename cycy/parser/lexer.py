@@ -6,6 +6,8 @@ RULES = [
     ("\d+", "INTEGER"),
     ("int", "INT32"),
     ("[_a-zA-Z][_a-zA-Z0-9]*", "IDENTIFIER"),
+    ("\[", "LEFT_SQUARE_BRACKET"),
+    ("\]", "RIGHT_SQUARE_BRACKET"),
     ("=", "="),
     ("!=", "!="),
     ("\+\+", "++")

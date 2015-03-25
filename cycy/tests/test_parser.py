@@ -7,7 +7,8 @@ from cycy.parser.ast import (
     Int32,
     PostOperation,
     Variable,
-    VariableDeclaration
+    VariableDeclaration,
+    ArrayDereference
 )
 
 class TestParser(TestCase):
@@ -32,4 +33,10 @@ class TestParser(TestCase):
         self.assertEqual(
             parse("i = 0"),
             Assignment(left=Variable(name="i"), right=Int32(value=0))
+        )
+
+    def test_array_deference(self):
+        self.assertEqual(
+            parse("array[4]"),
+            ArrayDereference(array=Variable(name="array"), index=Int32(value=4))
         )

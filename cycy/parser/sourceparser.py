@@ -6,7 +6,8 @@ from .ast import (
     VariableDeclaration,
     PostOperation,
     Variable,
-    Assignment
+    Assignment,
+    ArrayDereference
 )
 
 class SourceParser(object):
@@ -39,6 +40,10 @@ class SourceParser(object):
     def main_assign(self, p):
         return p[0]
 
+    @pg.production("main : dereference")
+    def expr_dereference(self, p):
+        return p[0]
+
     @pg.production("assign : var = expr")
     def assign(self, p):
         return Assignment(left=p[0], right=p[2])
@@ -50,6 +55,14 @@ class SourceParser(object):
     @pg.production("expr : INTEGER")
     def expr_integer(self, p):
         return Int32(value=int(p[0].getstr()))
+
+    @pg.production("dereference : array LEFT_SQUARE_BRACKET expr RIGHT_SQUARE_BRACKET")
+    def array_dereference(self, p):
+        return ArrayDereference(array=p[0], index=p[2])
+
+    @pg.production("array : IDENTIFIER")
+    def array_variable(self, p):
+        return Variable(name=p[0].getstr())
 
     @pg.production("declaration : INT32 IDENTIFIER")
     def declare_int(self, p):
