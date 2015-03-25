@@ -2,15 +2,17 @@ from rply import ParserGenerator
 from .lexer import lexer, RULES
 from .ast import (
     Array,
+    ArrayDereference,
+    Assignment,
     BinaryOperation,
+    Block,
     Char,
+    Function,
     Int32,
-    VariableDeclaration,
     PostOperation,
     ReturnStatement,
     Variable,
-    Assignment,
-    ArrayDereference
+    VariableDeclaration,
 )
 
 class SourceParser(object):
@@ -26,6 +28,10 @@ class SourceParser(object):
     pg = ParserGenerator(RULES,
                          cache_id='cycy',
     )
+
+    @pg.production("main : function")
+    def main_function(self, p):
+        return p[0]
 
     @pg.production('main : binop')
     def main_binop(self, p):
@@ -47,12 +53,33 @@ class SourceParser(object):
     def main_expr(self, p):
         return p[0]
 
-    @pg.production("main : return expr ;")
+    @pg.production("main : return_statement")
+    def main_return_statement(self, p):
+        return p[0]
+
+    @pg.production("return_statement : return expr ;")
     def main_return(self, p):
         return ReturnStatement(value=p[1])
 
     @pg.production("main : dereference")
     def expr_dereference(self, p):
+        return p[0]
+
+    @pg.production("function : INT32 IDENTIFIER LEFT_BRACKET void RIGHT_BRACKET block")
+    def function_void_param(self, p):
+        return Function(
+            return_type=p[0].gettokentype(),
+            name=p[1].getstr(),
+            params=[],
+            body=p[5]
+        )
+
+    @pg.production("block : LEFT_CURLY_BRACKET statement_list RIGHT_CURLY_BRACKET")
+    def block_statement_list(self, p):
+        return Block(statements=[p[1]])
+
+    @pg.production("statement_list : return_statement")
+    def statement_list_return(self, p):
         return p[0]
 
     @pg.production("assign : var = expr")

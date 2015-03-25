@@ -116,3 +116,29 @@ class ArrayDereference(Node):
 class ReturnStatement(Node):
     def __init__(self, value):
         self.value = value
+
+@attributes(
+    [
+        Attribute(name="return_type"),
+        Attribute(name="name"),
+        Attribute(name="params"),
+        Attribute(name="body")
+    ],
+    apply_with_init=False
+)
+class Function(Node):
+    def __init__(self, return_type, name, params, body):
+        self.return_type = return_type
+        self.name = name
+        self.params = params
+        self.body = body
+
+@attributes(
+    [
+        Attribute(name="statements")
+    ],
+    apply_with_init=False
+)
+class Block(Node):
+    def __init__(self, statements):
+        self.statements = statements

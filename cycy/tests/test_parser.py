@@ -3,15 +3,17 @@ from unittest import TestCase
 from cycy.parser import parse
 from cycy.parser.ast import (
     Array,
+    ArrayDereference,
     Assignment,
     BinaryOperation,
+    Block,
     Char,
+    Function,
     Int32,
     PostOperation,
     ReturnStatement,
     Variable,
     VariableDeclaration,
-    ArrayDereference
 )
 
 class TestParser(TestCase):
@@ -60,4 +62,17 @@ class TestParser(TestCase):
         self.assertEqual(
             parse("return 0;"),
             ReturnStatement(value=Int32(value=0))
+        )
+
+    def test_main_function(self):
+        self.assertEqual(
+            parse("int main(void) { return 0; }"),
+            Function(
+                return_type="INT32",
+                name="main",
+                params=[],
+                body=Block([
+                        ReturnStatement(value=Int32(value=0))
+                ])
+            )
         )
