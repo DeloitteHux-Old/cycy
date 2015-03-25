@@ -36,10 +36,11 @@ class Variable(Node):
     def __init__(self):
         pass
 
-@attributes([Attribute(name="operator"), Attribute(name="variable")])
 class PostOperation(Node):
-    def __init__(self):
-        assert self.operator in ("++", "--")
+    def __init__(self, operator, variable):
+        assert operator in ("++", "--")
+        self.operator = operator
+        self.variable = variable
 
 @attributes([Attribute(name="left"), Attribute(name="right")])
 class Assignment(Node):
