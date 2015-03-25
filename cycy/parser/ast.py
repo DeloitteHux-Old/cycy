@@ -24,6 +24,7 @@ class BinaryOperation(Node):
         self.left = left
         self.right = right
 
+
 @attributes(
     [
         Attribute(name="name"),
@@ -39,6 +40,7 @@ class VariableDeclaration(Node):
         self.vtype = vtype
         self.value = value
 
+
 @attributes([Attribute(name="value")], apply_with_init=False)
 class Int32(Node):
     def __init__(self, value):
@@ -46,13 +48,18 @@ class Int32(Node):
         assert -2**32 < value <= 2**32-1
         self.value = value
 
+
 @attributes([Attribute(name="name")], apply_with_init=False)
 class Variable(Node):
     def __init__(self, name):
         self.name = name
 
+
 @attributes(
-    [Attribute(name="operator"), Attribute(name="variable")],
+    [
+        Attribute(name="operator"),
+        Attribute(name="variable"),
+    ],
     apply_with_init=False,
 )
 class PostOperation(Node):
@@ -81,6 +88,7 @@ class Array(Node):
             assert isinstance(v, _type)
         self.value = value
 
+
 @attributes([Attribute(name="value")], apply_with_init=False)
 class Char(Node):
     def __init__(self, value):
@@ -88,10 +96,14 @@ class Char(Node):
         assert isinstance(value, str) and len(value) == 1
         self.value = value
 
-@attributes([
-    Attribute(name="array"),
-    Attribute(name="index"),
-    ], apply_with_init=False)
+
+@attributes(
+    [
+        Attribute(name="array"),
+        Attribute(name="index"),
+    ],
+    apply_with_init=False,
+)
 class ArrayDereference(Node):
     def __init__(self, array, index):
         self.array = array
