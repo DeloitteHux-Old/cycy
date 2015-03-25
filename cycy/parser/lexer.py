@@ -3,7 +3,9 @@ from rpython.rlib.rsre.rsre_re import compile, M, DOTALL
 from rply.token import Token, SourcePosition
 
 RULES = [
-    ("\d+", "INT"),
+    ("\d+", "INTEGER"),
+    ("int", "INT32"),
+    ("[_a-zA-Z][_a-zA-Z0-9]*", "IDENTIFIER"),
     ("!=", "!=")
 ]
 

@@ -1,6 +1,6 @@
 from rply import ParserGenerator
 from .lexer import RULES, Lexer
-from .ast import BinaryOperation, Int32
+from .ast import BinaryOperation, Int32, VariableDeclaration
 
 
 class SourceParser(object):
@@ -21,14 +21,21 @@ class SourceParser(object):
     def main_binop(self, p):
         return p[0]
 
+    @pg.production('main : declaration')
+    def main_declaration(self, p):
+        return p[0]
+
     @pg.production('binop : expr != expr')
     def binop_ne(self, p):
         return BinaryOperation(operand="!=", left=p[0], right=p[2])
 
-    @pg.production("expr : INT")
+    @pg.production("expr : INTEGER")
     def expr_integer(self, p):
         return Int32(value=int(p[0].getstr()))
 
+    @pg.production("declaration : INT32 IDENTIFIER")
+    def declare_int(self, p):
+        return VariableDeclaration(name=p[1].getstr(), vtype="INT32", value=None)
 
     # @pg.production('main : expr')
     # def main_expr(self, p):
