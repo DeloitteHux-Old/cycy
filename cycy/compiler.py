@@ -19,12 +19,12 @@ class Context(object):
         self.variable_indices = {}
 
     def emit(self, byte_code, arg=-42):
-        self.instructions.append(chr(byte_code))
+        self.instructions.append(byte_code)
         has_arg, = bytecode.META[byte_code]
         if has_arg:
             assert arg >= 0
             # TODO: could this be more than a byte?
-            self.instructions.append(chr(arg))
+            self.instructions.append(arg)
         else:
             assert arg == -42
 
@@ -34,7 +34,7 @@ class Context(object):
 
     def build(self, name):
         return bytecode.Bytecode(
-            bytes="".join(self.instructions),
+            instructions=self.instructions,
             name=name,
             constants=self.constants,
             number_of_variables=len(self.variable_indices),
