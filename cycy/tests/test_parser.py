@@ -1,7 +1,13 @@
 from unittest import TestCase
 
 from cycy.parser import parse
-from cycy.parser.ast import BinaryOperation, Int32, PostOperation, Variable, Assignment
+from cycy.parser.ast import (
+    Assignment
+    BinaryOperation,
+    Int32,
+    PostOperation,
+    Variable,
+)
 
 class TestParser(TestCase):
     def test_basic_ne(self):
