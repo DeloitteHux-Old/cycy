@@ -14,6 +14,15 @@ class BinaryOperation(Node):
     def __init__(self):
         assert self.operand in ("+", "-", "!=") # for now
 
+@attributes([
+    Attribute(name="name"),
+    Attribute(name="vtype"),
+    Attribute(name="value"),
+])
+class VariableDeclaration(Node):
+    def __init__(self):
+        assert self.vtype == "INT32"
+
 @attributes([Attribute(name="value")])
 class Int32(Node):
     def __init__(self):

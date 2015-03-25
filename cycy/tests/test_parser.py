@@ -7,6 +7,7 @@ from cycy.parser.ast import (
     Int32,
     PostOperation,
     Variable,
+    VariableDeclaration,
 )
 
 class TestParser(TestCase):
@@ -15,6 +16,11 @@ class TestParser(TestCase):
             parse('2 != 3'),
             BinaryOperation(operand="!=", left=Int32(value=2), right=Int32(value=3))
         )
+
+    def test_variable_declaration(self):
+        self.assertEqual(
+            parse('int i'),
+            VariableDeclaration(name="i", vtype="INT32", value=None))
 
     def test_postincrement(self):
         self.assertEqual(
