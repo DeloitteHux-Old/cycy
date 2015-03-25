@@ -18,15 +18,9 @@ class Context(object):
         self.constants = []
         self.variable_indices = {}
 
-    def emit(self, byte_code, arg=-42):
+    def emit(self, byte_code, arg=bytecode.NO_ARG):
         self.instructions.append(byte_code)
-        has_arg, = bytecode.META[byte_code]
-        if has_arg:
-            assert arg >= 0
-            # TODO: could this be more than a byte?
-            self.instructions.append(arg)
-        else:
-            assert arg == -42
+        self.instructions.append(arg)
 
     def register_int32_constant(self, int32):
         self.constants.append(int32)

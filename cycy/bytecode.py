@@ -3,22 +3,22 @@ from characteristic import Attribute, attributes
 
 LOAD_CONST = 1
 BINARY_NEQ = 2
+PUTC       = 3
 
 
 NAMES = {
-    1: "LOAD_CONST",
-    2: "BINARY_NEQ",
+    LOAD_CONST: "LOAD_CONST",
+    BINARY_NEQ: "BINARY_NEQ",
+    PUTC: "PUTC",
 }
 
-# bytecode => (has_arg, )
-META = {
-    LOAD_CONST: (True, ),
-    BINARY_NEQ: (False, ),
-}
 
 BINARY_OPERATION_BYTECODE = {
     "!=": BINARY_NEQ,
 }
+
+
+NO_ARG = -42
 
 
 @attributes(
@@ -45,17 +45,13 @@ class Bytecode(object):
         """
         offset = 0
         while offset < len(self.instructions):
-            next_offset = offset + 1
             byte_code = self.instructions[offset]
-            arg = None
-
-            has_arg, = META[byte_code]
-            if has_arg:
-                arg = self.instructions[next_offset]
-                next_offset += 1
+            arg = self.instructions[offset + 1]
+            if arg is NO_ARG:
+                arg = None
 
             yield (offset, byte_code, arg)
-            offset = next_offset
+            offset += 2
 
     def dump(self):
         lines = []
