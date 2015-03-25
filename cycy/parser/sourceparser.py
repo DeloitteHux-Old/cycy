@@ -8,7 +8,8 @@ from .ast import (
     VariableDeclaration,
     PostOperation,
     Variable,
-    Assignment
+    Assignment,
+    ArrayDereference
 )
 
 class SourceParser(object):
@@ -45,13 +46,17 @@ class SourceParser(object):
     def main_expr(self, p):
         return p[0]
 
+    @pg.production("main : dereference")
+    def expr_dereference(self, p):
+        return p[0]
+
     @pg.production("assign : var = expr")
     def assign(self, p):
         return Assignment(left=p[0], right=p[2])
 
     @pg.production('binop : expr != expr')
     def binop_ne(self, p):
-        return BinaryOperation(operand="!=", left=p[0], right=p[2])
+        return BinaryOperation(operator="!=", left=p[0], right=p[2])
 
     @pg.production("expr : INTEGER")
     def expr_integer(self, p):
@@ -69,13 +74,21 @@ class SourceParser(object):
         vals.append(Char(value=chr(0)))
         return Array(value=vals)
 
+    @pg.production("dereference : array LEFT_SQUARE_BRACKET expr RIGHT_SQUARE_BRACKET")
+    def array_dereference(self, p):
+        return ArrayDereference(array=p[0], index=p[2])
+
+    @pg.production("array : IDENTIFIER")
+    def array_variable(self, p):
+        return Variable(name=p[0].getstr())
+
     @pg.production("declaration : INT32 IDENTIFIER")
     def declare_int(self, p):
         return VariableDeclaration(name=p[1].getstr(), vtype="INT32", value=None)
 
     @pg.production("postincr : var ++")
     def post_incr(self, p):
-        return PostOperation(operand="++", variable=p[0])
+        return PostOperation(operator="++", variable=p[0])
 
     @pg.production("var : IDENTIFIER")
     def var_variable(self, p):

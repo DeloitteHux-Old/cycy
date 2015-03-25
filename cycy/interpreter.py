@@ -1,14 +1,16 @@
+from cycy import compiler
+from cycy.parser.sourceparser import parse
+
+
 class CyCy(object):
     """
     The main CyCy interpreter.
     """
 
     def run(self, bytecode):
-        print "Hello, world!"
+        pass
 
-def compile(source):
-    pass
 
 def interpret(source):
-    bytecode = compile(source)
+    bytecode = compiler.Context.to_bytecode(parse(source))
     CyCy().run(bytecode)

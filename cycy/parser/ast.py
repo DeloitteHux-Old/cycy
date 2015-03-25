@@ -1,18 +1,20 @@
 from characteristic import Attribute, attributes
+from rpython.tool.pairtype import extendabletype
 
 
 class Node(object):
-    pass
+    # Allows using __extend__ to extend the type
+    __metaclass__ = extendabletype
 
 
 @attributes([
-    Attribute(name="operand"),
+    Attribute(name="operator"),
     Attribute(name="left"),
     Attribute(name="right"),
 ])
 class BinaryOperation(Node):
     def __init__(self):
-        assert self.operand in ("+", "-", "!=") # for now
+        assert self.operator in ("+", "-", "!=") # for now
 
 @attributes([
     Attribute(name="name"),
@@ -34,10 +36,14 @@ class Variable(Node):
     def __init__(self):
         pass
 
-@attributes([Attribute(name="operand"), Attribute(name="variable")])
 class PostOperation(Node):
-    def __init__(self):
-        assert self.operand in ("++", "--")
+    def __init__(self, operator, variable):
+        assert operator in ("++", "--")
+        self.operator = operator
+        self.variable = variable
+
+    def __eq__(self, other):
+        return self.operator == other.operator and self.variable == other.variable
 
 @attributes([Attribute(name="left"), Attribute(name="right")])
 class Assignment(Node):
@@ -56,3 +62,11 @@ class Char(Node):
     def __init__(self):
         # TODO handle escaped chars
         assert isinstance(self.value, str) and len(self.value) == 1
+
+@attributes([
+    Attribute(name="array"),
+    Attribute(name="index"),
+    ])
+class ArrayDereference(Node):
+    def __init__(self):
+        pass

@@ -9,14 +9,15 @@ from cycy.parser.ast import (
     Int32,
     PostOperation,
     Variable,
-    VariableDeclaration
+    VariableDeclaration,
+    ArrayDereference
 )
 
 class TestParser(TestCase):
     def test_basic_ne(self):
         self.assertEqual(
             parse('2 != 3'),
-            BinaryOperation(operand="!=", left=Int32(value=2), right=Int32(value=3))
+            BinaryOperation(operator="!=", left=Int32(value=2), right=Int32(value=3))
         )
 
     def test_variable_declaration(self):
@@ -27,7 +28,7 @@ class TestParser(TestCase):
     def test_postincrement(self):
         self.assertEqual(
             parse("i++"),
-            PostOperation(operand="++", variable=Variable(name="i"))
+            PostOperation(operator="++", variable=Variable(name="i"))
         )
 
     def test_assignment(self):
@@ -46,4 +47,10 @@ class TestParser(TestCase):
         self.assertEqual(
             parse('"foo"'),
             Array(value=[Char(value='f'), Char(value='o'), Char(value='o'), Char(value=chr(0))])
+        )
+
+    def test_array_deference(self):
+        self.assertEqual(
+            parse("array[4]"),
+            ArrayDereference(array=Variable(name="array"), index=Int32(value=4))
         )
