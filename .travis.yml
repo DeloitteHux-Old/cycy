@@ -6,6 +6,8 @@ before_install:
   - tar -xf `pwd`/../pypy.tar.bz2 -C `pwd`/../
 install:
   - pip install -Ur test-requirements.txt twisted
+env:
+  - PYTHONPATH=../pypy-pypy-*/:`pwd`
 script:
   - trial cycy
   - python ../pypy-pypy-*/rpython/bin/rpython --output=bin/cycy cycy/target.py
