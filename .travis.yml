@@ -1,0 +1,5 @@
+language: python
+python:
+  - 2.7
+install: pip install -Ur test-requirements.txt twisted
+script: trial cycy
