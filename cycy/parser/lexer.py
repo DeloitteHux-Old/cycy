@@ -37,6 +37,8 @@ class Lexer(object):
             m = token_regex.match(self.buf, pos=pos)
             if m:
                 self.pos = m.end()
+                while self.pos < len(self.buf) and self.buf[self.pos] == " ":
+                    self.pos += 1
                 return Token(token_type, self.buf[m.start():m.end()],
                              SourcePosition(pos, 0, pos))
         raise LexerError("Unrecognized token starting at %s" %
