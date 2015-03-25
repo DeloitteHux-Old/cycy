@@ -19,3 +19,8 @@ class Int32(Node):
     def __init__(self):
         assert isinstance(self.value, int)
         assert -2**32 < self.value <= 2**32-1
+
+@attributes([Attribute(name="name")])
+class Variable(Node):
+    def __init__(self):
+        pass
