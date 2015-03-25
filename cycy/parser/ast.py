@@ -29,3 +29,8 @@ class Variable(Node):
 class PostOperation(Node):
     def __init__(self):
         assert self.operand in ("++", "--")
+
+@attributes([Attribute(name="left"), Attribute(name="right")])
+class Assignment(Node):
+    def __init__(self):
+        assert isinstance(self.left, Variable)

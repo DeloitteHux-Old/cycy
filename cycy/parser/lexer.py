@@ -5,6 +5,7 @@ from rply.token import Token, SourcePosition
 RULES = [
     ("[a-zA-Z]+", "VARIABLE"),
     ("\d+", "INT"),
+    ("=", "="),
     ("!=", "!="),
     ("\+\+", "++")
 ]
