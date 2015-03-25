@@ -10,6 +10,5 @@ install:
 env:
   - PYTHONPATH=`pwd`/../pypy-src/:`pwd`
 script:
-  - env
   - trial cycy
   - python `pwd`/../pypy-src/rpython/bin/rpython --output=cycy-c cycy/target.py
