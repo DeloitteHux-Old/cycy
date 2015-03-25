@@ -25,5 +25,5 @@ class CyCy(object):
 
 def interpret(source):
     ast = parse(source)
-    bytecode = compiler.compile(ast=ast)
-    CyCy().run(bytecode=bytecode)
+    byte_code = compiler.compile(ast=ast)
+    CyCy().run(byte_code=byte_code)
