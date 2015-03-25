@@ -4,12 +4,20 @@ from cycy import bytecode
 from cycy.parser import ast
 
 
-@attributes([
-    Attribute(name="instructions", default_factory=list),
-    Attribute(name="constants", default_factory=list),
-    Attribute(name="variable_indices", default_factory=dict),
-])
+@attributes(
+    [
+        Attribute(name="instructions"),
+        Attribute(name="constants"),
+        Attribute(name="variable_indices"),
+    ],
+    apply_with_init=False,
+)
 class Context(object):
+    def __init__(self):
+        self.instructions = []
+        self.constants = []
+        self.variable_indices = {}
+
     def emit(self, byte_code, arg=-42):
         self.instructions.append(chr(byte_code))
         has_arg, = bytecode.META[byte_code]

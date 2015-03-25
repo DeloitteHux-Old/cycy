@@ -21,13 +21,22 @@ BINARY_OPERATION_BYTECODE = {
 }
 
 
-@attributes([
-    Attribute(name="bytes", exclude_from_repr=True),
-    Attribute(name="name"),
-    Attribute(name="constants"),
-    Attribute(name="number_of_variables"),
-])
+@attributes(
+    [
+        Attribute(name="bytes", exclude_from_repr=True),
+        Attribute(name="name"),
+        Attribute(name="constants"),
+        Attribute(name="number_of_variables"),
+    ],
+    apply_with_init=False,
+)
 class Bytecode(object):
+    def __init__(self, bytes, name, constants, number_of_variables):
+        self.bytes = bytes
+        self.name = name
+        self.constants = constants
+        self.number_of_variables = number_of_variables
+
     def dump(self):
         lines = []
         skip = 0
