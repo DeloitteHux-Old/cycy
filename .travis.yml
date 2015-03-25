@@ -4,8 +4,12 @@ python:
 before_install:
   - wget https://bitbucket.org/pypy/pypy/get/default.tar.bz2 -O `pwd`/../pypy.tar.bz2
   - tar -xf `pwd`/../pypy.tar.bz2 -C `pwd`/../
+  - mv `pwd`/../pypy-pypy-* `pwd`/../pypy-src
 install:
   - pip install -Ur test-requirements.txt twisted
+env:
+  - PYTHONPATH=`pwd`/../pypy-src/:`pwd`
 script:
+  - env
   - trial cycy
   - python ../pypy-pypy-*/rpython/bin/rpython --output=bin/cycy cycy/target.py
