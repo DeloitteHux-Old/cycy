@@ -1,4 +1,4 @@
-import sys
+import os
 
 from cycy import bytecode
 from cycy import compiler
@@ -20,7 +20,8 @@ class CyCy(object):
                 arg = byte_code.instructions[pc]
                 pc += 1
                 value = byte_code.constants[arg]
-                sys.stdout.write(chr(value))
+                os.write(1, chr(value))
+                # TODO: error handling?
 
 
 def interpret(source):

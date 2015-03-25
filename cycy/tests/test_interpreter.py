@@ -1,6 +1,5 @@
-from StringIO import StringIO
 from unittest import TestCase
-import sys
+import os
 
 from mock import patch
 
@@ -19,11 +18,10 @@ class TestInterpreter(TestCase):
             number_of_variables=0,
         )
 
-        stdout = StringIO()
-        with patch.object(sys, "stdout", stdout):
+        with patch.object(os, "write") as os_write:
             interpreter.CyCy().run(byte_code)
 
-        self.assertEqual(
-            stdout.getvalue(),
-            "x",
-        )
+            os_write.assert_called_once_with(
+                1,  # file descriptor for stdout
+                "x",
+            )
