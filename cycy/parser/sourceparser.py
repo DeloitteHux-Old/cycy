@@ -1,6 +1,6 @@
 from rply import ParserGenerator
 from .lexer import RULES, Lexer
-from .ast import BinaryOperation, Int32, VariableDeclaration, PostOperation, Variable
+from .ast import BinaryOperation, Int32, VariableDeclaration, PostOperation, Variable, Assignment
 
 class SourceParser(object):
     """ Parse a given input using a lexer
@@ -28,6 +28,14 @@ class SourceParser(object):
     def main_postincr(self, p):
         return p[0]
 
+    @pg.production("main : assign")
+    def main_assign(self, p):
+        return p[0]
+
+    @pg.production("assign : var = expr")
+    def assign(self, p):
+        return Assignment(left=p[0], right=p[2])
+
     @pg.production('binop : expr != expr')
     def binop_ne(self, p):
         return BinaryOperation(operand="!=", left=p[0], right=p[2])
@@ -47,34 +55,6 @@ class SourceParser(object):
     @pg.production("var : IDENTIFIER")
     def var_variable(self, p):
         return Variable(name=p[0].getstr())
-
-    # @pg.production('main : expr')
-    # def main_expr(self, p):
-    #     return p[0]
-    #
-    # @pg.production('expr : expr + expr')
-    # def expr_plus(self, p):
-    #     return BinaryOp("+", p[0], p[2])
-    #
-    # @pg.production('expr : T_NUMBER')
-    # def expr_number(self, p):
-    #     return ConstInt(int(p[0].getstr()))
-    #
-    # @pg.production('expr : T_FLOAT_NUMBER')
-    # def expr_float_number(self, p):
-    #     return ConstFloat(float(p[0].getstr()))
-    #
-    # @pg.production('expr : T_VARIABLE = expr')
-    # def expr_variable_assign(self, p):
-    #     return Assignment(p[0].getstr(), p[2])
-    #
-    # @pg.production('expr : expr ; expr')
-    # def expr_semicolon(self, p):
-    #     return SemicolonExpr(p[0], p[2])
-    #
-    # @pg.production('expr : T_VARIABLE')
-    # def expr_variable(self, p):
-    #     return Variable(p[0].getstr())
 
     parser = pg.build()
 
