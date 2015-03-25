@@ -4,22 +4,19 @@ from cycy import bytecode
 from cycy.parser import ast
 
 
-@attributes([
-    Attribute(name="instructions", default_factory=list),
-    Attribute(name="constants", default_factory=list),
-    Attribute(name="variable_indices", default_factory=dict),
-])
+@attributes(
+    [
+        Attribute(name="instructions"),
+        Attribute(name="constants"),
+        Attribute(name="variable_indices"),
+    ],
+    apply_with_init=False,
+)
 class Context(object):
-    @classmethod
-    def to_bytecode(cls, ast, name="<don't know>"):  # TODO: name?
-        """
-        Build bytecode for the given AST.
-
-        """
-
-        context = cls()
-        ast.compile(context=context)
-        return context.build(name=name)
+    def __init__(self):
+        self.instructions = []
+        self.constants = []
+        self.variable_indices = {}
 
     def emit(self, byte_code, arg=-42):
         self.instructions.append(chr(byte_code))
@@ -55,3 +52,9 @@ class __extend__(ast.Int32):
     def compile(self, context):
         index = context.register_int32_constant(self.value)
         context.emit(bytecode.LOAD_CONST, index)
+
+
+def compile(ast):
+    context = Context()
+    ast.compile(context=context)
+    return context.build(name="<don't know>")

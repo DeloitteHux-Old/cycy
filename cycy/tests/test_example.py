@@ -13,5 +13,5 @@ class TestExample(TestCase):
     def test_it_works(self):
         stdout = StringIO()
         with patch.object(sys, "stdout", stdout):
-            interpret(FilePath(__file__).sibling("example.c"))
+            interpret(FilePath(__file__).sibling("example.c").getContent())
         self.assertEqual(stdout.getvalue(), "Hello, world!\n")

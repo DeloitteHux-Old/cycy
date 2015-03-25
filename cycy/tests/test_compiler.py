@@ -14,7 +14,7 @@ class TestCompiler(TestCase):
 
         """
 
-        bytecode = compiler.Context.to_bytecode(ast=parse(source))
+        bytecode = compiler.compile(ast=parse(source))
         expected = dedent(cleaned(to).strip("\n")).strip("\n")
         self.assertEqual(bytecode.dump(), expected)
 
