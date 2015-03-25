@@ -1,7 +1,7 @@
 from unittest import TestCase
 
 from cycy.parser import parse
-from cycy.parser.ast import BinaryOperation, Int32, VariableDeclaration
+from cycy.parser.ast import BinaryOperation, Int32, VariableDeclaration, PostOperation, Variable
 
 class TestParser(TestCase):
     def test_basic_ne(self):
@@ -14,3 +14,9 @@ class TestParser(TestCase):
         self.assertEqual(
             parse('int i'),
             VariableDeclaration(name="i", vtype="INT32", value=None))
+
+    def test_postincrement(self):
+        self.assertEqual(
+            parse("i++"),
+            PostOperation(operand="++", variable=Variable(name="i"))
+        )

@@ -33,3 +33,8 @@ class Int32(Node):
 class Variable(Node):
     def __init__(self):
         pass
+
+@attributes([Attribute(name="operand"), Attribute(name="variable")])
+class PostOperation(Node):
+    def __init__(self):
+        assert self.operand in ("++", "--")

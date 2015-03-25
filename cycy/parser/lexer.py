@@ -6,7 +6,8 @@ RULES = [
     ("\d+", "INTEGER"),
     ("int", "INT32"),
     ("[_a-zA-Z][_a-zA-Z0-9]*", "IDENTIFIER"),
-    ("!=", "!=")
+    ("!=", "!="),
+    ("\+\+", "++")
 ]
 
 class LexerError(Exception):
