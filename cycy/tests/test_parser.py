@@ -2,12 +2,12 @@ from unittest import TestCase
 
 from cycy.parser import parse
 from cycy.parser.ast import (
-    Assignment
+    Assignment,
     BinaryOperation,
     Int32,
     PostOperation,
     Variable,
-    VariableDeclaration,
+    VariableDeclaration
 )
 
 class TestParser(TestCase):

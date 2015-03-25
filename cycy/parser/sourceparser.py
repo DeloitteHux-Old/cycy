@@ -1,6 +1,13 @@
 from rply import ParserGenerator
 from .lexer import RULES, Lexer
-from .ast import BinaryOperation, Int32, VariableDeclaration, PostOperation, Variable, Assignment
+from .ast import (
+    BinaryOperation,
+    Int32,
+    VariableDeclaration,
+    PostOperation,
+    Variable,
+    Assignment
+)
 
 class SourceParser(object):
     """ Parse a given input using a lexer
