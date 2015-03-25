@@ -23,11 +23,11 @@ class SourceParser(object):
 
     @pg.production('binop : expr != expr')
     def binop_ne(self, p):
-        return BinaryOperation("!=", p[0], p[2])
+        return BinaryOperation(operand="!=", left=p[0], right=p[2])
 
     @pg.production("expr : INT")
     def expr_integer(self, p):
-        return Int32(int(p[0].getstr()))
+        return Int32(value=int(p[0].getstr()))
 
 
     # @pg.production('main : expr')

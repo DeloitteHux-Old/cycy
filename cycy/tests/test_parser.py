@@ -7,5 +7,5 @@ class TestParser(TestCase):
     def test_basic_ne(self):
         self.assertEqual(
             parse('2 != 3'),
-            BinaryOperation("!=", Int32(2), Int32(3))
+            BinaryOperation(operand="!=", left=Int32(value=2), right=Int32(value=3))
         )
