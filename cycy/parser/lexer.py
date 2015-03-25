@@ -3,8 +3,10 @@ from rpython.rlib.rsre.rsre_re import compile, M, DOTALL
 from rply.token import Token, SourcePosition
 
 RULES = [
+    ("[a-zA-Z]+", "VARIABLE"),
     ("\d+", "INT"),
-    ("!=", "!=")
+    ("!=", "!="),
+    ("\+\+", "++")
 ]
 
 class LexerError(Exception):
