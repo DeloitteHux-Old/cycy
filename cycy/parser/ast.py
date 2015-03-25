@@ -108,3 +108,11 @@ class ArrayDereference(Node):
     def __init__(self, array, index):
         self.array = array
         self.index = index
+
+@attributes(
+    [Attribute(name="value")],
+    apply_with_init=False
+)
+class ReturnStatement(Node):
+    def __init__(self, value):
+        self.value = value

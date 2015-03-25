@@ -7,6 +7,7 @@ from .ast import (
     Int32,
     VariableDeclaration,
     PostOperation,
+    ReturnStatement,
     Variable,
     Assignment,
     ArrayDereference
@@ -45,6 +46,10 @@ class SourceParser(object):
     @pg.production("main : expr")
     def main_expr(self, p):
         return p[0]
+
+    @pg.production("main : return expr ;")
+    def main_return(self, p):
+        return ReturnStatement(value=p[1])
 
     @pg.production("main : dereference")
     def expr_dereference(self, p):
