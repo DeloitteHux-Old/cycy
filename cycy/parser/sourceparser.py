@@ -1,5 +1,5 @@
 from rply import ParserGenerator
-from .lexer import RULES, Lexer
+from .lexer import lexer, RULES
 from .ast import (
     Array,
     BinaryOperation,
@@ -22,7 +22,7 @@ class SourceParser(object):
     def parse(self):
         return self.parser.parse(self.lexer, state=self)
 
-    pg = ParserGenerator([d for _, d in RULES],
+    pg = ParserGenerator(RULES,
                          cache_id='cycy',
     )
 
@@ -97,6 +97,5 @@ class SourceParser(object):
     parser = pg.build()
 
 def parse(source):
-    parser = SourceParser(Lexer().input(source, 0))
+    parser = SourceParser(lexer.lex(source))
     return parser.parse()
-    print("")
