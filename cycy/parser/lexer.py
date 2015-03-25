@@ -18,6 +18,11 @@ RULES = [
 class LexerError(Exception):
     pass
 
+class TokenRule:
+    def __init__(self, rule, token_type):
+        self.rule = rule
+        self.token_type = token_type
+
 class Lexer(object):
     """ Lexer object creates a list of tokens for a given input.
     Use:
@@ -27,7 +32,7 @@ class Lexer(object):
     def __init__(self):
         self.rules = []
         for regex, type in RULES:
-            self.rules.append((compile(regex, M | DOTALL), type))
+            self.rules.append(TokenRule(compile(regex, M | DOTALL), type))
 
     def input(self, buf, pos):
         """ Initialize the lexer with a buffer as input.
@@ -41,13 +46,13 @@ class Lexer(object):
 
     def token(self):
         pos = self.pos
-        for token_regex, token_type in self.rules:
-            m = token_regex.match(self.buf, pos=pos)
+        for trule in self.rules:
+            m = trule.rule.match(self.buf, pos=pos)
             if m:
                 self.pos = m.end()
                 while self.pos < len(self.buf) and self.buf[self.pos] == " ":
                     self.pos += 1
-                return Token(token_type, self.buf[m.start():m.end()],
+                return Token(trule.token_type, self.buf[m.start():m.end()],
                              SourcePosition(pos, 0, pos))
         raise LexerError("Unrecognized token starting at %s" %
                          self.buf[self.pos:self.pos+10])
