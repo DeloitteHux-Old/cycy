@@ -1,7 +1,7 @@
 from unittest import TestCase
 
 from cycy.parser import parse
-from cycy.parser.ast import BinaryOperation, Int32, VariableDeclaration, PostOperation, Variable, Assignment
+from cycy.parser.ast import BinaryOperation, Int32, VariableDeclaration, PostOperation, Variable, Assignment, ArrayDereference
 
 class TestParser(TestCase):
     def test_basic_ne(self):
@@ -25,4 +25,10 @@ class TestParser(TestCase):
         self.assertEqual(
             parse("i = 0"),
             Assignment(left=Variable(name="i"), right=Int32(value=0))
+        )
+
+    def test_array_deference(self):
+        self.assertEqual(
+            parse("array[4]"),
+            ArrayDereference(array=Variable(name="array"), index=Int32(value=4))
         )
