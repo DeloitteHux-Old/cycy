@@ -2,8 +2,10 @@ from unittest import TestCase
 
 from cycy.parser import parse
 from cycy.parser.ast import (
+    Array,
     Assignment,
     BinaryOperation,
+    Char,
     Int32,
     PostOperation,
     Variable,
@@ -32,4 +34,16 @@ class TestParser(TestCase):
         self.assertEqual(
             parse("i = 0"),
             Assignment(left=Variable(name="i"), right=Int32(value=0))
+        )
+
+    def test_char_literal(self):
+        self.assertEqual(
+            parse("'c'"),
+            Char(value='c')
+        )
+
+    def test_string_literal(self):
+        self.assertEqual(
+            parse('"foo"'),
+            Array(value=[Char(value='f'), Char(value='o'), Char(value='o'), Char(value=chr(0))])
         )

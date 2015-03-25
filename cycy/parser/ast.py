@@ -43,3 +43,16 @@ class PostOperation(Node):
 class Assignment(Node):
     def __init__(self):
         assert isinstance(self.left, Variable)
+
+@attributes([Attribute(name="value")])
+class Array(Node):
+    def __init__(self):
+        _type = type(self.value[0])
+        for v in self.value:
+            assert isinstance(v, _type)
+
+@attributes([Attribute(name="value")])
+class Char(Node):
+    def __init__(self):
+        # TODO handle escaped chars
+        assert isinstance(self.value, str) and len(self.value) == 1

@@ -4,6 +4,8 @@ from rply.token import Token, SourcePosition
 
 RULES = [
     ("\d+", "INTEGER"),
+    ("'.'", "CHAR"),
+    ("\".*\"", "STRING"),
     ("int", "INT32"),
     ("[_a-zA-Z][_a-zA-Z0-9]*", "IDENTIFIER"),
     ("=", "="),

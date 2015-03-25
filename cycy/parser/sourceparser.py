@@ -1,7 +1,9 @@
 from rply import ParserGenerator
 from .lexer import RULES, Lexer
 from .ast import (
+    Array,
     BinaryOperation,
+    Char,
     Int32,
     VariableDeclaration,
     PostOperation,
@@ -39,6 +41,10 @@ class SourceParser(object):
     def main_assign(self, p):
         return p[0]
 
+    @pg.production("main : expr")
+    def main_expr(self, p):
+        return p[0]
+
     @pg.production("assign : var = expr")
     def assign(self, p):
         return Assignment(left=p[0], right=p[2])
@@ -50,6 +56,18 @@ class SourceParser(object):
     @pg.production("expr : INTEGER")
     def expr_integer(self, p):
         return Int32(value=int(p[0].getstr()))
+
+    @pg.production("expr : CHAR")
+    def expr_char(self, p):
+        return Char(value=p[0].getstr().strip("'"))
+
+    @pg.production("expr : STRING")
+    def expr_string(self, p):
+        vals = []
+        for v in p[0].getstr().strip('"'):
+            vals.append(Char(value=v))
+        vals.append(Char(value=chr(0)))
+        return Array(value=vals)
 
     @pg.production("declaration : INT32 IDENTIFIER")
     def declare_int(self, p):
