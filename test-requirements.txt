@@ -1,2 +1,4 @@
 betterpath==0.2.2
 mock
+
+-r requirements.txt
