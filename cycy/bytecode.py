@@ -3,17 +3,20 @@ from characteristic import Attribute, attributes
 
 LOAD_CONST = 1
 BINARY_NEQ = 2
+PUTC       = 3
 
 
 NAMES = {
-    1: "LOAD_CONST",
-    2: "BINARY_NEQ",
+    LOAD_CONST: "LOAD_CONST",
+    BINARY_NEQ: "BINARY_NEQ",
+    PUTC: "PUTC",
 }
 
 # bytecode => (has_arg, )
 META = {
     LOAD_CONST: (True, ),
     BINARY_NEQ: (False, ),
+    PUTC:       (True, ),
 }
 
 BINARY_OPERATION_BYTECODE = {
