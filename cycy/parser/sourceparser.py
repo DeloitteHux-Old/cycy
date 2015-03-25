@@ -45,7 +45,7 @@ class SourceParser(object):
 
     @pg.production('binop : expr != expr')
     def binop_ne(self, p):
-        return BinaryOperation(operand="!=", left=p[0], right=p[2])
+        return BinaryOperation(operator="!=", left=p[0], right=p[2])
 
     @pg.production("expr : INTEGER")
     def expr_integer(self, p):
@@ -57,7 +57,7 @@ class SourceParser(object):
 
     @pg.production("postincr : var ++")
     def post_incr(self, p):
-        return PostOperation(operand="++", variable=p[0])
+        return PostOperation(operator="++", variable=p[0])
 
     @pg.production("var : IDENTIFIER")
     def var_variable(self, p):

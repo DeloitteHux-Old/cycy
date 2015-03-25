@@ -14,7 +14,7 @@ class TestParser(TestCase):
     def test_basic_ne(self):
         self.assertEqual(
             parse('2 != 3'),
-            BinaryOperation(operand="!=", left=Int32(value=2), right=Int32(value=3))
+            BinaryOperation(operator="!=", left=Int32(value=2), right=Int32(value=3))
         )
 
     def test_variable_declaration(self):
@@ -25,7 +25,7 @@ class TestParser(TestCase):
     def test_postincrement(self):
         self.assertEqual(
             parse("i++"),
-            PostOperation(operand="++", variable=Variable(name="i"))
+            PostOperation(operator="++", variable=Variable(name="i"))
         )
 
     def test_assignment(self):

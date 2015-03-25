@@ -1,18 +1,20 @@
 from characteristic import Attribute, attributes
+from rpython.tool.pairtype import extendabletype
 
 
 class Node(object):
-    pass
+    # Allows using __extend__ to extend the type
+    __metaclass__ = extendabletype
 
 
 @attributes([
-    Attribute(name="operand"),
+    Attribute(name="operator"),
     Attribute(name="left"),
     Attribute(name="right"),
 ])
 class BinaryOperation(Node):
     def __init__(self):
-        assert self.operand in ("+", "-", "!=") # for now
+        assert self.operator in ("+", "-", "!=") # for now
 
 @attributes([
     Attribute(name="name"),
@@ -34,10 +36,10 @@ class Variable(Node):
     def __init__(self):
         pass
 
-@attributes([Attribute(name="operand"), Attribute(name="variable")])
+@attributes([Attribute(name="operator"), Attribute(name="variable")])
 class PostOperation(Node):
     def __init__(self):
-        assert self.operand in ("++", "--")
+        assert self.operator in ("++", "--")
 
 @attributes([Attribute(name="left"), Attribute(name="right")])
 class Assignment(Node):
