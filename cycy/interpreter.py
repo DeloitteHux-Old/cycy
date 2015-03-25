@@ -14,11 +14,10 @@ class CyCy(object):
         pc = 0
         while pc < len(byte_code.instructions):
             opcode = byte_code.instructions[pc]
-            pc += 1
+            arg = byte_code.instructions[pc + 1]
+            pc += 2
 
             if opcode == bytecode.PUTC:
-                arg = byte_code.instructions[pc]
-                pc += 1
                 value = byte_code.constants[arg]
                 os.write(1, chr(value))
                 # TODO: error handling?
