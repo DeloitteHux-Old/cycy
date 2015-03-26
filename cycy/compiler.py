@@ -34,6 +34,19 @@ class Context(object):
             number_of_variables=len(self.variable_indices),
         )
 
+class __extend__(ast.Program):
+    def compile(self, context):
+        for function in self.functions:
+            function.compile(context=context)
+
+class __extend__(ast.Function):
+    def compile(self, context):
+        self.body.compile(context=context)
+
+class __extend__(ast.Block):
+    def compile(self, context):
+        for statement in self.statements:
+            statement.compile(context=context)
 
 class __extend__(ast.BinaryOperation):
     def compile(self, context):

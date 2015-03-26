@@ -18,10 +18,9 @@ class TestCompiler(TestCase):
         expected = dedent(cleaned(to).strip("\n")).strip("\n")
         self.assertEqual(bytecode.dump(), expected)
 
-    @skip("Broken now everything is wrapped in functions")
     def test_basic_neq(self):
         self.assertCompiles(
-            "2 != 3", """
+            "int main(void) { 2 != 3; }", """
             0 LOAD_CONST 0
             2 LOAD_CONST 1
             4 BINARY_NEQ
