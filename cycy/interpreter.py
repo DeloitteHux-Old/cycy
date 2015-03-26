@@ -2,6 +2,7 @@ import os
 
 from cycy import bytecode, compiler
 from cycy.objects import W_Char
+from cycy.parser import ast
 from cycy.parser.sourceparser import parse
 
 # So that you can still run this module under standard CPython, I add this
@@ -26,8 +27,11 @@ class CyCy(object):
     The main CyCy interpreter.
     """
 
-    def run_main(self, program):
-        main_byte_code = program.compiled_functions["main"]
+    def __init__(self):
+        self.compiled_functions = {}
+
+    def run_main(self):
+        main_byte_code = self.compiled_functions["main"]
         self.run(main_byte_code)
 
     def run(self, byte_code):
@@ -47,8 +51,15 @@ class CyCy(object):
 
 
 def interpret(source):
+    interp = CyCy()
     program = parse(source)
-    compiler.compile_program(program)
-    CyCy().run_main(program)
+
+    assert isinstance(program, ast.Program)
+    for function in program.functions:
+        assert isinstance(function, ast.Function)
+        byte_code = compiler.compile(function)
+        interp.compiled_functions[function.name] = byte_code
+
+    interp.run_main()
     # TODO: duh, this should really come from the program
     return 5

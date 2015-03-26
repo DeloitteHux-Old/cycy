@@ -128,10 +128,3 @@ def compile(ast):
     context = Context()
     ast.compile(context=context)
     return context.build(name="<don't know>")
-
-def compile_program(program):
-    assert isinstance(program, ast.Program)
-    for function_ast in program.functions:
-        byte_code = compile(function_ast)
-        program.compiled_functions[function_ast.name] = byte_code
-    return program
