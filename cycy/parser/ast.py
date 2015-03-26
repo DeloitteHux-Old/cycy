@@ -205,10 +205,12 @@ class Type(Node):
         if base == 'int':
             self.base_type = 'int'
             self.length = 32
-
-        if base == 'char':
+        elif base == 'char':
             self.base_type = 'int'
             self.length = 8
+        else:
+            self.base_type = base
+            self.length = None
 
         self.const = const
         self.unsigned = unsigned

@@ -139,7 +139,7 @@ class TestParser(TestCase):
                 Function(
                     return_type=Type(base='int'),
                     name="puts",
-                    params=[VariableDeclaration(name="string", vtype=Type(base="pointer", const=True, reference=Type(base="int")))],
+                    params=[VariableDeclaration(name="string", vtype=Type(base="pointer", const=True, reference=Type(base="char")))],
                     body=Block([
                         ReturnStatement(value=Int32(value=0))
                     ])
@@ -189,7 +189,7 @@ class TestParser(TestCase):
                 Function(
                     return_type=Type(base='int'),
                     name="puts",
-                    params=[VariableDeclaration(name="string", vtype=Type(base="pointer", const=True, reference=Type(base="int")))],
+                    params=[VariableDeclaration(name="string", vtype=Type(base="pointer", const=True, reference=Type(base="char")))],
                     body=Block([
                         VariableDeclaration(name="i", vtype=Type(base="int"), value=Int32(value=0)),
                         While(
@@ -256,7 +256,7 @@ class TestParser(TestCase):
                 Function(
                     return_type=Type(base='int'),
                     name="puts",
-                    params=[VariableDeclaration(name="string", vtype=Type(base="pointer", const=True, reference=Type(base="int")))],
+                    params=[VariableDeclaration(name="string", vtype=Type(base="pointer", const=True, reference=Type(base="char")))],
                     body=Block([
                         VariableDeclaration(name="i", vtype=Type(base="int"), value=Int32(value=0)),
                         While(
