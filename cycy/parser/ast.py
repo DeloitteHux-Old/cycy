@@ -43,8 +43,6 @@ class VariableDeclaration(Node):
 @attributes([Attribute(name="value")], apply_with_init=False)
 class Int32(Node):
     def __init__(self, value):
-        assert isinstance(value, int)
-        assert -2**32 < value <= 2**32-1
         self.value = value
 
 

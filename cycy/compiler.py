@@ -1,6 +1,7 @@
 from characteristic import Attribute, attributes
 
 from cycy import bytecode
+from cycy.objects import W_Int32
 from cycy.parser import ast
 
 
@@ -13,6 +14,28 @@ from cycy.parser import ast
     apply_with_init=False,
 )
 class Context(object):
+    """
+    The compilation context, which stores the state during interpretation.
+
+    .. attribute:: instructions
+
+        a :class:`list` of bytecode instructions (:class:`int`\ s)
+
+    .. attribute:: constants
+
+        the :class:`list` of contents that the bytecode indexes into.
+
+        .. note::
+
+            These are C-level objects (i.e. they're wrapped).
+
+    .. attribute:: variable_indices
+
+        a mapping between variable names (:class:`str`\ s) and the
+        indices in an array that they should be assigned to
+
+    """
+
     def __init__(self):
         self.instructions = []
         self.constants = []
@@ -57,7 +80,8 @@ class __extend__(ast.BinaryOperation):
 
 class __extend__(ast.Int32):
     def compile(self, context):
-        index = context.register_int32_constant(self.value)
+        wrapped = W_Int32(value=self.value)
+        index = context.register_int32_constant(wrapped)
         context.emit(bytecode.LOAD_CONST, index)
 
 
