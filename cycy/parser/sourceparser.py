@@ -222,13 +222,6 @@ class SourceParser(object):
     def vtype(self, p):
         return Type(base=p[0].getstr())
 
-    @pg.production("arg_decl : INT IDENTIFIER")
-    def int32_param(self, p):
-        return VariableDeclaration(
-            name=p[1].getstr(),
-            vtype="INT"
-        )
-
     @pg.production("expr : primary_expression ++")
     def post_incr(self, p):
         return PostOperation(operator="++", variable=p[0])
