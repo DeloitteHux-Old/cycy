@@ -19,15 +19,12 @@ class _W_Null(W_Object):
 
 w_null = _W_Null()
 
-@attributes([Attribute(name="ordinal")], apply_with_init=False)
+@attributes([Attribute(name="char")], apply_with_init=False)
 class W_Char(W_Object):
-    def __init__(self, ordinal):
-        assert isinstance(ordinal, int)
-        assert -(2 ** 7) < 0 < (2 ** 7)
-        self.ordinal = ordinal
-
-    def str(self):
-        return chr(self.ordinal)
+    def __init__(self, char):
+        assert isinstance(char, str)
+        assert len(char) == 1
+        self.char = char
 
 
 @attributes([Attribute(name="value")], apply_with_init=False)
@@ -49,7 +46,15 @@ class W_Int32(W_Object):
     def sub(self, other):
         return self.value - other.value
 
+
 @attributes([Attribute(name="value")], apply_with_init=False)
 class W_Bool(W_Object):
     def __init__(self, value):
         self.value = bool(value)
+
+
+@attributes([Attribute(name="name"), Attribute(name="num_args")], apply_with_init=False)
+class W_Function(W_Object):
+    def __init__(self, name, num_args):
+        self.name = name
+        self.num_args = num_args

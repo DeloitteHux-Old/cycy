@@ -66,7 +66,7 @@ class CyCy(object):
             elif opcode == bytecode.PUTC:
                 value = byte_code.constants[arg]
                 assert isinstance(value, W_Char)
-                os.write(1, value.str())
+                os.write(1, value.char)
                 # TODO: error handling?
             elif opcode == bytecode.BINARY_LEQ:
                 left = stack.pop()
@@ -74,6 +74,13 @@ class CyCy(object):
                 assert isinstance(left, W_Int32)
                 assert isinstance(right, W_Int32)
                 stack.append(W_Bool(left.leq(right)))
+            elif opcode == bytecode.CALL:
+                func = byte_code.constants[arg]
+                # TODO: arguments
+                func_byte_code = self.compiled_functions[func.name]
+                rv = self.run(func_byte_code)
+                if rv is not None:
+                    stack.append(rv)
             elif opcode == bytecode.RETURN:
                 if arg == 1:
                     return stack.pop()
@@ -110,6 +117,6 @@ def interpret(source):
         byte_code = compiler.compile(function)
         interp.compiled_functions[function.name] = byte_code
 
-    interp.run_main()
-    # TODO: duh, this should really come from the program
-    return 5
+    rv = interp.run_main()
+    assert isinstance(rv, W_Int32)
+    return rv.value

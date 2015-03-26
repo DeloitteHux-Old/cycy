@@ -1,7 +1,7 @@
 from characteristic import Attribute, attributes
 
 from cycy import bytecode
-from cycy.objects import W_Int32
+from cycy.objects import W_Char, W_Function, W_Int32
 from cycy.parser import ast
 
 
@@ -82,6 +82,12 @@ class __extend__(ast.Int32):
         index = context.register_constant(wrapped)
         context.emit(bytecode.LOAD_CONST, index)
 
+class __extend__(ast.Char):
+    def compile(self, context):
+        wrapped = W_Char(char=self.value)
+        index = context.register_constant(wrapped)
+        context.emit(bytecode.LOAD_CONST, index)
+
 class __extend__(ast.ReturnStatement):
     def compile(self, context):
         if self.value:
@@ -122,10 +128,13 @@ class __extend__(ast.Variable):
 
 class __extend__(ast.Call):
     def compile(self, context):
-        assert len(self.args) < 256  # technically probably should be smaller?
+        num_args = len(self.args)
+        assert num_args < 256  # technically probably should be smaller?
         for arg in reversed(self.args):
             arg.compile(context)
-        context.emit(bytecode.CALL, len(self.args))
+        wrapped_func = W_Function(self.name, num_args)
+        func_index = context.register_constant(wrapped_func)
+        context.emit(bytecode.CALL, func_index)
 
 
 def compile(ast):
