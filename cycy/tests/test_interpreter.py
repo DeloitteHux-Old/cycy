@@ -329,6 +329,6 @@ class TestInterperterWithC(TestCase):
         self.assertEqual(rv, W_Bool(False))
 
     def test_binary_sub(self):
-        byte_code_lt = self.get_bytecode("int main(void) { return 7 - 3; }")
-        rv = interpreter.CyCy().run(byte_code_lt)
+        byte_code = self.get_bytecode("int main(void) { return 7 - 3; }")
+        rv = interpreter.CyCy().run(byte_code)
         self.assertEqual(rv, W_Int32(4))
