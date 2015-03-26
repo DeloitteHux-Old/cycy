@@ -1,7 +1,7 @@
 import os
 
 from cycy import bytecode, compiler
-from cycy.objects import W_Char, W_Bool
+from cycy.objects import W_Char, W_Int32, W_Bool
 from cycy.parser import ast
 from cycy.parser.sourceparser import parse
 
@@ -51,12 +51,20 @@ class CyCy(object):
             elif opcode == bytecode.BINARY_NEQ:
                 left = stack.pop()
                 right = stack.pop()
-                stack.append(W_Bool(left != right))
+                assert isinstance(left, W_Int32)
+                assert isinstance(right, W_Int32)
+                stack.append(W_Bool(left.neq(right)))
             elif opcode == bytecode.PUTC:
                 value = byte_code.constants[arg]
                 assert isinstance(value, W_Char)
                 os.write(1, value.str())
                 # TODO: error handling?
+            elif opcode == bytecode.BINARY_LEQ:
+                left = stack.pop()
+                right = stack.pop()
+                assert isinstance(left, W_Int32)
+                assert isinstance(right, W_Int32)
+                stack.append(W_Bool(left.leq(right)))
 
         return stack
 

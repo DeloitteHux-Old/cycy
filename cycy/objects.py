@@ -31,6 +31,12 @@ class W_Int32(W_Object):
         assert -2**32 < value <= 2**32-1
         self.value = value
 
+    def leq(self, other):
+        return self.value <= other.value
+
+    def neq(self, other):
+        return self.value != other.value
+
 @attributes([Attribute(name="value")], apply_with_init=False)
 class W_Bool(W_Object):
     def __init__(self, value):

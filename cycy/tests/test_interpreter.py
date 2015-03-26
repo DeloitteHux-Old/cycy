@@ -38,13 +38,50 @@ class TestInterpreter(TestCase):
         self.assertEqual(stack, [W_Int32(0)])
 
     def test_binary_neq(self):
-        byte_code = Bytecode(
+        byte_code_ne = Bytecode(
             instructions=[LOAD_CONST, 0, LOAD_CONST, 1, BINARY_NEQ, 0],
             constants=[W_Int32(0), W_Int32(1)],
             name="<test_binary_neq>",
             number_of_variables=0,
         )
+        byte_code_eq = Bytecode(
+            instructions=[LOAD_CONST, 0, LOAD_CONST, 0, BINARY_NEQ, 0],
+            constants=[W_Int32(0)],
+            name="<test_binary_neq>",
+            number_of_variables=0,
+        )
 
-        stack = interpreter.CyCy().run(byte_code)
-
+        stack = interpreter.CyCy().run(byte_code_ne)
         self.assertEqual(stack, [W_Bool(True)])
+
+        stack = interpreter.CyCy().run(byte_code_eq)
+        self.assertEqual(stack, [W_Bool(False)])
+
+    def test_binary_leq(self):
+        byte_code_lt = Bytecode(
+            instructions=[LOAD_CONST, 0, LOAD_CONST, 1, BINARY_LEQ, 0],
+            constants=[W_Int32(1), W_Int32(0)],
+            name="<test_binary_neq>",
+            number_of_variables=0,
+        )
+        byte_code_leq = Bytecode(
+            instructions=[LOAD_CONST, 0, LOAD_CONST, 0, BINARY_LEQ, 0],
+            constants=[W_Int32(0)],
+            name="<test_binary_neq>",
+            number_of_variables=0,
+        )
+        byte_code_gt = Bytecode(
+            instructions=[LOAD_CONST, 0, LOAD_CONST, 1, BINARY_LEQ, 0],
+            constants=[W_Int32(0), W_Int32(1)],
+            name="<test_binary_neq>",
+            number_of_variables=0,
+        )
+
+        stack = interpreter.CyCy().run(byte_code_lt)
+        self.assertEqual(stack, [W_Bool(True)])
+
+        stack = interpreter.CyCy().run(byte_code_leq)
+        self.assertEqual(stack, [W_Bool(True)])
+
+        stack = interpreter.CyCy().run(byte_code_gt)
+        self.assertEqual(stack, [W_Bool(False)])
