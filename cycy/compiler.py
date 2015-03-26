@@ -1,7 +1,7 @@
 from characteristic import Attribute, attributes
 
 from cycy import bytecode
-from cycy.objects import W_Int32
+from cycy.objects import W_Int32, W_String
 from cycy.parser import ast
 
 
@@ -53,6 +53,14 @@ class Context(object):
         self.constants.append(int32)
         return len(self.constants) - 1
 
+    def register_string_variable(self, name):
+        self.variable_indices[name] = len(self.variable_indices)
+        return len(self.variable_indices) - 1
+
+    def register_string_constant(self, string):
+        self.constants.append(string)
+        return len(self.constants) - 1
+
     def build(self, name="<input>"):
         return bytecode.Bytecode(
             instructions=self.instructions,
@@ -82,6 +90,12 @@ class __extend__(ast.Int32):
         index = context.register_int32_constant(wrapped)
         context.emit(bytecode.LOAD_CONST, index)
 
+class __extend__(ast.String):
+    def compile(self, context):
+        wrapped = W_String(value=self.value)
+        index = context.register_string_constant(wrapped)
+        context.emit(bytecode.LOAD_CONST, index)
+
 class __extend__(ast.ReturnStatement):
     def compile(self, context):
         if self.value:
@@ -109,6 +123,14 @@ class __extend__(ast.VariableDeclaration):
                 context.emit(bytecode.STORE_VARIABLE, variable_index)
             # else we've declared the variable, but it is
             # uninitialized... TODO: how to handle this
+        elif vtype.base_type == "pointer":
+            ref = vtype.reference
+            assert isinstance(ref, ast.Type)
+            if ref.base_type == "int" and ref.length == 8:
+                variable_index = context.register_string_variable(self.name)
+                if self.value:
+                    self.value.compile(context)
+                    context.emit(bytecode.STORE_VARIABLE, variable_index)
         else:
             raise NotImplementedError("Variable type %s not supported" % vtype)
 

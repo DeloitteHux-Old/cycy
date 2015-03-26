@@ -15,6 +15,7 @@ from cycy.parser.ast import (
     PostOperation,
     Program,
     ReturnStatement,
+    String,
     Variable,
     VariableDeclaration,
     While,
@@ -73,6 +74,14 @@ class TestParser(TestCase):
         var = Type(base="short")
         self.assertEqual( var.base_type, "int")
         self.assertEqual( var.length, 16)
+
+    def test_string_variable_declaration(self):
+        self.assertEqual(
+            parse("int main(void) { const char* foo = \"foo\"; }"),
+            self.function_wrap_node(
+                VariableDeclaration(name="foo", vtype=Type(base="pointer", const=True, reference=Type(base="char")), value=String("foo"))
+            )
+        )
 
     def test_long_variable_declaration(self):
         self.assertEqual(
@@ -212,7 +221,7 @@ class TestParser(TestCase):
         self.assertEqual(
             parse(self.function_wrap('"foo";')),
             self.function_wrap_node(
-                Array(value=[Char(value='f'), Char(value='o'), Char(value='o'), Char(value=chr(0))])
+                String(value="foo")
             )
         )
 
@@ -334,7 +343,7 @@ class TestParser(TestCase):
                     params=[],
                     body=Block([
                         ReturnStatement(
-                            value=Call(name="puts", args=[Array([Char('H'), Char('e'), Char('l'), Char('l'), Char('o'), Char(','), Char(' '), Char('w'), Char('o'), Char('r'), Char('l'), Char('d'), Char('!'), Char(chr(0))])])
+                            value=Call(name="puts", args=[String("Hello, world!")])
                         )
                     ])
                 )
@@ -391,7 +400,7 @@ class TestParser(TestCase):
                     params=[],
                     body=Block([
                         ReturnStatement(
-                            value=Call(name="puts", args=[Array([Char('H'), Char('e'), Char('l'), Char('l'), Char('o'), Char(','), Char(' '), Char('w'), Char('o'), Char('r'), Char('l'), Char('d'), Char('!'), Char(chr(0))])])
+                            value=Call(name="puts", args=[String("Hello, world!")])
                         )
                     ])
                 ),

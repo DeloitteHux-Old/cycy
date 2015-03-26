@@ -28,3 +28,11 @@ class TestCompiler(TestCase):
             4 BINARY_NEQ
             """
         )
+
+    def test_char_array(self):
+        self.assertCompiles(
+            "int main(void) { const char* foo = \"foo\"; }", """
+            0 LOAD_CONST 0
+            2 STORE_VARIABLE 0
+            """
+        )

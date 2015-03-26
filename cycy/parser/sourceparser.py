@@ -16,6 +16,7 @@ from .ast import (
     PostOperation,
     Program,
     ReturnStatement,
+    String,
     Variable,
     VariableDeclaration,
     While,
@@ -164,11 +165,7 @@ class SourceParser(object):
 
     @pg.production("expr : STRING_LITERAL")
     def expr_string(self, p):
-        vals = []
-        for v in p[0].getstr().strip('"'):
-            vals.append(Char(value=v))
-        vals.append(Char(value=chr(0)))
-        return Array(value=vals)
+        return String(p[0].getstr().strip("\""))
 
     @pg.production("expr : null")
     def expr_null(self, p):
@@ -192,6 +189,14 @@ class SourceParser(object):
             name=p[1].getstr(),
             vtype=p[0],
             value=Int32(int(p[3].getstr()))
+        )
+
+    @pg.production("declaration : type IDENTIFIER = STRING_LITERAL")
+    def declare_assign_string(self, p):
+        return VariableDeclaration(
+            name=p[1].getstr(),
+            vtype=p[0],
+            value=String(p[3].getstr().strip("\""))
         )
 
     @pg.production("type : optional_unsigned optional_const core_or_pointer_type")

@@ -5,19 +5,28 @@ Execute ./cycy-c <filename>
 
 import sys
 
-from rpython.rlib.streamio import open_file_as_stream
-
 from cycy.interpreter import interpret
-
+from cycy.environment import Environment
 
 def main(argv):
-    if len(argv) != 2:
+    print_help = False
+    env = Environment()
+    source_files = []
+
+    for arg in argv[1:]:
+        if arg == "--help" or arg == "-h":
+            print_help = True
+            break
+        elif arg.startswith("-I"):
+            env.add_include(arg[2:])
+        else:
+            source_files.append(arg)
+
+    if print_help or len(argv) < 2:
         print __doc__
         return 1
-    source_file = open_file_as_stream(argv[1])
-    data = source_file.readall()
-    source_file.close()
-    interpret(data)
+
+    interpret(source_files, env)
     return 0
 
 

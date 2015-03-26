@@ -46,6 +46,11 @@ class Int32(Node):
         self.value = value
 
 
+@attributes([Attribute(name="value")], apply_with_init=False)
+class String(Node):
+    def __init__(self, value):
+        self.value = value
+
 @attributes([Attribute(name="name")], apply_with_init=False)
 class Variable(Node):
     def __init__(self, name):

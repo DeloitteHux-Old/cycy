@@ -6,7 +6,7 @@ import sys
 from bp.filepath import FilePath
 from mock import patch
 
-from cycy.interpreter import interpret
+from cycy.interpreter import interpret_source
 
 
 class TestExample(TestCase):
@@ -31,5 +31,5 @@ class TestExample(TestCase):
         }
         """)
 
-        main_return = interpret(source)
+        main_return = interpret_source(source)
         self.assertEqual(5, main_return)
