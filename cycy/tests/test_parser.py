@@ -11,6 +11,7 @@ from cycy.parser.ast import (
     Call,
     Char,
     Function,
+    If,
     Int32,
     Double,
     Null,
@@ -514,6 +515,31 @@ class TestParser(TestCase):
                     condition=BinaryOperation(operator="<", left=Variable(name="i"), right=Int32(value=10)),
                     increment=PostOperation(operator="++", variable=Variable(name="i")),
                     body=Block([Call(name="putc", args=[Variable(name="i")])]),
+                    )
+                )
+            )
+
+    def test_braceless_if_loop(self):
+        self.assertEqual(
+            parse(self.function_wrap("""
+                if ( i > 10 )
+                    i++;
+                """)),
+            self.function_wrap_node(
+                If(
+                    condition=BinaryOperation(operator=">", left=Variable(name="i"), right=Int32(value=10)),
+                    body=Block([PostOperation(operator="++", variable=Variable(name="i"))]),
+                    )
+                )
+            )
+
+    def test_if_loop(self):
+        self.assertEqual(
+            parse(self.function_wrap("if ( i > 10 ) { i++; } ")),
+            self.function_wrap_node(
+                If(
+                    condition=BinaryOperation(operator=">", left=Variable(name="i"), right=Int32(value=10)),
+                    body=Block([PostOperation(operator="++", variable=Variable(name="i"))]),
                     )
                 )
             )

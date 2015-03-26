@@ -12,6 +12,7 @@ from .ast import (
     Char,
     For,
     Function,
+    If,
     Int32,
     Double,
     Node,
@@ -163,6 +164,7 @@ class SourceParser(object):
     @pg.production("statement : func_call_statement")
     @pg.production("statement : while_loop")
     @pg.production("statement : for_loop")
+    @pg.production("statement : if_loop")
     @pg.production("statement : assembler ;")
     def statement_list_return(self, p):
         return p[0]
@@ -174,6 +176,14 @@ class SourceParser(object):
     @pg.production("assembler : ASM LEFT_BRACKET STRING_LITERAL RIGHT_BRACKET")
     def assembler(self, p):
         return Assembler(instruction=String(p[2].getstr().strip("\"")))
+
+    @pg.production("if_loop : if LEFT_BRACKET expr RIGHT_BRACKET block")
+    def if_loop(self, p):
+        return If(condition=p[2], body=p[4])
+
+    @pg.production("if_loop : if LEFT_BRACKET expr RIGHT_BRACKET statement")
+    def if_loop_single_line(self, p):
+        return If(condition=p[2], body=Block(statements=[p[4]]))
 
     @pg.production("while_loop : while LEFT_BRACKET expr RIGHT_BRACKET block")
     def while_loop(self, p):
