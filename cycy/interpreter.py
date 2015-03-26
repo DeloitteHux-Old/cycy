@@ -36,6 +36,8 @@ class CyCy(object):
 
     def run(self, byte_code):
         pc = 0
+        stack = []
+
         while pc < len(byte_code.instructions):
             jitdriver.jit_merge_point(pc=pc, byte_code=byte_code)
 
@@ -48,7 +50,11 @@ class CyCy(object):
                 assert isinstance(value, W_Char)
                 os.write(1, value.str())
                 # TODO: error handling?
+            elif opcode == bytecode.LOAD_CONST:
+                value = byte_code.constants[arg]
+                stack.append(value)
 
+        return stack
 
 def interpret(source):
     interp = CyCy()

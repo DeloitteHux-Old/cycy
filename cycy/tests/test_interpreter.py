@@ -4,7 +4,7 @@ import os
 from mock import patch
 
 from cycy import interpreter
-from cycy.objects import W_Char
+from cycy.objects import W_Char, W_Int32
 from cycy.bytecode import *
 
 
@@ -24,3 +24,15 @@ class TestInterpreter(TestCase):
                 1,  # file descriptor for stdout
                 "x",
             )
+
+    def test_it_handles_load_const(self):
+        byte_code = Bytecode(
+            instructions=[LOAD_CONST, 0],
+            constants=[W_Int32(0)],
+            name="<test_load_const>",
+            number_of_variables=0,
+        )
+
+        stack = interpreter.CyCy().run(byte_code)
+
+        self.assertEqual(stack, [W_Int32(0)])
