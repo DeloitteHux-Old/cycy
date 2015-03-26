@@ -16,11 +16,14 @@ except ImportError:
         def can_enter_jit(self,**kw): pass
     def purefunction(f): return f
 
-def get_location(pc):
-    return "%s" % pc
+def get_location(pc, stack):
+    return "%s %s" % (pc, stack)
 
-jitdriver = JitDriver(greens=['pc', "stack", "variables"], reds=['byte_code'],
-        get_printable_location=get_location)
+jitdriver = JitDriver(
+    greens=['pc', "stack", "variables"],
+    reds=['byte_code'],
+    get_printable_location=get_location
+)
 
 class CyCy(object):
     """
@@ -71,6 +74,11 @@ class CyCy(object):
                 assert isinstance(left, W_Int32)
                 assert isinstance(right, W_Int32)
                 stack.append(W_Bool(left.leq(right)))
+            elif opcode == bytecode.RETURN:
+                if arg == 1:
+                    return stack.pop()
+                else:
+                    return None
             elif opcode == bytecode.STORE_VARIABLE:
                 val = stack.pop()
                 variables[arg] = val
@@ -89,7 +97,8 @@ class CyCy(object):
                 assert isinstance(right, W_Int32)
                 stack.append(W_Int32(left.sub(right)))
 
-        return stack
+        assert False, "bytecode exited the main loop without returning"
+
 
 def interpret(source):
     interp = CyCy()
