@@ -34,7 +34,7 @@ class W_Char(W_Object):
 class W_Int32(W_Object):
     def __init__(self, value):
         assert isinstance(value, int)
-        assert -2**32 < value <= 2**32-1
+        assert -2**32 <= value < 2**32
         self.value = value
 
     def leq(self, other):
