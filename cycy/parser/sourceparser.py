@@ -6,14 +6,32 @@ from .ast import (
     Assignment,
     BinaryOperation,
     Block,
+    Call,
     Char,
     Function,
     Int32,
+    Node,
     PostOperation,
     ReturnStatement,
     Variable,
     VariableDeclaration,
 )
+
+class NodeList(Node):
+    """
+    A list of nodes used for temporary accumulation during parsing, this
+    should never appear in the final AST
+    """
+    def __init__(self, items=None):
+        if items is None:
+            items = []
+        self.items = items
+
+    def append(self, item):
+        self.items.append(item)
+
+    def get_items(self):
+        return self.items
 
 class SourceParser(object):
     """ Parse a given input using a lexer
@@ -57,6 +75,10 @@ class SourceParser(object):
     def main_return_statement(self, p):
         return p[0]
 
+    @pg.production("main : func_call")
+    def main_func_call(self, p):
+        return p[0]
+
     @pg.production("return_statement : return expr ;")
     def main_return(self, p):
         return ReturnStatement(value=p[1])
@@ -76,11 +98,19 @@ class SourceParser(object):
 
     @pg.production("block : LEFT_CURLY_BRACKET statement_list RIGHT_CURLY_BRACKET")
     def block_statement_list(self, p):
-        return Block(statements=[p[1]])
+        return Block(statements=p[1].get_items())
 
     @pg.production("statement_list : return_statement")
     def statement_list_return(self, p):
-        return p[0]
+        return NodeList(items=[p[0]])
+
+    @pg.production("func_call : IDENTIFIER LEFT_BRACKET param_list RIGHT_BRACKET ;")
+    def function_call(self, p):
+        return Call(name=p[0].getstr(), args=p[2].get_items())
+
+    @pg.production("param_list : var")
+    def param_list(self, p):
+        return NodeList(items=[p[0]])
 
     @pg.production("assign : var = expr")
     def assign(self, p):
@@ -106,7 +136,7 @@ class SourceParser(object):
         vals.append(Char(value=chr(0)))
         return Array(value=vals)
 
-    @pg.production("dereference : array LEFT_SQUARE_BRACKET expr RIGHT_SQUARE_BRACKET")
+    @pg.production("expr : array LEFT_SQUARE_BRACKET expr RIGHT_SQUARE_BRACKET")
     def array_dereference(self, p):
         return ArrayDereference(array=p[0], index=p[2])
 

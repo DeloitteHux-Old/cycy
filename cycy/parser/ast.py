@@ -142,3 +142,15 @@ class Function(Node):
 class Block(Node):
     def __init__(self, statements):
         self.statements = statements
+
+@attributes(
+    [
+        Attribute(name="name"),
+        Attribute(name="args"),
+    ],
+    apply_with_init=False
+)
+class Call(Node):
+    def __init__(self, name, args):
+        self.name = name
+        self.args = args

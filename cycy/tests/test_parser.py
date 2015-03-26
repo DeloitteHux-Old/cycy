@@ -7,6 +7,7 @@ from cycy.parser.ast import (
     Assignment,
     BinaryOperation,
     Block,
+    Call,
     Char,
     Function,
     Int32,
@@ -74,5 +75,14 @@ class TestParser(TestCase):
                 body=Block([
                         ReturnStatement(value=Int32(value=0))
                 ])
+            )
+        )
+
+    def test_function_call(self):
+        self.assertEqual(
+            parse("putc(string);"),
+            Call(
+                name="putc",
+                args=[Variable(name="string")]
             )
         )
