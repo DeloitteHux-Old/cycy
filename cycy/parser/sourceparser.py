@@ -1,4 +1,5 @@
 from rply import ParserGenerator
+from .preprocessor import preprocess
 from .lexer import lexer, RULES
 from .ast import (
     Array,
@@ -221,5 +222,6 @@ class SourceParser(object):
     parser = pg.build()
 
 def parse(source):
-    parser = SourceParser(lexer.lex(source))
+    lexed = lexer.lex(preprocess(source))
+    parser = SourceParser(lexed)
     return parser.parse()
