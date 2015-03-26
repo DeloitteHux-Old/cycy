@@ -18,6 +18,7 @@ from cycy.parser.ast import (
     Variable,
     VariableDeclaration,
     While,
+    Type,
 )
 
 class TestParser(TestCase):
@@ -26,7 +27,7 @@ class TestParser(TestCase):
 
     def function_wrap_node(self, node):
         return Program([Function(
-            return_type="INT32",
+            return_type=Type(base="int"),
             name="main",
             params=[],
             body=Block([node])
@@ -44,13 +45,37 @@ class TestParser(TestCase):
         self.assertEqual(
             parse(self.function_wrap('int i;')),
             self.function_wrap_node(
-                VariableDeclaration(name="i", vtype="INT32", value=None)
+                VariableDeclaration(name="i", vtype=Type(base="int"), value=None)
             )
         )
+
+    def test_variable_declaration_with_assignment(self):
         self.assertEqual(
             parse(self.function_wrap("int i = 0;")),
             self.function_wrap_node(
-                VariableDeclaration(name="i", vtype="INT32", value=Int32(value=0))
+                VariableDeclaration(name="i", vtype=Type(base="int"), value=Int32(value=0))
+            )
+        )
+
+    def test_pointer_variable_declaration(self):
+        self.assertEqual(
+            parse(self.function_wrap('int* i;')),
+            self.function_wrap_node(
+                VariableDeclaration(name="i", vtype=Type(base="pointer", reference=Type(base="int")), value=None)
+            )
+        )
+        self.assertEqual(
+            parse(self.function_wrap('int *i;')),
+            self.function_wrap_node(
+                VariableDeclaration(name="i", vtype=Type(base="pointer", reference=Type(base="int")), value=None)
+            )
+        )
+
+    def test_const_variable_declaration(self):
+        self.assertEqual(
+            parse(self.function_wrap('const int i;')),
+            self.function_wrap_node(
+                VariableDeclaration(name="i", vtype=Type(base="int", const=True), value=None)
             )
         )
 
@@ -98,7 +123,7 @@ class TestParser(TestCase):
         self.assertEqual(
             parse("int main(void) { return 0; }"),
             Function(
-                return_type="INT32",
+                return_type=Type(base='int'),
                 name="main",
                 params=[],
                 body=Block([
@@ -112,9 +137,9 @@ class TestParser(TestCase):
             parse("int puts(const char* string) { return 0; }"),
             Program([
                 Function(
-                    return_type="INT32",
+                    return_type=Type(base='int'),
                     name="puts",
-                    params=[VariableDeclaration(name="string", vtype="CONST_CHAR_PTR")],
+                    params=[VariableDeclaration(name="string", vtype=Type(base="pointer", const=True, reference=Type(base="char")))],
                     body=Block([
                         ReturnStatement(value=Int32(value=0))
                     ])
@@ -162,11 +187,11 @@ class TestParser(TestCase):
             """),
             Program([
                 Function(
-                    return_type="INT32",
+                    return_type=Type(base='int'),
                     name="puts",
-                    params=[VariableDeclaration(name="string", vtype="CONST_CHAR_PTR")],
+                    params=[VariableDeclaration(name="string", vtype=Type(base="pointer", const=True, reference=Type(base="char")))],
                     body=Block([
-                        VariableDeclaration(name="i", vtype="INT32", value=Int32(value=0)),
+                        VariableDeclaration(name="i", vtype=Type(base="int"), value=Int32(value=0)),
                         While(
                             condition=BinaryOperation(
                                 operator="!=",
@@ -199,7 +224,7 @@ class TestParser(TestCase):
             """),
             Program([
                 Function(
-                    return_type="INT32",
+                    return_type=Type(base='int'),
                     name="main",
                     params=[],
                     body=Block([
@@ -229,11 +254,11 @@ class TestParser(TestCase):
             """),
             Program([
                 Function(
-                    return_type="INT32",
+                    return_type=Type(base='int'),
                     name="puts",
-                    params=[VariableDeclaration(name="string", vtype="CONST_CHAR_PTR")],
+                    params=[VariableDeclaration(name="string", vtype=Type(base="pointer", const=True, reference=Type(base="char")))],
                     body=Block([
-                        VariableDeclaration(name="i", vtype="INT32", value=Int32(value=0)),
+                        VariableDeclaration(name="i", vtype=Type(base="int"), value=Int32(value=0)),
                         While(
                             condition=BinaryOperation(
                                 operator="!=",
@@ -256,7 +281,7 @@ class TestParser(TestCase):
                     ])
                 ),
                 Function(
-                    return_type="INT32",
+                    return_type=Type(base='int'),
                     name="main",
                     params=[],
                     body=Block([

@@ -19,6 +19,7 @@ from .ast import (
     Variable,
     VariableDeclaration,
     While,
+    Type,
 )
 
 class NodeList(Node):
@@ -72,25 +73,25 @@ class SourceParser(object):
     def return_statement(self, p):
         return ReturnStatement(value=p[1])
 
-    @pg.production("function : INT32 IDENTIFIER LEFT_BRACKET void RIGHT_BRACKET block")
+    @pg.production("function : type IDENTIFIER LEFT_BRACKET void RIGHT_BRACKET block")
     def function_void_param(self, p):
         return Function(
-            return_type=p[0].gettokentype(),
+            return_type=p[0],
             name=p[1].getstr(),
             params=[],
             body=p[5]
         )
 
-    @pg.production("function : INT32 IDENTIFIER LEFT_BRACKET arg_decl_list RIGHT_BRACKET block")
+    @pg.production("function : type IDENTIFIER LEFT_BRACKET arg_decl_list RIGHT_BRACKET block")
     def function_with_args(self, p):
         return Function(
-            return_type=p[0].gettokentype(),
+            return_type=p[0],
             name=p[1].getstr(),
             params=p[3].get_items(),
             body=p[5]
         )
 
-    @pg.production("arg_decl_list : arg_decl")
+    @pg.production("arg_decl_list : declaration")
     def arg_decl_list_arg_decl(self, p):
         return NodeList([p[0]])
 
@@ -175,26 +176,43 @@ class SourceParser(object):
     def array_variable(self, p):
         return Variable(name=p[0].getstr())
 
-    # The following three functions are a cheat around implementing proper
-    # type declarations
-    @pg.production("declaration : INT32 IDENTIFIER")
+    @pg.production("declaration : type IDENTIFIER")
     def declare_int(self, p):
-        return VariableDeclaration(name=p[1].getstr(), vtype="INT32", value=None)
+        return VariableDeclaration(name=p[1].getstr(), vtype=p[0], value=None)
 
-    @pg.production("declaration : INT32 IDENTIFIER = INTEGER")
+    @pg.production("declaration : type IDENTIFIER = INTEGER")
     def declare_assign_int(self, p):
         return VariableDeclaration(
             name=p[1].getstr(),
-            vtype="INT32",
+            vtype=p[0],
             value=Int32(int(p[3].getstr()))
         )
 
-    @pg.production("arg_decl : CONST CHAR * IDENTIFIER")
-    def const_char_param(self, p):
-        return VariableDeclaration(
-            name=p[3].getstr(),
-            vtype="CONST_CHAR_PTR"
-        )
+    @pg.production("type : optional_const core_or_pointer_type")
+    def type_object(self, p):
+        p[1].const = p[0]
+        return p[1]
+
+    @pg.production("optional_const : ")
+    def const_false(self, p):
+        return False
+
+    @pg.production("optional_const : CONST")
+    def const_true(self, p):
+        return True
+
+    @pg.production("core_or_pointer_type : core_type")
+    def core_type(self, p):
+        return p[0]
+
+    @pg.production("core_or_pointer_type : core_or_pointer_type *")
+    def pointer_type(self, p):
+        return Type(base="pointer", reference=p[0])
+
+    @pg.production("core_type : INT")
+    @pg.production("core_type : CHAR")
+    def vtype(self, p):
+        return Type(base=p[0].getstr())
 
     @pg.production("arg_decl : INT32 IDENTIFIER")
     def int32_param(self, p):
