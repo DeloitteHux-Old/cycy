@@ -152,6 +152,14 @@ class TestParser(TestCase):
             )
         )
 
+    def test_pointer_to_pointer_variable_declaration(self):
+        self.assertEqual(
+            parse(self.function_wrap('char **argv;')),
+            self.function_wrap_node(
+                VariableDeclaration(name="argv", vtype=Type(base="pointer", reference=Type(base="pointer", reference=Type(base="char"))), value=None)
+            )
+        )
+
     def test_const_variable_declaration(self):
         self.assertEqual(
             parse(self.function_wrap('const int i;')),
