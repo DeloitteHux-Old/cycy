@@ -65,6 +65,8 @@ class Context(object):
 
 class __extend__(ast.Function):
     def compile(self, context):
+        for param in self.params:
+            param.compile(context=context)
         self.body.compile(context=context)
 
 class __extend__(ast.Block):
