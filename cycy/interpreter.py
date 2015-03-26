@@ -16,11 +16,14 @@ except ImportError:
         def can_enter_jit(self,**kw): pass
     def purefunction(f): return f
 
-def get_location(pc):
-    return "%s" % pc
+def get_location(pc, stack):
+    return "%s %s" % (pc, stack)
 
-jitdriver = JitDriver(greens=['pc'], reds=['byte_code'],
-        get_printable_location=get_location)
+jitdriver = JitDriver(
+    greens=['pc', 'stack'],
+    reds=['byte_code'],
+    get_printable_location=get_location,
+)
 
 class CyCy(object):
     """
@@ -39,7 +42,7 @@ class CyCy(object):
         stack = []
 
         while pc < len(byte_code.instructions):
-            jitdriver.jit_merge_point(pc=pc, byte_code=byte_code)
+            jitdriver.jit_merge_point(pc=pc, byte_code=byte_code, stack=stack)
 
             opcode = byte_code.instructions[pc]
             arg = byte_code.instructions[pc + 1]
