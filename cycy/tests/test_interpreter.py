@@ -160,6 +160,19 @@ class TestInterpreter(TestCase):
             number_of_variables=0,
         )
 
+    def test_store_and_load_variable(self):
+        byte_code = Bytecode(
+            instructions=[
+                LOAD_CONST, 0,
+                STORE_VARIABLE, 0,
+                LOAD_VARIABLE, 0,
+                RETURN, 1
+            ],
+            constants=[W_Int32(1)],
+            name="<test_binary_add>",
+            number_of_variables=1,
+        )
+
         rv = interpreter.CyCy().run(byte_code)
         self.assertEqual(rv, W_Int32(1))
 
