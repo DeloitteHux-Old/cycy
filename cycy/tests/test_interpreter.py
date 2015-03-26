@@ -15,7 +15,7 @@ class TestInterpreter(TestCase):
                 PUTC, 0,
                 RETURN, 0,
             ],
-            constants=[W_Char(ord("x"))],
+            constants=[W_Char("x")],
             name="<some test bytecode>",
             number_of_variables=0,
         )

@@ -60,7 +60,7 @@ class CyCy(object):
             elif opcode == bytecode.PUTC:
                 value = byte_code.constants[arg]
                 assert isinstance(value, W_Char)
-                os.write(1, value.str())
+                os.write(1, value.char)
                 # TODO: error handling?
             elif opcode == bytecode.BINARY_LEQ:
                 left = stack.pop()

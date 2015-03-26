@@ -19,15 +19,12 @@ class _W_Null(W_Object):
 
 w_null = _W_Null()
 
-@attributes([Attribute(name="ordinal")], apply_with_init=False)
+@attributes([Attribute(name="char")], apply_with_init=False)
 class W_Char(W_Object):
-    def __init__(self, ordinal):
-        assert isinstance(ordinal, int)
-        assert -(2 ** 7) < 0 < (2 ** 7)
-        self.ordinal = ordinal
-
-    def str(self):
-        return chr(self.ordinal)
+    def __init__(self, char):
+        assert isinstance(char, str)
+        assert len(char) == 1
+        self.char = char
 
 
 @attributes([Attribute(name="value")], apply_with_init=False)

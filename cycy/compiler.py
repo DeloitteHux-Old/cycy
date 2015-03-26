@@ -84,7 +84,7 @@ class __extend__(ast.Int32):
 
 class __extend__(ast.Char):
     def compile(self, context):
-        wrapped = W_Char(ordinal=self.value)
+        wrapped = W_Char(char=self.value)
         index = context.register_constant(wrapped)
         context.emit(bytecode.LOAD_CONST, index)
 
