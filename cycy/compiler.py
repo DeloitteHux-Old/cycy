@@ -133,7 +133,7 @@ class __extend__(ast.Call):
         assert num_args < 256  # technically probably should be smaller?
         for arg in reversed(self.args):
             arg.compile(context)
-        wrapped_func = W_Function(self.name, num_args)
+        wrapped_func = W_Function(self.name, len(self.args))
         func_index = context.register_constant(wrapped_func)
         context.emit(bytecode.CALL, func_index)
 

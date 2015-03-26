@@ -220,3 +220,35 @@ class TestInterpreter(TestCase):
 
         rv = interp.run(byte_code_caller)
         self.assertEqual(W_Int32(42), rv)
+
+    def test_it_calls_a_function_with_one_arg(self):
+        byte_code_caller = Bytecode(
+            instructions=[
+                LOAD_CONST, 0,
+                CALL, 1,
+                RETURN, 1,
+            ],
+            constants=[W_Int32(42), W_Function("callee", 1)],
+            name="<test_calls_a_function_with_no_args>",
+            arguments=(),
+            variables={},
+        )
+
+        byte_code_callee = Bytecode(
+            instructions=[
+                LOAD_VARIABLE, 0,
+                RETURN, 1,
+            ],
+            constants=[],
+            name="<test_calls_a_function_with_no_args>",
+            arguments=["x"],
+            variables={"x": 0},
+        )
+
+        interp = interpreter.CyCy()
+        interp.compiled_functions = {
+            "callee": byte_code_callee,
+        }
+
+        rv = interp.run(byte_code_caller)
+        self.assertEqual(W_Int32(42), rv)

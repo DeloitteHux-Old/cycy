@@ -21,7 +21,7 @@ def get_location(pc, stack, variables):
 
 jitdriver = JitDriver(
     greens=["pc", "stack", "variables"],
-    reds=["byte_code"],
+    reds=["byte_code", "arguments"],
     get_printable_location=get_location
 )
 
@@ -37,17 +37,22 @@ class CyCy(object):
         main_byte_code = self.compiled_functions["main"]
         self.run(main_byte_code)
 
-    def run(self, byte_code):
+    def run(self, byte_code, arguments=[]):
         pc = 0
         stack = []
         variables = [None] * len(byte_code.variables)
+
+        for name, value in zip(byte_code.arguments, arguments):
+            index = byte_code.variables[name]
+            variables[index] = value
 
         while pc < len(byte_code.instructions):
             jitdriver.jit_merge_point(
                 pc=pc,
                 stack=stack,
                 variables=variables,
-                byte_code=byte_code
+                byte_code=byte_code,
+                arguments=arguments,
             )
 
             opcode = byte_code.instructions[pc]
@@ -76,9 +81,11 @@ class CyCy(object):
                 stack.append(W_Bool(left.leq(right)))
             elif opcode == bytecode.CALL:
                 func = byte_code.constants[arg]
-                # TODO: arguments
+                args = []
+                for _ in xrange(func.num_args):
+                    args.append(stack.pop())
                 func_byte_code = self.compiled_functions[func.name]
-                rv = self.run(func_byte_code)
+                rv = self.run(func_byte_code, args)
                 if rv is not None:
                     stack.append(rv)
             elif opcode == bytecode.RETURN:
