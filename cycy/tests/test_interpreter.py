@@ -4,11 +4,13 @@ import os
 from mock import patch
 
 from cycy import interpreter
-from cycy.objects import W_Bool, W_Char, W_Function, W_Int32, W_String
 from cycy.bytecode import *
+from cycy.compiler import compile
+from cycy.objects import W_Bool, W_Char, W_Function, W_Int32, W_String
+from cycy.parser import parse
 
 
-class TestInterpreter(TestCase):
+class TestInterpreterWithBytecode(TestCase):
     def test_it_handles_opcodes_with_args(self):
         byte_code = Bytecode(
             instructions=[
@@ -306,3 +308,27 @@ class TestInterpreter(TestCase):
 
         rv = interpreter.CyCy().run(byte_code)
         self.assertEqual(rv, W_Int32(1))
+
+class TestInterperterWithC(TestCase):
+
+    def get_bytecode(self, source, func_name="main"):
+        program = parse(source)
+        return compile(next(f for f in program.functions() if f.name == func_name))
+
+    def test_binary_leq(self):
+        byte_code_lt = self.get_bytecode("int main(void) { return 1 <= 2; }")
+        rv = interpreter.CyCy().run(byte_code_lt)
+        self.assertEqual(rv, W_Bool(True))
+
+        byte_code_leq = self.get_bytecode("int main(void) { return 1 <= 1; }")
+        rv = interpreter.CyCy().run(byte_code_leq)
+        self.assertEqual(rv, W_Bool(True))
+
+        byte_code_gt = self.get_bytecode("int main(void) { return 2 <= 1; }")
+        rv = interpreter.CyCy().run(byte_code_gt)
+        self.assertEqual(rv, W_Bool(False))
+
+    def test_binary_sub(self):
+        byte_code_lt = self.get_bytecode("int main(void) { return 7 - 3; }")
+        rv = interpreter.CyCy().run(byte_code_lt)
+        self.assertEqual(rv, W_Int32(4))

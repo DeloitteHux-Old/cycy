@@ -74,8 +74,10 @@ class __extend__(ast.Block):
 
 class __extend__(ast.BinaryOperation):
     def compile(self, context):
-        self.left.compile(context=context)
+        # compile RHS then LHS so that their results end up on the stack
+        # in reverse order; then we can pop in order in the interpreter
         self.right.compile(context=context)
+        self.left.compile(context=context)
         context.emit(bytecode.BINARY_OPERATION_BYTECODE[self.operator])
 
 class __extend__(ast.Int32):
