@@ -265,7 +265,8 @@ class TestInterpreter(TestCase):
             ],
             constants=[W_String("bar"), W_Int32(1)],
             name="<test_array_dereferences>",
-            number_of_variables=1,
+            arguments=[],
+            variables={"foo": ""},
         )
 
         rv = interpreter.CyCy().run(byte_code)
