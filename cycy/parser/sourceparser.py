@@ -142,6 +142,10 @@ class SourceParser(object):
     def binop_add(self, p):
         return BinaryOperation(operator="+", left=p[0], right=p[2])
 
+    @pg.production("expr : expr <= expr")
+    def binop_le(self, p):
+        return BinaryOperation(operator="<=", left=p[0], right=p[2])
+
     @pg.production("expr : STRING")
     def expr_string(self, p):
         vals = []

@@ -4,17 +4,20 @@ from characteristic import Attribute, attributes
 LOAD_CONST = 1
 BINARY_NEQ = 2
 PUTC       = 3
+BINARY_LEQ = 4
 
 
 NAMES = {
     LOAD_CONST: "LOAD_CONST",
     BINARY_NEQ: "BINARY_NEQ",
     PUTC: "PUTC",
+    BINARY_LEQ: "BINARY_LEQ",
 }
 
 
 BINARY_OPERATION_BYTECODE = {
     "!=": BINARY_NEQ,
+    "<=": BINARY_LEQ,
 }
 
 

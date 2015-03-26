@@ -19,7 +19,7 @@ class Node(BaseBox):
 )
 class BinaryOperation(Node):
     def __init__(self, operator, left, right):
-        assert operator in ("+", "-", "!=") # for now
+        assert operator in ("+", "-", "!=", "<=") # for now
         self.operator = operator
         self.left = left
         self.right = right

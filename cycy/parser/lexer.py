@@ -20,6 +20,7 @@ RULES = [
     "RIGHT_CURLY_BRACKET",
     "=",
     "!=",
+    "<=",
     "++",
     "+",
     ";",
@@ -45,6 +46,7 @@ lg.add("LEFT_CURLY_BRACKET", "{")
 lg.add("RIGHT_CURLY_BRACKET", "}")
 lg.add("=", "=")
 lg.add("!=", "!=")
+lg.add("<=", "<=")
 lg.add("++", "\+\+")
 lg.add("+", "\+")
 lg.add(";", ";")
