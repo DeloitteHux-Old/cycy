@@ -13,6 +13,28 @@ from cycy.parser import ast
     apply_with_init=False,
 )
 class Context(object):
+    """
+    The compilation context, which stores the state during interpretation.
+
+    .. attribute:: instructions
+
+        a :class:`list` of bytecode instructions (:class:`int`\ s)
+
+    .. attribute:: constants
+
+        the :class:`list` of contents that the bytecode indexes into.
+
+        .. note::
+
+            These are C-level objects (i.e. they're wrapped).
+
+    .. attribute:: variable_indices
+
+        a mapping between variable names (:class:`str`\ s) and the
+        indices in an array that they should be assigned to
+
+    """
+
     def __init__(self):
         self.instructions = []
         self.constants = []

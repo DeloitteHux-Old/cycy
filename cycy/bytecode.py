@@ -31,16 +31,26 @@ NO_ARG = -42
     apply_with_init=False,
 )
 class Bytecode(object):
+    """
+    The bytecode, man.
+
+    .. attribute:: instructions
+    .. attribute:: constants
+
+        inherited from the :class:`cycy.compiler.Context` that produced this
+        bytecode
+
+    .. attribute:: number_of_variables
+
+        Yeah, that.
+
+    .. attribute:: name
+
+        an optional :class:`str` which is the source-file name
+
+    """
+
     def __init__(self, instructions, constants, number_of_variables, name):
-        """
-        :argument list instructions: the list of bytecode instructions
-        :argument list constants: the collection of constants indexed
-            into by the instructions
-        :argument int number_of_variables: yeah, that
-        :argument str name: an optional source-file name
-
-        """
-
         self.instructions = instructions
         self.name = name
         self.constants = constants
