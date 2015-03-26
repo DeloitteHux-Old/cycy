@@ -6,6 +6,7 @@ Execute ./cycy-c <filename>
 import sys
 
 from rpython.rlib.streamio import open_file_as_stream
+from rpython.jit.codewriter.policy import JitPolicy
 
 from cycy.interpreter import interpret
 
@@ -23,3 +24,7 @@ def main(argv):
 
 def target(driver, args):
     return main, None
+
+
+def jitpolicy(driver):
+    return JitPolicy()
