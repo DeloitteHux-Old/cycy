@@ -57,11 +57,6 @@ class Context(object):
             number_of_variables=len(self.variable_indices),
         )
 
-class __extend__(ast.Program):
-    def compile(self, context):
-        for function in self.functions:
-            function.compile(context=context)
-
 class __extend__(ast.Function):
     def compile(self, context):
         self.body.compile(context=context)
@@ -89,3 +84,10 @@ def compile(ast):
     context = Context()
     ast.compile(context=context)
     return context.build(name="<don't know>")
+
+def compile_program(program):
+    assert isinstance(program, ast.Program)
+    for function_ast in program.functions:
+        byte_code = compile(function_ast)
+        program.compiled_functions[function_ast.name] = byte_code
+    return program

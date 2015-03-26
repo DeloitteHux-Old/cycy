@@ -185,6 +185,7 @@ class While(Node):
 class Program(Node):
     def __init__(self, functions):
         self.functions = functions
+        self.compiled_functions = {}
 
     def add_function(self, func):
         self.functions.append(func)

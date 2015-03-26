@@ -26,6 +26,10 @@ class CyCy(object):
     The main CyCy interpreter.
     """
 
+    def run_main(self, program):
+        main_byte_code = program.compiled_functions["main"]
+        self.run(main_byte_code)
+
     def run(self, byte_code):
         pc = 0
         while pc < len(byte_code.instructions):
@@ -43,6 +47,6 @@ class CyCy(object):
 
 
 def interpret(source):
-    ast = parse(source)
-    byte_code = compiler.compile(ast=ast)
-    CyCy().run(byte_code=byte_code)
+    program = parse(source)
+    compiler.compile_program(program)
+    CyCy().run_main(program)
