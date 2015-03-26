@@ -1,7 +1,7 @@
 import os
 
 from cycy import bytecode, compiler
-from cycy.objects import W_Char
+from cycy.objects import W_Char, W_Bool
 from cycy.parser import ast
 from cycy.parser.sourceparser import parse
 
@@ -45,14 +45,18 @@ class CyCy(object):
             arg = byte_code.instructions[pc + 1]
             pc += 2
 
-            if opcode == bytecode.PUTC:
+            if opcode == bytecode.LOAD_CONST:
+                value = byte_code.constants[arg]
+                stack.append(value)
+            elif opcode == bytecode.BINARY_NEQ:
+                left = stack.pop()
+                right = stack.pop()
+                stack.append(W_Bool(left != right))
+            elif opcode == bytecode.PUTC:
                 value = byte_code.constants[arg]
                 assert isinstance(value, W_Char)
                 os.write(1, value.str())
                 # TODO: error handling?
-            elif opcode == bytecode.LOAD_CONST:
-                value = byte_code.constants[arg]
-                stack.append(value)
 
         return stack
 
