@@ -34,8 +34,8 @@ class BinaryOperation(Node):
     apply_with_init=False,
 )
 class VariableDeclaration(Node):
-    def __init__(self, name, vtype, value):
-        assert vtype == "INT32"
+    def __init__(self, name, vtype, value=None):
+        assert vtype in ("INT32", "CONST_CHAR_PTR")
         self.name = name
         self.vtype = vtype
         self.value = value
@@ -91,8 +91,11 @@ class Array(Node):
 
 @attributes([Attribute(name="value")], apply_with_init=False)
 class Char(Node):
+    char_escapes = {"n": "\n"}
+
     def __init__(self, value):
-        # TODO handle escaped chars
+        if len(value) == 2 and value[0] == "\\":
+            value = self.char_escapes.get(value[1], value[1])
         assert isinstance(value, str) and len(value) == 1
         self.value = value
 

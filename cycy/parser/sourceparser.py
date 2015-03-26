@@ -32,6 +32,9 @@ class NodeList(Node):
     def append(self, item):
         self.items.append(item)
 
+    def extend(self, items):
+        self.items.extend(items)
+
     def get_items(self):
         return self.items
 
@@ -66,20 +69,42 @@ class SourceParser(object):
             body=p[5]
         )
 
+    @pg.production("function : INT32 IDENTIFIER LEFT_BRACKET arg_decl_list RIGHT_BRACKET block")
+    def function_with_args(self, p):
+        return Function(
+            return_type=p[0].gettokentype(),
+            name=p[1].getstr(),
+            params=p[3].get_items(),
+            body=p[5]
+        )
+
+    @pg.production("arg_decl_list : arg_decl")
+    def arg_decl_list_arg_decl(self, p):
+        return NodeList([p[0]])
+
     @pg.production("block : LEFT_CURLY_BRACKET statement_list RIGHT_CURLY_BRACKET")
     def block_statement_list(self, p):
         return Block(statements=p[1].get_items())
 
-    @pg.production("statement_list : return_statement")
-    @pg.production("statement_list : expr ;")
-    @pg.production("statement_list : declaration ;")
-    @pg.production("statement_list : postincr ;")
-    @pg.production("statement_list : assignment ;")
-    @pg.production("statement_list : primary_expression ;")
-    @pg.production("statement_list : func_call_statement")
-    @pg.production("statement_list : while_loop")
+    @pg.production("statement_list : statement")
+    def statement_list_statement(self, p):
+        return NodeList([p[0]])
+
+    @pg.production("statement_list : statement statement_list")
+    def statement_list_statement_list(self, p):
+        st = NodeList([p[0]])
+        st.extend(p[1].get_items())
+        return st
+
+    @pg.production("statement : return_statement")
+    @pg.production("statement : expr ;")
+    @pg.production("statement : declaration ;")
+    @pg.production("statement : assignment ;")
+    @pg.production("statement : primary_expression ;")
+    @pg.production("statement : func_call_statement")
+    @pg.production("statement : while_loop")
     def statement_list_return(self, p):
-        return NodeList(items=[p[0]])
+        return p[0]
 
     @pg.production("while_loop : while LEFT_BRACKET expr RIGHT_BRACKET block")
     def while_loop(self, p):
@@ -89,7 +114,7 @@ class SourceParser(object):
     def function_call_statement(self, p):
         return Call(name=p[0].getstr(), args=p[2].get_items())
 
-    @pg.production("param_list : primary_expression")
+    @pg.production("param_list : expr")
     def param_list(self, p):
         return NodeList(items=[p[0]])
 
@@ -100,6 +125,10 @@ class SourceParser(object):
     @pg.production('expr : expr != expr')
     def binop_ne(self, p):
         return BinaryOperation(operator="!=", left=p[0], right=p[2])
+
+    @pg.production("expr : expr + expr")
+    def binop_add(self, p):
+        return BinaryOperation(operator="+", left=p[0], right=p[2])
 
     @pg.production("expr : STRING")
     def expr_string(self, p):
@@ -121,11 +150,28 @@ class SourceParser(object):
     def array_variable(self, p):
         return Variable(name=p[0].getstr())
 
+    # The following three functions are a cheat around implementing proper
+    # type declarations
     @pg.production("declaration : INT32 IDENTIFIER")
     def declare_int(self, p):
         return VariableDeclaration(name=p[1].getstr(), vtype="INT32", value=None)
 
-    @pg.production("postincr : primary_expression ++")
+    @pg.production("declaration : INT32 IDENTIFIER = INTEGER")
+    def declare_assign_int(self, p):
+        return VariableDeclaration(
+            name=p[1].getstr(),
+            vtype="INT32",
+            value=Int32(int(p[3].getstr()))
+        )
+
+    @pg.production("arg_decl : CONST CHAR * IDENTIFIER")
+    def const_char_param(self, p):
+        return VariableDeclaration(
+            name=p[3].getstr(),
+            vtype="CONST_CHAR_PTR"
+        )
+
+    @pg.production("expr : primary_expression ++")
     def post_incr(self, p):
         return PostOperation(operator="++", variable=p[0])
 

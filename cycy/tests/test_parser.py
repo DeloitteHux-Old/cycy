@@ -46,6 +46,12 @@ class TestParser(TestCase):
                 VariableDeclaration(name="i", vtype="INT32", value=None)
             )
         )
+        self.assertEqual(
+            parse(self.function_wrap("int i = 0;")),
+            self.function_wrap_node(
+                VariableDeclaration(name="i", vtype="INT32", value=Int32(value=0))
+            )
+        )
 
     def test_postincrement(self):
         self.assertEqual(
@@ -95,8 +101,22 @@ class TestParser(TestCase):
                 name="main",
                 params=[],
                 body=Block([
-                        ReturnStatement(value=Int32(value=0))
+                    ReturnStatement(value=Int32(value=0))
                 ])
+            )
+        )
+
+    def test_function_arguments(self):
+        self.assertEqual(
+            parse("int puts(const char* string) { return 0; }"),
+            Function(
+                return_type="INT32",
+                name="puts",
+                params=[VariableDeclaration(name="string", vtype="CONST_CHAR_PTR")],
+                body=Block([
+                    ReturnStatement(value=Int32(value=0))
+                ])
+
             )
         )
 
@@ -113,15 +133,55 @@ class TestParser(TestCase):
 
     def test_while_loop(self):
         self.assertEqual(
-            parse(self.function_wrap("while (string[i] != NULL) { putc(string); }")),
+            parse(self.function_wrap("while (string[i] != NULL) { putc(string[i++]); }")),
             self.function_wrap_node(
                 While(
                     condition=BinaryOperation(operator="!=",
                                               left=ArrayDereference(array=Variable(name="string"), index=Variable("i")),
                                               right=Null()),
                     body=Block([
-                        Call(name="putc", args=[Variable(name="string")])
+                        Call(name="putc", args=[ArrayDereference(array=Variable("string"), index=PostOperation(operator="++", variable=Variable(name="i")))])
                     ])
                 )
+            )
+        )
+
+    def test_puts_function(self):
+        self.assertEqual(
+            parse("""
+                int puts(const char * string) {
+                    int i = 0;
+                    while (string[i] != NULL) {
+                        putc(string[i++]);
+                    }
+                    putc('\\n');
+                    return i + 1;
+                }
+            """),
+            Function(
+                return_type="INT32",
+                name="puts",
+                params=[VariableDeclaration(name="string", vtype="CONST_CHAR_PTR")],
+                body=Block([
+                    VariableDeclaration(name="i", vtype="INT32", value=Int32(value=0)),
+                    While(
+                        condition=BinaryOperation(
+                            operator="!=",
+                            left=ArrayDereference(array=Variable(name="string"), index=Variable(name="i")),
+                            right=Null()
+                        ),
+                        body=Block([
+                            Call(name="putc", args=[ArrayDereference(array=Variable("string"), index=PostOperation(operator="++", variable=Variable(name="i")))])
+                        ])
+                    ),
+                    Call(name="putc", args=[Char('\n')]),
+                    ReturnStatement(
+                        value=BinaryOperation(
+                            operator="+",
+                            left=Variable(name="i"),
+                            right=Int32(value=1)
+                        )
+                    )
+                ])
             )
         )
