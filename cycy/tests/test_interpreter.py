@@ -85,3 +85,25 @@ class TestInterpreter(TestCase):
 
         stack = interpreter.CyCy().run(byte_code_gt)
         self.assertEqual(stack, [W_Bool(False)])
+
+    def test_binary_add(self):
+        byte_code = Bytecode(
+            instructions=[LOAD_CONST, 0, LOAD_CONST, 1, BINARY_ADD, NO_ARG],
+            constants=[W_Int32(1), W_Int32(2)],
+            name="<test_binary_add>",
+            number_of_variables=0,
+        )
+
+        stack = interpreter.CyCy().run(byte_code)
+        self.assertEqual(stack, [W_Int32(3)])
+
+    def test_binary_add(self):
+        byte_code = Bytecode(
+            instructions=[LOAD_CONST, 0, LOAD_CONST, 1, BINARY_SUB, NO_ARG],
+            constants=[W_Int32(1), W_Int32(2)],
+            name="<test_binary_add>",
+            number_of_variables=0,
+        )
+
+        stack = interpreter.CyCy().run(byte_code)
+        self.assertEqual(stack, [W_Int32(1)])

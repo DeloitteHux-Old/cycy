@@ -19,7 +19,7 @@ except ImportError:
 def get_location(pc):
     return "%s" % pc
 
-jitdriver = JitDriver(greens=['pc'], reds=['byte_code'],
+jitdriver = JitDriver(greens=['pc', "stack", "variables"], reds=['byte_code'],
         get_printable_location=get_location)
 
 class CyCy(object):
@@ -37,9 +37,15 @@ class CyCy(object):
     def run(self, byte_code):
         pc = 0
         stack = []
+        variables = {}
 
         while pc < len(byte_code.instructions):
-            jitdriver.jit_merge_point(pc=pc, byte_code=byte_code)
+            jitdriver.jit_merge_point(
+                pc=pc,
+                stack=stack,
+                variables=variables,
+                byte_code=byte_code
+            )
 
             opcode = byte_code.instructions[pc]
             arg = byte_code.instructions[pc + 1]
@@ -65,6 +71,23 @@ class CyCy(object):
                 assert isinstance(left, W_Int32)
                 assert isinstance(right, W_Int32)
                 stack.append(W_Bool(left.leq(right)))
+            elif opcode == bytecode.STORE_VARIABLE:
+                val = stack.pop()
+                variables[arg] = val
+            elif opcode == bytecode.LOAD_VARIABLE:
+                stack.append(variables[arg])
+            elif opcode == bytecode.BINARY_ADD:
+                left = stack.pop()
+                right = stack.pop()
+                assert isinstance(left, W_Int32)
+                assert isinstance(right, W_Int32)
+                stack.append(W_Int32(left.add(right)))
+            elif opcode == bytecode.BINARY_SUB:
+                left = stack.pop()
+                right = stack.pop()
+                assert isinstance(left, W_Int32)
+                assert isinstance(right, W_Int32)
+                stack.append(W_Int32(left.sub(right)))
 
         return stack
 
