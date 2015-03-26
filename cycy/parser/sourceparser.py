@@ -162,7 +162,7 @@ class SourceParser(object):
     def binop_le(self, p):
         return BinaryOperation(operator="<=", left=p[0], right=p[2])
 
-    @pg.production("expr : STRING")
+    @pg.production("expr : STRING_LITERAL")
     def expr_string(self, p):
         vals = []
         for v in p[0].getstr().strip('"'):
@@ -247,7 +247,7 @@ class SourceParser(object):
 
     @pg.production("primary_expression : const")
     @pg.production("primary_expression : IDENTIFIER")
-    @pg.production("primary_expression : STRING")
+    @pg.production("primary_expression : STRING_LITERAL")
     @pg.production("primary_expression : LEFT_BRACKET primary_expression RIGHT_BRACKET")
     def primary_expression(self, p):
         if isinstance(p[0], Node):
@@ -255,7 +255,7 @@ class SourceParser(object):
             return p[0]
         elif p[0].gettokentype() == "IDENTIFIER":
             return Variable(name=p[0].getstr())
-        elif p[0].gettokentype() == "STRING":
+        elif p[0].gettokentype() == "STRING_LITERAL":
             vals = []
             for v in p[0].getstr().strip('"'):
                 vals.append(Char(value=v))
@@ -265,11 +265,11 @@ class SourceParser(object):
             return p[1]
 
     @pg.production("const : INTEGER")
-    @pg.production("const : CHAR")
+    @pg.production("const : CHAR_LITERAL")
     def const(self, p):
         if p[0].gettokentype() == "INTEGER":
             return Int32(int(p[0].getstr()))
-        elif p[0].gettokentype() == "CHAR":
+        elif p[0].gettokentype() == "CHAR_LITERAL":
             return Char(p[0].getstr().strip("'"))
         raise AssertionError("Bad token type in const")
 

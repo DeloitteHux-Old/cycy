@@ -2,8 +2,8 @@ from rply import LexerGenerator
 
 RULES = [
     "INTEGER",
-    "CHAR",
-    "STRING",
+    "CHAR_LITERAL",
+    "STRING_LITERAL",
     "CHAR",
     "SHORT",
     "INT",
@@ -32,8 +32,8 @@ RULES = [
 ]
 lg = LexerGenerator()
 lg.add("INTEGER", "\d+")
-lg.add("CHAR", "'\\\\?.'")
-lg.add("STRING", "\".*\"")
+lg.add("CHAR_LITERAL", "'\\\\?.'")
+lg.add("STRING_LITERAL", "\".*\"")
 lg.add("CHAR", "char")
 lg.add("SHORT", "short")
 lg.add("INT", "int")

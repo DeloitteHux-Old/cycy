@@ -41,6 +41,17 @@ class TestParser(TestCase):
             )
         )
 
+    def test_char_variable_declaration(self):
+        self.assertEqual(
+            parse(self.function_wrap('char i;')),
+            self.function_wrap_node(
+                VariableDeclaration(name="i", vtype=Type(base="char"), value=None)
+            )
+        )
+        var = Type(base="char")
+        self.assertEqual( var.base_type, "int")
+        self.assertEqual( var.length, 8)
+
     def test_int_variable_declaration(self):
         self.assertEqual(
             parse(self.function_wrap('int i;')),
