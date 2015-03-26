@@ -281,11 +281,14 @@ class SourceParser(object):
 
     @pg.error
     def error_handler(self, token):
+        source_pos = token.source_pos
+        if source_pos is None:
+            raise ValueError("Unexpected %s" % (token.gettokentype()))
         raise ValueError(
             "Unexpected %s at line %s col %s" % (
                 token.gettokentype(),
-                token.source_pos.lineno,
-                token.source_pos.colno,
+                source_pos.lineno,
+                source_pos.colno,
             )
         )
 
