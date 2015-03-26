@@ -91,7 +91,7 @@ class SourceParser(object):
             body=p[5]
         )
 
-    @pg.production("arg_decl_list : type")
+    @pg.production("arg_decl_list : declaration")
     def arg_decl_list_arg_decl(self, p):
         return NodeList([p[0]])
 
@@ -175,13 +175,10 @@ class SourceParser(object):
             value=Int32(int(p[3].getstr()))
         )
 
-    ##@pg.production("type : optional_const core_or_pointer_type")
-    ##def type_object(self, p):
-        ##return Type(base=p[1].getstr(), const=p[0])
-
-    @pg.production("type : optional_const core_type")
+    @pg.production("type : optional_const core_or_pointer_type")
     def type_object(self, p):
-        return Type(base=p[1].getstr(), const=p[0])
+        p[1].const = p[0]
+        return p[1]
 
     @pg.production("optional_const : ")
     def const_false(self, p):
@@ -191,18 +188,18 @@ class SourceParser(object):
     def const_true(self, p):
         return True
 
-    ###@pg.production("core_or_pointer_type : core_type")
-    ###def core_type(self, p):
-        ###return p[0]
+    @pg.production("core_or_pointer_type : core_type")
+    def core_type(self, p):
+        return p[0]
 
-    ##@pg.production("core_or_pointer_type : * core_or_pointer_type")
-    ##def pointer_type(self, p):
-        ##return Type(base="pointer", reference=p[1])
+    @pg.production("core_or_pointer_type : core_or_pointer_type *")
+    def pointer_type(self, p):
+        return Type(base="pointer", reference=p[0])
 
     @pg.production("core_type : INT")
     @pg.production("core_type : CHAR")
     def vtype(self, p):
-        return p[0]
+        return Type(base=p[0].getstr())
 
     @pg.production("expr : primary_expression ++")
     def post_incr(self, p):
