@@ -138,7 +138,6 @@ class CyCy(object):
             assert isinstance(function, ast.Function)
             byte_code = compiler.compile(function)
             self.compiled_functions[function.name] = byte_code
-        return byte_code
 
     def interpret(self, paths):
         for path in paths:
@@ -148,7 +147,7 @@ class CyCy(object):
             self.interpret_source(source)
 
         return_value = self.run_main()
-        assert isinstance(rv, W_Int32)
+        assert isinstance(return_value, W_Int32)
         # TODO: duh, this should really come from the program
         return 5
 
