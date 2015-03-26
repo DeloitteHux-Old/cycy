@@ -340,7 +340,7 @@ class SourceParser(object):
 
     parser = pg.build()
 
-def parse(source):
-    lexed = lexer.lex(preprocess(source))
+def parse(source, environment=None):
+    lexed = lexer.lex(preprocess(source, environment))
     parser = SourceParser(lexed)
     return parser.parse()

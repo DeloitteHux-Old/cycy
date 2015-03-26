@@ -117,10 +117,10 @@ def interpret(source_files, environment=None):
         source = source_file.readall()
         source_file.close()
 
-        program = parse(source)
+        program = parse(source, environment)
 
         assert isinstance(program, ast.Program)
-        for function in program.functions:
+        for function in program.functions():
             assert isinstance(function, ast.Function)
             byte_code = compiler.compile(function)
             interp.compiled_functions[function.name] = byte_code
