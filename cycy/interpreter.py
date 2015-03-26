@@ -37,7 +37,7 @@ class CyCy(object):
 
     def run_main(self):
         main_byte_code = self.compiled_functions["main"]
-        self.run(main_byte_code)
+        return self.run(main_byte_code)
 
     def run(self, byte_code, arguments=[]):
         pc = 0
@@ -121,6 +121,12 @@ class CyCy(object):
                 assert isinstance(array, W_String)
                 assert isinstance(index, W_Int32)
                 stack.append(W_Char(array.dereference(index)))
+            elif opcode == bytecode.JUMP:
+                pc = arg
+            elif opcode == bytecode.JUMP_IF_NOT_ZERO:
+                val = stack.pop()
+                if val.is_true():
+                    pc = arg
 
         assert False, "bytecode exited the main loop without returning"
 
@@ -157,4 +163,4 @@ def interpret_source(source):
 
     rv = interp.run_main()
     assert isinstance(rv, W_Int32)
-    return rv.value
+    return rv

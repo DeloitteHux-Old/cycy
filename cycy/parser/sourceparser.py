@@ -175,6 +175,10 @@ class SourceParser(object):
     def while_loop(self, p):
         return While(condition=p[2], body=p[4])
 
+    @pg.production("while_loop : while LEFT_BRACKET expr RIGHT_BRACKET statement")
+    def while_loop_single_line(self, p):
+        return While(condition=p[2], body=Block(statements=[p[4]]))
+
     @pg.production("func_call : IDENTIFIER LEFT_BRACKET param_list RIGHT_BRACKET")
     def function_call(self, p):
         return Call(name=p[0].getstr(), args=p[2].get_items())
@@ -227,6 +231,10 @@ class SourceParser(object):
     @pg.production("declaration : type IDENTIFIER")
     def declare_int(self, p):
         return VariableDeclaration(name=p[1].getstr(), vtype=p[0], value=None)
+
+    @pg.production("declaration : type IDENTIFIER LEFT_SQUARE_BRACKET INTEGER_LITERAL RIGHT_SQUARE_BRACKET")
+    def declare_array(self, p):
+        return VariableDeclaration(name=p[1].getstr(), vtype=Type(base="array", arraylength=Int32(int(p[3].getstr())), reference=p[0]))
 
     @pg.production("declaration : type IDENTIFIER = INTEGER_LITERAL")
     def declare_assign_int(self, p):

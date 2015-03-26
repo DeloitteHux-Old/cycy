@@ -29,7 +29,8 @@ class REPL(object):
             program = self.stdin.readline()
             # XXX: multiple lines, and pass stdin / stdout / stderr down
             return_value = interpret_source(program)
-            self.stdout.write(return_value)
+            self.stdout.write(return_value.str())
+            self.stdout.write("\n")
 
     def show_banner(self):
         self.stdout.write("CyCy %s\n\n" % (__version__,))

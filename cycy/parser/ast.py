@@ -232,7 +232,7 @@ class Program(Node):
     apply_with_init=False
 )
 class Type(Node):
-    def __init__(self, base=None, const=False, unsigned=False, reference=None):
+    def __init__(self, base=None, const=False, unsigned=False, reference=None, arraylength=None):
         if base == 'char':
             self.base_type = 'int'
             self.length = 8
@@ -254,6 +254,9 @@ class Type(Node):
         elif base == 'long double':
             self.base_type = 'float'
             self.length = 80
+        elif base == 'array':
+            self.base_type = 'pointer'
+            self.length = arraylength
         else:
             self.base_type = base
             self.length = -1
