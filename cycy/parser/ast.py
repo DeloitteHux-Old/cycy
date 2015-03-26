@@ -212,6 +212,15 @@ class Type(Node):
         elif base == 'long long':
             self.base_type = 'int'
             self.length = 64
+        elif base == 'float':
+            self.base_type = 'float'
+            self.length = 32
+        elif base == 'double':
+            self.base_type = 'float'
+            self.length = 64
+        elif base == 'long double':
+            self.base_type = 'float'
+            self.length = 80
         else:
             self.base_type = base
             self.length = -1

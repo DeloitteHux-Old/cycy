@@ -8,6 +8,8 @@ RULES = [
     "SHORT",
     "INT",
     "LONG",
+    "FLOAT",
+    "DOUBLE",
     "CONST",
     "UNSIGNED",
     "null",
@@ -38,6 +40,8 @@ lg.add("CHAR", "char")
 lg.add("SHORT", "short")
 lg.add("INT", "int")
 lg.add("LONG", "long")
+lg.add("FLOAT", "float")
+lg.add("DOUBLE", "double")
 lg.add("null", "NULL")
 lg.add("CONST", "const")
 lg.add("UNSIGNED", "unsigned")

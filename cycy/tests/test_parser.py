@@ -97,6 +97,39 @@ class TestParser(TestCase):
         self.assertEqual( var.base_type, "int")
         self.assertEqual( var.length, 64)
 
+    def test_float_variable_declaration(self):
+        self.assertEqual(
+            parse(self.function_wrap('float i;')),
+            self.function_wrap_node(
+                VariableDeclaration(name="i", vtype=Type(base="float"), value=None)
+            )
+        )
+        var = Type(base="float")
+        self.assertEqual( var.base_type, "float")
+        self.assertEqual( var.length, 32)
+
+    def test_double_variable_declaration(self):
+        self.assertEqual(
+            parse(self.function_wrap('double i;')),
+            self.function_wrap_node(
+                VariableDeclaration(name="i", vtype=Type(base="double"), value=None)
+            )
+        )
+        var = Type(base="double")
+        self.assertEqual( var.base_type, "float")
+        self.assertEqual( var.length, 64)
+
+    def test_long_double_variable_declaration(self):
+        self.assertEqual(
+            parse(self.function_wrap('long double i;')),
+            self.function_wrap_node(
+                VariableDeclaration(name="i", vtype=Type(base="long double"), value=None)
+            )
+        )
+        var = Type(base="long double")
+        self.assertEqual( var.base_type, "float")
+        self.assertEqual( var.length, 80)
+
     def test_variable_declaration_with_assignment(self):
         self.assertEqual(
             parse(self.function_wrap("int i = 0;")),

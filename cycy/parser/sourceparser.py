@@ -230,12 +230,18 @@ class SourceParser(object):
     @pg.production("core_type : INT")
     @pg.production("core_type : SHORT")
     @pg.production("core_type : LONG")
+    @pg.production("core_type : FLOAT")
+    @pg.production("core_type : DOUBLE")
     def generic_vtype(self, p):
         return Type(base=p[0].getstr())
 
     @pg.production("core_type : LONG LONG")
     def long_long_vtype(self, p):
         return Type(base='long long')
+
+    @pg.production("core_type : LONG DOUBLE")
+    def long_double_vtype(self, p):
+        return Type(base='long double')
 
     @pg.production("expr : primary_expression ++")
     def post_incr(self, p):
