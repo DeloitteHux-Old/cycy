@@ -128,6 +128,10 @@ class CyCy(object):
                 val = stack.pop()
                 if val.is_true():
                     pc = arg
+            elif opcode == bytecode.JUMP_IF_ZERO:
+                val = stack.pop()
+                if not val.is_true():
+                    pc = arg
 
         assert False, "bytecode exited the main loop without returning"
 
