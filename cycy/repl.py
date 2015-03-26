@@ -50,6 +50,11 @@ class REPL(object):
 
         """
 
+        self.stdout.write(function_name)
+        self.stdout.write("\n")
+        self.stdout.write("-" * len(function_name))
+        self.stdout.write("\n\n")
+
         byte_code = self.interpreter.compiled_functions[function_name]
         self.stdout.write(byte_code.dump())
         self.stdout.write("\n")
