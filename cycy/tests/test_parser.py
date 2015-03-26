@@ -18,51 +18,71 @@ from cycy.parser.ast import (
 )
 
 class TestParser(TestCase):
+    def function_wrap(self, source):
+        return "int main(void) { %s }" % source
+
+    def function_wrap_node(self, node):
+        return Function(
+            return_type="INT32",
+            name="main",
+            params=[],
+            body=Block([node])
+)
+
     def test_basic_ne(self):
         self.assertEqual(
-            parse('2 != 3'),
-            BinaryOperation(operator="!=", left=Int32(value=2), right=Int32(value=3))
+            parse(self.function_wrap('2 != 3;')),
+            self.function_wrap_node(
+                BinaryOperation(operator="!=", left=Int32(value=2), right=Int32(value=3))
+            )
         )
 
     def test_variable_declaration(self):
         self.assertEqual(
-            parse('int i'),
-            VariableDeclaration(name="i", vtype="INT32", value=None))
+            parse(self.function_wrap('int i;')),
+            self.function_wrap_node(
+                VariableDeclaration(name="i", vtype="INT32", value=None)
+            )
+        )
 
     def test_postincrement(self):
         self.assertEqual(
-            parse("i++"),
-            PostOperation(operator="++", variable=Variable(name="i"))
+            parse(self.function_wrap("i++;")),
+            self.function_wrap_node(
+                PostOperation(operator="++", variable=Variable(name="i"))
+            )
         )
 
     def test_assignment(self):
         self.assertEqual(
-            parse("i = 0"),
-            Assignment(left=Variable(name="i"), right=Int32(value=0))
+            parse(self.function_wrap("i = 0;")),
+            self.function_wrap_node(
+                Assignment(left=Variable(name="i"), right=Int32(value=0))
+            )
         )
 
     def test_char_literal(self):
         self.assertEqual(
-            parse("'c'"),
-            Char(value='c')
+            parse(self.function_wrap("'c';")),
+            self.function_wrap_node(
+                Char(value='c')
+            )
         )
 
     def test_string_literal(self):
         self.assertEqual(
-            parse('"foo"'),
-            Array(value=[Char(value='f'), Char(value='o'), Char(value='o'), Char(value=chr(0))])
+            parse(self.function_wrap('"foo";')),
+            self.function_wrap_node(
+                Array(value=[Char(value='f'), Char(value='o'), Char(value='o'), Char(value=chr(0))])
+            )
         )
 
     def test_array_deference(self):
         self.assertEqual(
-            parse("array[4]"),
-            ArrayDereference(array=Variable(name="array"), index=Int32(value=4))
-        )
-
-    def test_return_statement(self):
-        self.assertEqual(
-            parse("return 0;"),
-            ReturnStatement(value=Int32(value=0))
+            parse(self.function_wrap("array[4];")),
+            self.function_wrap_node(
+                ArrayDereference(array=Variable(name="array"), index=Int32(value=4))
+            )
         )
 
     def test_main_function(self):
@@ -80,9 +100,11 @@ class TestParser(TestCase):
 
     def test_function_call(self):
         self.assertEqual(
-            parse("putc(string);"),
-            Call(
-                name="putc",
-                args=[Variable(name="string")]
+            parse(self.function_wrap("putc(string);")),
+            self.function_wrap_node(
+                Call(
+                    name="putc",
+                    args=[Variable(name="string")]
+                )
             )
         )

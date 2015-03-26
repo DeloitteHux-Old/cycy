@@ -51,41 +51,9 @@ class SourceParser(object):
     def main_function(self, p):
         return p[0]
 
-    @pg.production('main : binop')
-    def main_binop(self, p):
-        return p[0]
-
-    @pg.production('main : declaration')
-    def main_declaration(self, p):
-        return p[0]
-
-    @pg.production("main : postincr")
-    def main_postincr(self, p):
-        return p[0]
-
-    @pg.production("main : assign")
-    def main_assign(self, p):
-        return p[0]
-
-    @pg.production("main : expr")
-    def main_expr(self, p):
-        return p[0]
-
-    @pg.production("main : return_statement")
-    def main_return_statement(self, p):
-        return p[0]
-
-    @pg.production("main : func_call")
-    def main_func_call(self, p):
-        return p[0]
-
     @pg.production("return_statement : return expr ;")
-    def main_return(self, p):
+    def return_statement(self, p):
         return ReturnStatement(value=p[1])
-
-    @pg.production("main : dereference")
-    def expr_dereference(self, p):
-        return p[0]
 
     @pg.production("function : INT32 IDENTIFIER LEFT_BRACKET void RIGHT_BRACKET block")
     def function_void_param(self, p):
@@ -101,32 +69,31 @@ class SourceParser(object):
         return Block(statements=p[1].get_items())
 
     @pg.production("statement_list : return_statement")
+    @pg.production("statement_list : binop_expr ;")
+    @pg.production("statement_list : declaration ;")
+    @pg.production("statement_list : postincr ;")
+    @pg.production("statement_list : assignment ;")
+    @pg.production("statement_list : primary_expression ;")
+    @pg.production("statement_list : func_call_statement")
+    @pg.production("statement_list : dereference ;")
     def statement_list_return(self, p):
         return NodeList(items=[p[0]])
 
-    @pg.production("func_call : IDENTIFIER LEFT_BRACKET param_list RIGHT_BRACKET ;")
-    def function_call(self, p):
+    @pg.production("func_call_statement : IDENTIFIER LEFT_BRACKET param_list RIGHT_BRACKET ;")
+    def function_call_statement(self, p):
         return Call(name=p[0].getstr(), args=p[2].get_items())
 
-    @pg.production("param_list : var")
+    @pg.production("param_list : primary_expression")
     def param_list(self, p):
         return NodeList(items=[p[0]])
 
-    @pg.production("assign : var = expr")
+    @pg.production("assignment : IDENTIFIER = expr")
     def assign(self, p):
-        return Assignment(left=p[0], right=p[2])
+        return Assignment(left=Variable(p[0].getstr()), right=p[2])
 
-    @pg.production('binop : expr != expr')
+    @pg.production('binop_expr : expr != expr')
     def binop_ne(self, p):
         return BinaryOperation(operator="!=", left=p[0], right=p[2])
-
-    @pg.production("expr : INTEGER")
-    def expr_integer(self, p):
-        return Int32(value=int(p[0].getstr()))
-
-    @pg.production("expr : CHAR")
-    def expr_char(self, p):
-        return Char(value=p[0].getstr().strip("'"))
 
     @pg.production("expr : STRING")
     def expr_string(self, p):
@@ -136,7 +103,7 @@ class SourceParser(object):
         vals.append(Char(value=chr(0)))
         return Array(value=vals)
 
-    @pg.production("expr : array LEFT_SQUARE_BRACKET expr RIGHT_SQUARE_BRACKET")
+    @pg.production("dereference : array LEFT_SQUARE_BRACKET expr RIGHT_SQUARE_BRACKET")
     def array_dereference(self, p):
         return ArrayDereference(array=p[0], index=p[2])
 
@@ -148,13 +115,41 @@ class SourceParser(object):
     def declare_int(self, p):
         return VariableDeclaration(name=p[1].getstr(), vtype="INT32", value=None)
 
-    @pg.production("postincr : var ++")
+    @pg.production("postincr : primary_expression ++")
     def post_incr(self, p):
         return PostOperation(operator="++", variable=p[0])
 
-    @pg.production("var : IDENTIFIER")
-    def var_variable(self, p):
-        return Variable(name=p[0].getstr())
+    @pg.production("expr : primary_expression")
+    def expr_const(self, p):
+        return p[0]
+
+    @pg.production("primary_expression : const")
+    @pg.production("primary_expression : IDENTIFIER")
+    @pg.production("primary_expression : STRING")
+    @pg.production("primary_expression : LEFT_BRACKET primary_expression RIGHT_BRACKET")
+    def primary_expression(self, p):
+        if isinstance(p[0], Node):
+            # const
+            return p[0]
+        elif p[0].gettokentype() == "IDENTIFIER":
+            return Variable(name=p[0].getstr())
+        elif p[0].gettokentype() == "STRING":
+            vals = []
+            for v in p[0].getstr().strip('"'):
+                vals.append(Char(value=v))
+            vals.append(Char(value=chr(0)))
+            return Array(value=vals)
+        else:
+            return p[1]
+
+    @pg.production("const : INTEGER")
+    @pg.production("const : CHAR")
+    def const(self, p):
+        if p[0].gettokentype() == "INTEGER":
+            return Int32(int(p[0].getstr()))
+        elif p[0].gettokentype() == "CHAR":
+            return Char(p[0].getstr().strip("'"))
+        raise AssertionError("Bad token type in const")
 
     parser = pg.build()
 
