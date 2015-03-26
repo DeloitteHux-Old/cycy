@@ -37,7 +37,7 @@ class CyCy(object):
 
     def run_main(self):
         main_byte_code = self.compiled_functions["main"]
-        self.run(main_byte_code)
+        return self.run(main_byte_code)
 
     def run(self, byte_code, arguments=[]):
         pc = 0
