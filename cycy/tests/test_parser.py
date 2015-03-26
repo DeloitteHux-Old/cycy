@@ -267,7 +267,7 @@ class TestParser(TestCase):
     def test_main_with_no_parameters(self):
         self.assertEqual(
             parse("int main(void) { return 0; }"),
-            Program(functions=[
+            Program(units=[
                 Function(
                     return_type=Type(base='int'),
                     name="main",
@@ -282,7 +282,7 @@ class TestParser(TestCase):
     def test_main_with_multiple_parameters(self):
         self.assertEqual(
             parse("int main(int argc, char **argv, char **env) { return 0; }"),
-            Program(functions=[
+            Program(units=[
                 Function(
                     return_type=Type(base='int'),
                     name="main",
@@ -338,6 +338,42 @@ class TestParser(TestCase):
                 )
             )
         )
+
+    def test_prototype_with_named_arguments(self):
+        self.assertEqual(
+            parse("int foo(int i, long l, double d, char *cp);"),
+            Program([
+                Function(
+                    return_type=Type(base='int'),
+                    name="foo",
+                    params=[
+                        VariableDeclaration(name="i", vtype=Type(base="int")),
+                        VariableDeclaration(name="l", vtype=Type(base="long")),
+                        VariableDeclaration(name="d", vtype=Type(base="double")),
+                        VariableDeclaration(name="cp", vtype=Type(base="pointer", reference=Type(base="char"))),
+                        ],
+                    prototype=True,
+                    )
+                ])
+            )
+
+    def test_prototype_without_named_arguments(self):
+        self.assertEqual(
+            parse("int foo(int, long, double, char *);"),
+            Program([
+                Function(
+                    return_type=Type(base='int'),
+                    name="foo",
+                    params=[
+                        VariableDeclaration(name=None, vtype=Type(base="int")),
+                        VariableDeclaration(name=None, vtype=Type(base="long")),
+                        VariableDeclaration(name=None, vtype=Type(base="double")),
+                        VariableDeclaration(name=None, vtype=Type(base="pointer", reference=Type(base="char"))),
+                        ],
+                    prototype=True,
+                    )
+                ])
+            )
 
     def test_puts_function(self):
         self.assertEqual(

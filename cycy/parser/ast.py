@@ -121,16 +121,18 @@ class ReturnStatement(Node):
         Attribute(name="return_type"),
         Attribute(name="name"),
         Attribute(name="params"),
-        Attribute(name="body")
+        Attribute(name="body"),
+        Attribute(name="prototype")
     ],
     apply_with_init=False
 )
 class Function(Node):
-    def __init__(self, return_type, name, params, body):
+    def __init__(self, return_type=None, name=None, params=None, body=None, prototype=False):
         self.return_type = return_type
         self.name = name
         self.params = params
         self.body = body
+        self.prototype = prototype
 
 @attributes(
     [
@@ -176,16 +178,20 @@ class While(Node):
 
 @attributes(
     [
-        Attribute(name="functions")
+        Attribute(name="units")
     ],
     apply_with_init=False
 )
 class Program(Node):
-    def __init__(self, functions):
-        self.functions = functions
+    def __init__(self, units):
+        self.units = units
 
-    def add_function(self, func):
-        self.functions.append(func)
+    def add_unit(self, unit):
+        self.units.append(unit)
+
+    def functions(self):
+        return [unit for unit in self.units if not unit.prototype]
+
 
 @attributes(
     [

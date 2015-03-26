@@ -112,7 +112,7 @@ def interpret(source):
     program = parse(source)
 
     assert isinstance(program, ast.Program)
-    for function in program.functions:
+    for function in program.functions():
         assert isinstance(function, ast.Function)
         byte_code = compiler.compile(function)
         interp.compiled_functions[function.name] = byte_code

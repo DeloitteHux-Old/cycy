@@ -65,19 +65,24 @@ class SourceParser(object):
     def main_program(self, p):
         return p[0]
 
-    @pg.production("program : function")
+    @pg.production("program : unit")
     def program_function(self, p):
         return Program([p[0]])
 
-    @pg.production("program : function program")
-    def program_function_program(self, p):
-        p[1].add_function(p[0])
+    @pg.production("program : unit program")
+    def program_unit_program(self, p):
+        p[1].add_unit(p[0])
         return p[1]
 
     @pg.production("return_statement : return expr ;")
     @pg.production("return_statement : return func_call_statement")
     def return_statement(self, p):
         return ReturnStatement(value=p[1])
+
+    @pg.production("unit : function")
+    @pg.production("unit : prototype")
+    def unit(self, p):
+        return p[0]
 
     @pg.production("function : type IDENTIFIER LEFT_BRACKET void RIGHT_BRACKET block")
     def function_void_param(self, p):
@@ -95,6 +100,33 @@ class SourceParser(object):
             name=p[1].getstr(),
             params=p[3].get_items(),
             body=p[5]
+        )
+
+    @pg.production("prototype : type IDENTIFIER LEFT_BRACKET void RIGHT_BRACKET ;")
+    def function_void_param(self, p):
+        return Function(
+            return_type=p[0],
+            name=p[1].getstr(),
+            params=[],
+            prototype=True
+        )
+
+    @pg.production("prototype : type IDENTIFIER LEFT_BRACKET arg_decl_list RIGHT_BRACKET ;")
+    def function_with_args(self, p):
+        return Function(
+            return_type=p[0],
+            name=p[1].getstr(),
+            params=p[3].get_items(),
+            prototype=True
+        )
+
+    @pg.production("prototype : type IDENTIFIER LEFT_BRACKET type_list RIGHT_BRACKET ;")
+    def function_with_args(self, p):
+        return Function(
+            return_type=p[0],
+            name=p[1].getstr(),
+            params=[VariableDeclaration(name=None, vtype=x, value=None) for x in p[3].get_items()],
+            prototype=True
         )
 
     @pg.production("arg_decl_list : declaration")
@@ -193,6 +225,15 @@ class SourceParser(object):
             vtype=p[0],
             value=Int32(int(p[3].getstr()))
         )
+
+    @pg.production("type_list : type")
+    def type_list(self, p):
+        return NodeList([p[0]])
+
+    @pg.production("type_list : type_list , type")
+    def type_list_type(self, p):
+        p[0].append(p[2])
+        return p[0]
 
     @pg.production("type : optional_unsigned optional_const core_or_pointer_type")
     def type_object(self, p):
