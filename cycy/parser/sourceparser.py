@@ -11,10 +11,12 @@ from .ast import (
     Function,
     Int32,
     Node,
+    Null,
     PostOperation,
     ReturnStatement,
     Variable,
     VariableDeclaration,
+    While,
 )
 
 class NodeList(Node):
@@ -69,15 +71,19 @@ class SourceParser(object):
         return Block(statements=p[1].get_items())
 
     @pg.production("statement_list : return_statement")
-    @pg.production("statement_list : binop_expr ;")
+    @pg.production("statement_list : expr ;")
     @pg.production("statement_list : declaration ;")
     @pg.production("statement_list : postincr ;")
     @pg.production("statement_list : assignment ;")
     @pg.production("statement_list : primary_expression ;")
     @pg.production("statement_list : func_call_statement")
-    @pg.production("statement_list : dereference ;")
+    @pg.production("statement_list : while_loop")
     def statement_list_return(self, p):
         return NodeList(items=[p[0]])
+
+    @pg.production("while_loop : while LEFT_BRACKET expr RIGHT_BRACKET block")
+    def while_loop(self, p):
+        return While(condition=p[2], body=p[4])
 
     @pg.production("func_call_statement : IDENTIFIER LEFT_BRACKET param_list RIGHT_BRACKET ;")
     def function_call_statement(self, p):
@@ -91,7 +97,7 @@ class SourceParser(object):
     def assign(self, p):
         return Assignment(left=Variable(p[0].getstr()), right=p[2])
 
-    @pg.production('binop_expr : expr != expr')
+    @pg.production('expr : expr != expr')
     def binop_ne(self, p):
         return BinaryOperation(operator="!=", left=p[0], right=p[2])
 
@@ -103,7 +109,11 @@ class SourceParser(object):
         vals.append(Char(value=chr(0)))
         return Array(value=vals)
 
-    @pg.production("dereference : array LEFT_SQUARE_BRACKET expr RIGHT_SQUARE_BRACKET")
+    @pg.production("expr : null")
+    def expr_null(self, p):
+        return Null()
+
+    @pg.production("expr : array LEFT_SQUARE_BRACKET expr RIGHT_SQUARE_BRACKET")
     def array_dereference(self, p):
         return ArrayDereference(array=p[0], index=p[2])
 

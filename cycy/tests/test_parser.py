@@ -11,10 +11,12 @@ from cycy.parser.ast import (
     Char,
     Function,
     Int32,
+    Null,
     PostOperation,
     ReturnStatement,
     Variable,
     VariableDeclaration,
+    While,
 )
 
 class TestParser(TestCase):
@@ -105,6 +107,21 @@ class TestParser(TestCase):
                 Call(
                     name="putc",
                     args=[Variable(name="string")]
+                )
+            )
+        )
+
+    def test_while_loop(self):
+        self.assertEqual(
+            parse(self.function_wrap("while (string[i] != NULL) { putc(string); }")),
+            self.function_wrap_node(
+                While(
+                    condition=BinaryOperation(operator="!=",
+                                              left=ArrayDereference(array=Variable(name="string"), index=Variable("i")),
+                                              right=Null()),
+                    body=Block([
+                        Call(name="putc", args=[Variable(name="string")])
+                    ])
                 )
             )
         )

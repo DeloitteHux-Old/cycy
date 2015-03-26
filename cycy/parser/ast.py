@@ -154,3 +154,23 @@ class Call(Node):
     def __init__(self, name, args):
         self.name = name
         self.args = args
+
+class Null(Node):
+    # This isn't actually a type in C, but we don't support macros, or pointers
+    # yet which are required to #define NULL (void*)0
+    def __eq__(self, other):
+        if isinstance(other, Null):
+            return True
+        return False
+
+@attributes(
+    [
+        Attribute(name="condition"),
+        Attribute(name="body")
+    ],
+    apply_with_init=False
+)
+class While(Node):
+    def __init__(self, condition, body):
+        self.condition = condition
+        self.body = body
