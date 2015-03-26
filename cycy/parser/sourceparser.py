@@ -4,6 +4,7 @@ from .lexer import lexer, RULES
 from .ast import (
     Array,
     ArrayDereference,
+    Assembler,
     Assignment,
     BinaryOperation,
     Block,
@@ -162,12 +163,21 @@ class SourceParser(object):
     @pg.production("statement : primary_expression ;")
     @pg.production("statement : func_call_statement")
     @pg.production("statement : while_loop")
+    @pg.production("statement : assembler ;")
     def statement_list_return(self, p):
         return p[0]
+    
+    @pg.production("assembler : ASM LEFT_BRACKET STRING_LITERAL RIGHT_BRACKET")
+    def assembler(self, p):
+        return Assembler(instruction=p[2])
 
     @pg.production("while_loop : while LEFT_BRACKET expr RIGHT_BRACKET block")
     def while_loop(self, p):
         return While(condition=p[2], body=p[4])
+
+    @pg.production("while_loop : while LEFT_BRACKET expr RIGHT_BRACKET statement")
+    def while_loop_single_line(self, p):
+        return While(condition=p[2], body=Block(statements=[p[4]]))
 
     @pg.production("func_call : IDENTIFIER LEFT_BRACKET param_list RIGHT_BRACKET")
     def function_call(self, p):

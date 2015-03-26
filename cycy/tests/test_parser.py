@@ -4,6 +4,7 @@ from cycy.parser import parse
 from cycy.parser.ast import (
     Array,
     ArrayDereference,
+    Assembler,
     Assignment,
     BinaryOperation,
     Block,
@@ -364,6 +365,22 @@ class TestParser(TestCase):
             )
         )
 
+    def test_asm(self):
+        instruction = "movl %ecx %eax"
+        self.assertEqual(
+            parse(self.function_wrap('__asm__("%s");') % instruction),
+            self.function_wrap_node(
+                Assembler(instruction=instruction)
+            )
+        )
+
+        self.assertEqual(
+            parse(self.function_wrap('asm("%s");') % instruction),
+            self.function_wrap_node(
+                Assembler(instruction=instruction)
+            )
+        )
+
     def test_array_dereference(self):
         self.assertEqual(
             parse(self.function_wrap("array[4];")),
@@ -431,6 +448,20 @@ class TestParser(TestCase):
                 )
             )
         )
+
+    def test_braceless_while_loop(self):
+        self.assertEqual(
+            parse(self.function_wrap("""
+                while ( i < 10 )
+                    i++;
+                """)),
+            self.function_wrap_node(
+                While(
+                    condition=BinaryOperation(operator="<", left=Variable(name="i"), right=Int32(value=10)),
+                    body=Block([PostOperation(operator="++", variable=Variable(name="i"))]),
+                    )
+                )
+            )
 
     def test_while_loop(self):
         self.assertEqual(

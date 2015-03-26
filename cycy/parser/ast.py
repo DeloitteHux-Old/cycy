@@ -187,6 +187,11 @@ class Null(Node):
             return True
         return False
 
+@attributes([Attribute(name="instruction")])
+class Assembler(Node):
+    def __init__(self, instruction=None):
+        self.instruction = instruction
+
 @attributes(
     [
         Attribute(name="condition"),
