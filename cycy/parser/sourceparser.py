@@ -169,7 +169,7 @@ class SourceParser(object):
     
     @pg.production("assembler : ASM LEFT_BRACKET STRING_LITERAL RIGHT_BRACKET")
     def assembler(self, p):
-        return Assembler(instruction=p[2])
+        return Assembler(instruction=String(p[2].getstr().strip("\"")))
 
     @pg.production("while_loop : while LEFT_BRACKET expr RIGHT_BRACKET block")
     def while_loop(self, p):
@@ -234,7 +234,7 @@ class SourceParser(object):
 
     @pg.production("declaration : type IDENTIFIER LEFT_SQUARE_BRACKET INTEGER_LITERAL RIGHT_SQUARE_BRACKET")
     def declare_array(self, p):
-        return VariableDeclaration(name=p[1].getstr(), vtype=Type(base="array", arraylength=Int32(int(p[3].getstr())), reference=p[0]))
+        return VariableDeclaration(name=p[1].getstr(), vtype=Type(base="array", arraylength=int(p[3].getstr()), reference=p[0]))
 
     @pg.production("declaration : type IDENTIFIER = INTEGER_LITERAL")
     def declare_assign_int(self, p):

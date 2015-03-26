@@ -3,7 +3,7 @@ import os
 from rpython.rlib import streamio
 
 from cycy import __version__
-from cycy.interpreter import interpret_source
+from cycy.interpreter import CyCy
 
 
 def _open(fd):
@@ -22,15 +22,20 @@ class REPL(object):
         self.stdout = stdout if stdout is not None else _open(fd=1)
         self.stderr = stderr if stderr is not None else _open(fd=2)
 
+        self.interpreter = CyCy()
+
     def run(self):
         self.show_banner()
         while True:
             self.stdout.write(self.PROMPT)
             program = self.stdin.readline()
-            # XXX: multiple lines, and pass stdin / stdout / stderr down
-            return_value = interpret_source(program)
-            self.stdout.write(return_value.str())
-            self.stdout.write("\n")
+            self.interpret(program)
+
+    def interpret(self, source):
+        # XXX: multiple lines, and pass stdin / stdout / stderr down
+        return_value = self.interpreter.interpret_source(source=source)
+        self.stdout.write(return_value.str())
+        self.stdout.write("\n")
 
     def show_banner(self):
         self.stdout.write("CyCy %s\n\n" % (__version__,))

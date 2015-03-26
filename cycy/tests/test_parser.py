@@ -233,7 +233,7 @@ class TestParser(TestCase):
         self.assertEqual(
             parse(self.function_wrap('int foo[10];')),
             self.function_wrap_node(
-                VariableDeclaration(name="foo", vtype=Type(base="array", arraylength=Int32(value=10), reference=Type(base="int")), value=None)
+                VariableDeclaration(name="foo", vtype=Type(base="array", arraylength=10, reference=Type(base="int")), value=None)
             )
         )
         var = Type(base="array", arraylength=Int32(value=10), reference=Type(base="int"))
@@ -381,14 +381,14 @@ class TestParser(TestCase):
         self.assertEqual(
             parse(self.function_wrap('__asm__("%s");') % instruction),
             self.function_wrap_node(
-                Assembler(instruction=instruction)
+                Assembler(instruction=String(value=instruction))
             )
         )
 
         self.assertEqual(
             parse(self.function_wrap('asm("%s");') % instruction),
             self.function_wrap_node(
-                Assembler(instruction=instruction)
+                Assembler(instruction=String(value=instruction))
             )
         )
 

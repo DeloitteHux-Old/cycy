@@ -3,7 +3,7 @@ import os
 from rpython.rlib.streamio import open_file_as_stream
 
 from cycy import bytecode, compiler
-from cycy.objects import W_Char, W_Int32, W_Bool, W_String
+from cycy.objects import W_Bool, W_Char, W_Int32, W_Object, W_String
 from cycy.parser import ast
 from cycy.parser.sourceparser import parse
 
@@ -32,8 +32,9 @@ class CyCy(object):
     The main CyCy interpreter.
     """
 
-    def __init__(self):
+    def __init__(self, environment=None):
         self.compiled_functions = {}
+        self.environment = environment
 
     def run_main(self):
         main_byte_code = self.compiled_functions["main"]
@@ -130,37 +131,28 @@ class CyCy(object):
 
         assert False, "bytecode exited the main loop without returning"
 
-
-def interpret(source_files, environment=None):
-    interp = CyCy()
-
-    for file_path in source_files:
-        source_file = open_file_as_stream(file_path)
-        source = source_file.readall()
-        source_file.close()
-
-        program = parse(source, environment)
-
+    def compile(self, source):
+        program = parse(source=source, environment=self.environment)
         assert isinstance(program, ast.Program)
         for function in program.functions():
             assert isinstance(function, ast.Function)
             byte_code = compiler.compile(function)
-            interp.compiled_functions[function.name] = byte_code
+            self.compiled_functions[function.name] = byte_code
 
-    interp.run_main()
-    # TODO: duh, this should really come from the program
-    return 5
+    def interpret(self, paths):
+        for path in paths:
+            source_file = open_file_as_stream(path)
+            source = source_file.readall()
+            source_file.close()
+            self.interpret_source(source)
 
-def interpret_source(source):
-    interp = CyCy()
-    program = parse(source)
+        return_value = self.run_main()
+        assert isinstance(return_value, W_Int32)
+        # TODO: duh, this should really come from the program
+        return 5
 
-    assert isinstance(program, ast.Program)
-    for function in program.functions():
-        assert isinstance(function, ast.Function)
-        byte_code = compiler.compile(function)
-        interp.compiled_functions[function.name] = byte_code
-
-    rv = interp.run_main()
-    assert isinstance(rv, W_Int32)
-    return rv
+    def interpret_source(self, source):
+        self.compile(source)
+        return_value = self.run_main()
+        assert isinstance(return_value, W_Object)
+        return return_value

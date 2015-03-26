@@ -187,7 +187,7 @@ class Null(Node):
             return True
         return False
 
-@attributes([Attribute(name="instruction")])
+@attributes([Attribute(name="instruction")], apply_with_init=False)
 class Assembler(Node):
     def __init__(self, instruction=None):
         self.instruction = instruction
@@ -232,7 +232,7 @@ class Program(Node):
     apply_with_init=False
 )
 class Type(Node):
-    def __init__(self, base=None, const=False, unsigned=False, reference=None, arraylength=None):
+    def __init__(self, base=None, const=False, unsigned=False, reference=None, arraylength=-1):
         if base == 'char':
             self.base_type = 'int'
             self.length = 8
