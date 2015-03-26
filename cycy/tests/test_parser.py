@@ -449,6 +449,20 @@ class TestParser(TestCase):
             )
         )
 
+    def test_braceless_while_loop(self):
+        self.assertEqual(
+            parse(self.function_wrap("""
+                while ( i < 10 )
+                    i++;
+                """)),
+            self.function_wrap_node(
+                While(
+                    condition=BinaryOperation(operator="<", left=Variable(name="i"), right=Int32(value=10)),
+                    body=Block([PostOperation(operator="++", variable=Variable(name="i"))]),
+                    )
+                )
+            )
+
     def test_while_loop(self):
         self.assertEqual(
             parse(self.function_wrap("while (string[i] != NULL) { putc(string[i++]); }")),

@@ -175,6 +175,10 @@ class SourceParser(object):
     def while_loop(self, p):
         return While(condition=p[2], body=p[4])
 
+    @pg.production("while_loop : while LEFT_BRACKET expr RIGHT_BRACKET statement")
+    def while_loop_single_line(self, p):
+        return While(condition=p[2], body=Block(statements=[p[4]]))
+
     @pg.production("func_call : IDENTIFIER LEFT_BRACKET param_list RIGHT_BRACKET")
     def function_call(self, p):
         return Call(name=p[0].getstr(), args=p[2].get_items())
