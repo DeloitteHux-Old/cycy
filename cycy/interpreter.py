@@ -157,4 +157,4 @@ def interpret_source(source):
 
     rv = interp.run_main()
     assert isinstance(rv, W_Int32)
-    return rv.value
+    return rv
