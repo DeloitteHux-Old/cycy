@@ -194,11 +194,12 @@ class SourceParser(object):
             value=Int32(int(p[3].getstr()))
         )
 
-    @pg.production("type : optional_const core_or_pointer_type")
+    @pg.production("type : optional_unsigned optional_const core_or_pointer_type")
     def type_object(self, p):
-        the_type = p[1]
+        the_type = p[2]
         assert isinstance(the_type, Type)
-        the_type.const = p[0] == BoolTrue
+        the_type.unsigned = (p[0] == BoolTrue)
+        the_type.const = (p[1] == BoolTrue)
         return the_type
 
     @pg.production("optional_const : ")
@@ -209,6 +210,14 @@ class SourceParser(object):
     def const_true(self, p):
         return BoolTrue
 
+    @pg.production("optional_unsigned : ")
+    def unsigned_false(self, p):
+        return BoolFalse
+
+    @pg.production("optional_unsigned : UNSIGNED")
+    def unsigned_true(self, p):
+        return BoolTrue
+
     @pg.production("core_or_pointer_type : core_type")
     def core_type(self, p):
         return p[0]
@@ -217,10 +226,16 @@ class SourceParser(object):
     def pointer_type(self, p):
         return Type(base="pointer", reference=p[0])
 
-    @pg.production("core_type : INT")
     @pg.production("core_type : CHAR")
-    def vtype(self, p):
+    @pg.production("core_type : INT")
+    @pg.production("core_type : SHORT")
+    @pg.production("core_type : LONG")
+    def generic_vtype(self, p):
         return Type(base=p[0].getstr())
+
+    @pg.production("core_type : LONG LONG")
+    def long_long_vtype(self, p):
+        return Type(base='long long')
 
     @pg.production("expr : primary_expression ++")
     def post_incr(self, p):

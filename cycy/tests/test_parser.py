@@ -49,6 +49,31 @@ class TestParser(TestCase):
             )
         )
 
+    def test_short_variable_declaration(self):
+        self.assertEqual(
+            parse(self.function_wrap('short i;')),
+            self.function_wrap_node(
+                VariableDeclaration(name="i", vtype=Type(base="short"), value=None)
+            )
+        )
+
+    def test_long_variable_declaration(self):
+        self.assertEqual(
+            parse(self.function_wrap('long i;')),
+            self.function_wrap_node(
+                VariableDeclaration(name="i", vtype=Type(base="long"), value=None)
+            )
+        )
+
+
+    def test_long_long_variable_declaration(self):
+        self.assertEqual(
+            parse(self.function_wrap('long long i;')),
+            self.function_wrap_node(
+                VariableDeclaration(name="i", vtype=Type(base="long long"), value=None)
+            )
+        )
+
     def test_variable_declaration_with_assignment(self):
         self.assertEqual(
             parse(self.function_wrap("int i = 0;")),
@@ -76,6 +101,22 @@ class TestParser(TestCase):
             parse(self.function_wrap('const int i;')),
             self.function_wrap_node(
                 VariableDeclaration(name="i", vtype=Type(base="int", const=True), value=None)
+            )
+        )
+
+    def test_unsigned_variable_declaration(self):
+        self.assertEqual(
+            parse(self.function_wrap('unsigned int i;')),
+            self.function_wrap_node(
+                VariableDeclaration(name="i", vtype=Type(base="int", unsigned=True), value=None)
+            )
+        )
+
+    def test_unsigned_const_variable_declaration(self):
+        self.assertEqual(
+            parse(self.function_wrap('unsigned const int i;')),
+            self.function_wrap_node(
+                VariableDeclaration(name="i", vtype=Type(base="int", unsigned=True, const=True), value=None)
             )
         )
 

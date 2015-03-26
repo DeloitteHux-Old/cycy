@@ -99,7 +99,10 @@ class __extend__(ast.While):
 
 class __extend__(ast.VariableDeclaration):
     def compile(self, context):
-        if self.vtype.base_type == "int" and self.vtype.length == 32:
+        vtype = self.vtype
+        assert isinstance(vtype, ast.Type)
+
+        if vtype.base_type == "int" and vtype.length == 32:
             variable_index = context.register_int32_variable(self.name)
             if self.value:
                 self.value.compile(context)
@@ -107,12 +110,13 @@ class __extend__(ast.VariableDeclaration):
             # else we've declared the variable, but it is
             # uninitialized... TODO: how to handle this
         else:
-            raise NotImplementedError("Variable type %s not supported" % self.vtype)
+            raise NotImplementedError("Variable type %s not supported" % vtype)
 
 class __extend__(ast.Variable):
     def compile(self, context):
         variable_index = context.variable_indices.get(self.name, -42)
         if variable_index == -42:
+            # XXX: this should be either a runtime or compile time exception
             raise Exception("Attempt to use undeclared variable '%s'" % self.name)
         context.emit(bytecode.LOAD_VARIABLE, variable_index)
 

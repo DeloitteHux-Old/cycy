@@ -4,9 +4,12 @@ RULES = [
     "INTEGER",
     "CHAR",
     "STRING",
-    "INT",
     "CHAR",
+    "SHORT",
+    "INT",
+    "LONG",
     "CONST",
+    "UNSIGNED",
     "null",
     "return",
     "void",
@@ -31,10 +34,13 @@ lg = LexerGenerator()
 lg.add("INTEGER", "\d+")
 lg.add("CHAR", "'\\\\?.'")
 lg.add("STRING", "\".*\"")
-lg.add("INT", "int")
 lg.add("CHAR", "char")
+lg.add("SHORT", "short")
+lg.add("INT", "int")
+lg.add("LONG", "long")
 lg.add("null", "NULL")
 lg.add("CONST", "const")
+lg.add("UNSIGNED", "unsigned")
 lg.add("return", "return")
 lg.add("void", "void")
 lg.add("while", "while")
