@@ -5,10 +5,16 @@ Execute ./cycy-c <filename>
 
 import sys
 
+from rpython.jit.codewriter.policy import JitPolicy
+
 from cycy.interpreter import interpret
 from cycy.environment import Environment
+from cycy.repl import REPL
 
 def main(argv):
+    if len(argv) == 1:
+        REPL().run()
+
     print_help = False
     env = Environment()
     source_files = []
@@ -32,3 +38,7 @@ def main(argv):
 
 def target(driver, args):
     return main, None
+
+
+def jitpolicy(driver):
+    return JitPolicy()

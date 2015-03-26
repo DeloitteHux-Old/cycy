@@ -66,19 +66,24 @@ class SourceParser(object):
     def main_program(self, p):
         return p[0]
 
-    @pg.production("program : function")
+    @pg.production("program : unit")
     def program_function(self, p):
         return Program([p[0]])
 
-    @pg.production("program : function program")
-    def program_function_program(self, p):
-        p[1].add_function(p[0])
+    @pg.production("program : unit program")
+    def program_unit_program(self, p):
+        p[1].add_unit(p[0])
         return p[1]
 
     @pg.production("return_statement : return expr ;")
     @pg.production("return_statement : return func_call_statement")
     def return_statement(self, p):
         return ReturnStatement(value=p[1])
+
+    @pg.production("unit : function")
+    @pg.production("unit : prototype")
+    def unit(self, p):
+        return p[0]
 
     @pg.production("function : type IDENTIFIER LEFT_BRACKET void RIGHT_BRACKET block")
     def function_void_param(self, p):
@@ -98,9 +103,41 @@ class SourceParser(object):
             body=p[5]
         )
 
+    @pg.production("prototype : type IDENTIFIER LEFT_BRACKET void RIGHT_BRACKET ;")
+    def function_void_param(self, p):
+        return Function(
+            return_type=p[0],
+            name=p[1].getstr(),
+            params=[],
+            prototype=True
+        )
+
+    @pg.production("prototype : type IDENTIFIER LEFT_BRACKET arg_decl_list RIGHT_BRACKET ;")
+    def function_with_args(self, p):
+        return Function(
+            return_type=p[0],
+            name=p[1].getstr(),
+            params=p[3].get_items(),
+            prototype=True
+        )
+
+    @pg.production("prototype : type IDENTIFIER LEFT_BRACKET type_list RIGHT_BRACKET ;")
+    def function_with_args(self, p):
+        return Function(
+            return_type=p[0],
+            name=p[1].getstr(),
+            params=[VariableDeclaration(name=None, vtype=x, value=None) for x in p[3].get_items()],
+            prototype=True
+        )
+
     @pg.production("arg_decl_list : declaration")
-    def arg_decl_list_arg_decl(self, p):
+    def arg_decl_list_declaration(self, p):
         return NodeList([p[0]])
+
+    @pg.production("arg_decl_list : arg_decl_list , declaration")
+    def arg_decl_list(self, p):
+        p[0].append(p[2])
+        return p[0]
 
     @pg.production("block : LEFT_CURLY_BRACKET statement_list RIGHT_CURLY_BRACKET")
     def block_statement_list(self, p):
@@ -147,21 +184,16 @@ class SourceParser(object):
     def assign(self, p):
         return Assignment(left=Variable(p[0].getstr()), right=p[2])
 
-    @pg.production('expr : expr != expr')
-    def binop_ne(self, p):
-        return BinaryOperation(operator="!=", left=p[0], right=p[2])
-
-    @pg.production("expr : expr + expr")
-    def binop_add(self, p):
-        return BinaryOperation(operator="+", left=p[0], right=p[2])
-
     @pg.production("expr : expr - expr")
-    def binop_sub(self, p):
-        return BinaryOperation(operator="-", left=p[0], right=p[2])
-
+    @pg.production("expr : expr + expr")
+    @pg.production('expr : expr == expr')
+    @pg.production('expr : expr != expr')
     @pg.production("expr : expr <= expr")
-    def binop_le(self, p):
-        return BinaryOperation(operator="<=", left=p[0], right=p[2])
+    @pg.production("expr : expr >= expr")
+    @pg.production("expr : expr < expr")
+    @pg.production("expr : expr > expr")
+    def binop(self, p):
+        return BinaryOperation(operator=p[1].getstr(), left=p[0], right=p[2])
 
     @pg.production("expr : STRING_LITERAL")
     def expr_string(self, p):
@@ -198,6 +230,15 @@ class SourceParser(object):
             vtype=p[0],
             value=String(p[3].getstr().strip("\""))
         )
+
+    @pg.production("type_list : type")
+    def type_list(self, p):
+        return NodeList([p[0]])
+
+    @pg.production("type_list : type_list , type")
+    def type_list_type(self, p):
+        p[0].append(p[2])
+        return p[0]
 
     @pg.production("type : optional_unsigned optional_const core_or_pointer_type")
     def type_object(self, p):

@@ -4,7 +4,7 @@ import os
 from mock import patch
 
 from cycy import interpreter
-from cycy.objects import W_Char, W_Int32, W_Bool, w_null
+from cycy.objects import W_Bool, W_Char, W_Function, W_Int32
 from cycy.bytecode import *
 
 
@@ -15,7 +15,7 @@ class TestInterpreter(TestCase):
                 PUTC, 0,
                 RETURN, 0,
             ],
-            constants=[W_Char(ord("x"))],
+            constants=[W_Char("x")],
             name="<some test bytecode>",
             number_of_variables=0,
         )
@@ -162,3 +162,32 @@ class TestInterpreter(TestCase):
 
         rv = interpreter.CyCy().run(byte_code)
         self.assertEqual(rv, W_Int32(1))
+
+    def test_it_calls_a_function_with_no_args(self):
+        byte_code_caller = Bytecode(
+            instructions=[
+                CALL, 0,
+                RETURN, 1,
+            ],
+            constants=[W_Function("callee", 0)],
+            name="<test_calls_a_function_with_no_args>",
+            number_of_variables=0,
+        )
+
+        byte_code_callee = Bytecode(
+            instructions=[
+                LOAD_CONST, 0,
+                RETURN, 1,
+            ],
+            constants=[W_Int32(42)],
+            name="<test_calls_a_function_with_no_args>",
+            number_of_variables=0,
+        )
+
+        interp = interpreter.CyCy()
+        interp.compiled_functions = {
+            "callee": byte_code_callee,
+        }
+
+        rv = interp.run(byte_code_caller)
+        self.assertEqual(W_Int32(42), rv)
