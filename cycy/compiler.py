@@ -45,12 +45,12 @@ class Context(object):
         self.instructions.append(byte_code)
         self.instructions.append(arg)
 
-    def register_int32_variable(self, name):
+    def register_variable(self, name):
         self.variable_indices[name] = len(self.variable_indices)
         return len(self.variable_indices) - 1
 
-    def register_int32_constant(self, int32):
-        self.constants.append(int32)
+    def register_constant(self, constant):
+        self.constants.append(constant)
         return len(self.constants) - 1
 
     def build(self, name="<input>"):
@@ -79,7 +79,7 @@ class __extend__(ast.BinaryOperation):
 class __extend__(ast.Int32):
     def compile(self, context):
         wrapped = W_Int32(value=self.value)
-        index = context.register_int32_constant(wrapped)
+        index = context.register_constant(wrapped)
         context.emit(bytecode.LOAD_CONST, index)
 
 class __extend__(ast.ReturnStatement):
@@ -103,7 +103,7 @@ class __extend__(ast.VariableDeclaration):
         assert isinstance(vtype, ast.Type)
 
         if vtype.base_type == "int" and vtype.length == 32:
-            variable_index = context.register_int32_variable(self.name)
+            variable_index = context.register_variable(self.name)
             if self.value:
                 self.value.compile(context)
                 context.emit(bytecode.STORE_VARIABLE, variable_index)
