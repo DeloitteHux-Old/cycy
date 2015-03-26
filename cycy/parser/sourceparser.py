@@ -169,7 +169,7 @@ class SourceParser(object):
     
     @pg.production("assembler : ASM LEFT_BRACKET STRING_LITERAL RIGHT_BRACKET")
     def assembler(self, p):
-        return Assembler(instruction=p[2])
+        return Assembler(instruction=String(p[2].getstr().strip("\"")))
 
     @pg.production("while_loop : while LEFT_BRACKET expr RIGHT_BRACKET block")
     def while_loop(self, p):

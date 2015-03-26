@@ -381,14 +381,14 @@ class TestParser(TestCase):
         self.assertEqual(
             parse(self.function_wrap('__asm__("%s");') % instruction),
             self.function_wrap_node(
-                Assembler(instruction=instruction)
+                Assembler(instruction=String(value=instruction))
             )
         )
 
         self.assertEqual(
             parse(self.function_wrap('asm("%s");') % instruction),
             self.function_wrap_node(
-                Assembler(instruction=instruction)
+                Assembler(instruction=String(value=instruction))
             )
         )
 
