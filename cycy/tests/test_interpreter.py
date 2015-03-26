@@ -14,6 +14,7 @@ class TestInterpreterWithBytecode(TestCase):
     def test_it_handles_opcodes_with_args(self):
         byte_code = Bytecode(
             instructions=[
+                LOAD_CONST, 0,
                 PUTC, 0,
                 RETURN, 0,
             ],
