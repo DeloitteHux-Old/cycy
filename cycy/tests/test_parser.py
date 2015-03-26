@@ -11,10 +11,13 @@ from cycy.parser.ast import (
     Char,
     Function,
     Int32,
+    Double,
     Null,
     PostOperation,
+    PreOperation,
     Program,
     ReturnStatement,
+    String,
     Variable,
     VariableDeclaration,
     While,
@@ -114,6 +117,14 @@ class TestParser(TestCase):
         self.assertEqual( var.base_type, "int")
         self.assertEqual( var.length, 16)
 
+    def test_string_variable_declaration(self):
+        self.assertEqual(
+            parse("int main(void) { const char* foo = \"foo\"; }"),
+            self.function_wrap_node(
+                VariableDeclaration(name="foo", vtype=Type(base="pointer", const=True, reference=Type(base="char")), value=String("foo"))
+            )
+        )
+
     def test_long_variable_declaration(self):
         self.assertEqual(
             parse(self.function_wrap('long i;')),
@@ -178,6 +189,15 @@ class TestParser(TestCase):
             )
         )
 
+    def test_variable_declaration_with_floating_point_assignment(self):
+        self.assertEqual(
+            parse(self.function_wrap("float i = 0.0;")),
+            self.function_wrap_node(
+                VariableDeclaration(name="i", vtype=Type(base="float"), value=Double(value=0.0))
+            )
+        )
+
+
     def test_pointer_variable_declaration(self):
         self.assertEqual(
             parse(self.function_wrap('int* i;')),
@@ -232,11 +252,83 @@ class TestParser(TestCase):
             )
         )
 
+    def test_postdecrement(self):
+        self.assertEqual(
+            parse(self.function_wrap("i--;")),
+            self.function_wrap_node(
+                PostOperation(operator="--", variable=Variable(name="i"))
+            )
+        )
+
+    def test_preincrement(self):
+        self.assertEqual(
+            parse(self.function_wrap("++i;")),
+            self.function_wrap_node(
+                PreOperation(operator="++", variable=Variable(name="i"))
+            )
+        )
+
+    def test_predecrement(self):
+        self.assertEqual(
+            parse(self.function_wrap("--i;")),
+            self.function_wrap_node(
+                PreOperation(operator="--", variable=Variable(name="i"))
+            )
+        )
+
     def test_assignment(self):
         self.assertEqual(
             parse(self.function_wrap("i = 0;")),
             self.function_wrap_node(
                 Assignment(left=Variable(name="i"), right=Int32(value=0))
+            )
+        )
+
+    def test_floating_point_assignment(self):
+        self.assertEqual(
+            parse(self.function_wrap("i = 0.0;")),
+            self.function_wrap_node(
+                Assignment(left=Variable(name="i"), right=Double(value=0.0))
+            )
+        )
+
+    def test_addition(self):
+        self.assertEqual(
+            parse(self.function_wrap("1 + 2;")),
+            self.function_wrap_node(
+                BinaryOperation(operator="+", left=Int32(value=1), right=Int32(value=2))
+            )
+        )
+
+    def test_subtraction(self):
+        self.assertEqual(
+            parse(self.function_wrap("1 - 2;")),
+            self.function_wrap_node(
+                BinaryOperation(operator="-", left=Int32(value=1), right=Int32(value=2))
+            )
+        )
+
+    def test_multiplication(self):
+        self.assertEqual(
+            parse(self.function_wrap("1 * 2;")),
+            self.function_wrap_node(
+                BinaryOperation(operator="*", left=Int32(value=1), right=Int32(value=2))
+            )
+        )
+
+    def test_division(self):
+        self.assertEqual(
+            parse(self.function_wrap("1 / 2;")),
+            self.function_wrap_node(
+                BinaryOperation(operator="/", left=Int32(value=1), right=Int32(value=2))
+            )
+        )
+
+    def test_modulus(self):
+        self.assertEqual(
+            parse(self.function_wrap("1 % 2;")),
+            self.function_wrap_node(
+                BinaryOperation(operator="%", left=Int32(value=1), right=Int32(value=2))
             )
         )
 
@@ -252,11 +344,11 @@ class TestParser(TestCase):
         self.assertEqual(
             parse(self.function_wrap('"foo";')),
             self.function_wrap_node(
-                Array(value=[Char(value='f'), Char(value='o'), Char(value='o'), Char(value=chr(0))])
+                String(value="foo")
             )
         )
 
-    def test_array_deference(self):
+    def test_array_dereference(self):
         self.assertEqual(
             parse(self.function_wrap("array[4];")),
             self.function_wrap_node(
@@ -267,7 +359,7 @@ class TestParser(TestCase):
     def test_main_with_no_parameters(self):
         self.assertEqual(
             parse("int main(void) { return 0; }"),
-            Program(functions=[
+            Program(units=[
                 Function(
                     return_type=Type(base='int'),
                     name="main",
@@ -282,7 +374,7 @@ class TestParser(TestCase):
     def test_main_with_multiple_parameters(self):
         self.assertEqual(
             parse("int main(int argc, char **argv, char **env) { return 0; }"),
-            Program(functions=[
+            Program(units=[
                 Function(
                     return_type=Type(base='int'),
                     name="main",
@@ -338,6 +430,42 @@ class TestParser(TestCase):
                 )
             )
         )
+
+    def test_prototype_with_named_arguments(self):
+        self.assertEqual(
+            parse("int foo(int i, long l, double d, char *cp);"),
+            Program([
+                Function(
+                    return_type=Type(base='int'),
+                    name="foo",
+                    params=[
+                        VariableDeclaration(name="i", vtype=Type(base="int")),
+                        VariableDeclaration(name="l", vtype=Type(base="long")),
+                        VariableDeclaration(name="d", vtype=Type(base="double")),
+                        VariableDeclaration(name="cp", vtype=Type(base="pointer", reference=Type(base="char"))),
+                        ],
+                    prototype=True,
+                    )
+                ])
+            )
+
+    def test_prototype_without_named_arguments(self):
+        self.assertEqual(
+            parse("int foo(int, long, double, char *);"),
+            Program([
+                Function(
+                    return_type=Type(base='int'),
+                    name="foo",
+                    params=[
+                        VariableDeclaration(name=None, vtype=Type(base="int")),
+                        VariableDeclaration(name=None, vtype=Type(base="long")),
+                        VariableDeclaration(name=None, vtype=Type(base="double")),
+                        VariableDeclaration(name=None, vtype=Type(base="pointer", reference=Type(base="char"))),
+                        ],
+                    prototype=True,
+                    )
+                ])
+            )
 
     def test_puts_function(self):
         self.assertEqual(
@@ -395,7 +523,7 @@ class TestParser(TestCase):
                     params=[],
                     body=Block([
                         ReturnStatement(
-                            value=Call(name="puts", args=[Array([Char('H'), Char('e'), Char('l'), Char('l'), Char('o'), Char(','), Char(' '), Char('w'), Char('o'), Char('r'), Char('l'), Char('d'), Char('!'), Char(chr(0))])])
+                            value=Call(name="puts", args=[String("Hello, world!")])
                         )
                     ])
                 )
@@ -452,7 +580,7 @@ class TestParser(TestCase):
                     params=[],
                     body=Block([
                         ReturnStatement(
-                            value=Call(name="puts", args=[Array([Char('H'), Char('e'), Char('l'), Char('l'), Char('o'), Char(','), Char(' '), Char('w'), Char('o'), Char('r'), Char('l'), Char('d'), Char('!'), Char(chr(0))])])
+                            value=Call(name="puts", args=[String("Hello, world!")])
                         )
                     ])
                 ),

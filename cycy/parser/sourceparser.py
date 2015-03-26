@@ -11,11 +11,14 @@ from .ast import (
     Char,
     Function,
     Int32,
+    Double,
     Node,
     Null,
     PostOperation,
+    PreOperation,
     Program,
     ReturnStatement,
+    String,
     Variable,
     VariableDeclaration,
     While,
@@ -65,19 +68,24 @@ class SourceParser(object):
     def main_program(self, p):
         return p[0]
 
-    @pg.production("program : function")
+    @pg.production("program : unit")
     def program_function(self, p):
         return Program([p[0]])
 
-    @pg.production("program : function program")
-    def program_function_program(self, p):
-        p[1].add_function(p[0])
+    @pg.production("program : unit program")
+    def program_unit_program(self, p):
+        p[1].add_unit(p[0])
         return p[1]
 
     @pg.production("return_statement : return expr ;")
     @pg.production("return_statement : return func_call_statement")
     def return_statement(self, p):
         return ReturnStatement(value=p[1])
+
+    @pg.production("unit : function")
+    @pg.production("unit : prototype")
+    def unit(self, p):
+        return p[0]
 
     @pg.production("function : type IDENTIFIER LEFT_BRACKET void RIGHT_BRACKET block")
     def function_void_param(self, p):
@@ -95,6 +103,33 @@ class SourceParser(object):
             name=p[1].getstr(),
             params=p[3].get_items(),
             body=p[5]
+        )
+
+    @pg.production("prototype : type IDENTIFIER LEFT_BRACKET void RIGHT_BRACKET ;")
+    def function_void_param(self, p):
+        return Function(
+            return_type=p[0],
+            name=p[1].getstr(),
+            params=[],
+            prototype=True
+        )
+
+    @pg.production("prototype : type IDENTIFIER LEFT_BRACKET arg_decl_list RIGHT_BRACKET ;")
+    def function_with_args(self, p):
+        return Function(
+            return_type=p[0],
+            name=p[1].getstr(),
+            params=p[3].get_items(),
+            prototype=True
+        )
+
+    @pg.production("prototype : type IDENTIFIER LEFT_BRACKET type_list RIGHT_BRACKET ;")
+    def function_with_args(self, p):
+        return Function(
+            return_type=p[0],
+            name=p[1].getstr(),
+            params=[VariableDeclaration(name=None, vtype=x, value=None) for x in p[3].get_items()],
+            prototype=True
         )
 
     @pg.production("arg_decl_list : declaration")
@@ -153,6 +188,9 @@ class SourceParser(object):
 
     @pg.production("expr : expr - expr")
     @pg.production("expr : expr + expr")
+    @pg.production("expr : expr * expr")
+    @pg.production("expr : expr / expr")
+    @pg.production("expr : expr % expr")
     @pg.production('expr : expr == expr')
     @pg.production('expr : expr != expr')
     @pg.production("expr : expr <= expr")
@@ -164,11 +202,7 @@ class SourceParser(object):
 
     @pg.production("expr : STRING_LITERAL")
     def expr_string(self, p):
-        vals = []
-        for v in p[0].getstr().strip('"'):
-            vals.append(Char(value=v))
-        vals.append(Char(value=chr(0)))
-        return Array(value=vals)
+        return String(p[0].getstr().strip("\""))
 
     @pg.production("expr : null")
     def expr_null(self, p):
@@ -186,13 +220,38 @@ class SourceParser(object):
     def declare_int(self, p):
         return VariableDeclaration(name=p[1].getstr(), vtype=p[0], value=None)
 
-    @pg.production("declaration : type IDENTIFIER = INTEGER")
+    @pg.production("declaration : type IDENTIFIER = INTEGER_LITERAL")
     def declare_assign_int(self, p):
         return VariableDeclaration(
             name=p[1].getstr(),
             vtype=p[0],
             value=Int32(int(p[3].getstr()))
         )
+
+    @pg.production("declaration : type IDENTIFIER = FLOAT_LITERAL")
+    def declare_assign_float(self, p):
+        return VariableDeclaration(
+            name=p[1].getstr(),
+            vtype=p[0],
+            value=Double(float(p[3].getstr()))
+        )
+
+    @pg.production("declaration : type IDENTIFIER = STRING_LITERAL")
+    def declare_assign_string(self, p):
+        return VariableDeclaration(
+            name=p[1].getstr(),
+            vtype=p[0],
+            value=String(p[3].getstr().strip("\""))
+        )
+
+    @pg.production("type_list : type")
+    def type_list(self, p):
+        return NodeList([p[0]])
+
+    @pg.production("type_list : type_list , type")
+    def type_list_type(self, p):
+        p[0].append(p[2])
+        return p[0]
 
     @pg.production("type : optional_unsigned optional_const core_or_pointer_type")
     def type_object(self, p):
@@ -247,6 +306,18 @@ class SourceParser(object):
     def post_incr(self, p):
         return PostOperation(operator="++", variable=p[0])
 
+    @pg.production("expr : primary_expression --")
+    def post_incr(self, p):
+        return PostOperation(operator="--", variable=p[0])
+
+    @pg.production("expr : ++ primary_expression")
+    def post_incr(self, p):
+        return PreOperation(operator="++", variable=p[1])
+
+    @pg.production("expr : -- primary_expression")
+    def post_incr(self, p):
+        return PreOperation(operator="--", variable=p[1])
+
     @pg.production("expr : primary_expression")
     def expr_const(self, p):
         return p[0]
@@ -270,11 +341,14 @@ class SourceParser(object):
         else:
             return p[1]
 
-    @pg.production("const : INTEGER")
+    @pg.production("const : FLOAT_LITERAL")
+    @pg.production("const : INTEGER_LITERAL")
     @pg.production("const : CHAR_LITERAL")
     def const(self, p):
-        if p[0].gettokentype() == "INTEGER":
+        if p[0].gettokentype() == "INTEGER_LITERAL":
             return Int32(int(p[0].getstr()))
+        elif p[0].gettokentype() == "FLOAT_LITERAL":
+            return Double(float(p[0].getstr()))
         elif p[0].gettokentype() == "CHAR_LITERAL":
             return Char(p[0].getstr().strip("'"))
         raise AssertionError("Bad token type in const")
@@ -294,7 +368,7 @@ class SourceParser(object):
 
     parser = pg.build()
 
-def parse(source):
-    lexed = lexer.lex(preprocess(source))
+def parse(source, environment=None):
+    lexed = lexer.lex(preprocess(source, environment))
     parser = SourceParser(lexed)
     return parser.parse()

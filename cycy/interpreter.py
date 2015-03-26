@@ -1,5 +1,7 @@
 import os
 
+from rpython.rlib.streamio import open_file_as_stream
+
 from cycy import bytecode, compiler
 from cycy.objects import W_Char, W_Int32, W_Bool
 from cycy.parser import ast
@@ -21,7 +23,7 @@ def get_location(pc, stack, variables):
 
 jitdriver = JitDriver(
     greens=["pc", "stack", "variables"],
-    reds=["byte_code", "arguments"],
+    reds=["byte_code", "arguments", "interpreter"],
     get_printable_location=get_location
 )
 
@@ -55,6 +57,7 @@ class CyCy(object):
                 variables=variables,
                 byte_code=byte_code,
                 arguments=arguments,
+                interpreter=self,
             )
 
             opcode = byte_code.instructions[pc]
@@ -116,12 +119,32 @@ class CyCy(object):
         assert False, "bytecode exited the main loop without returning"
 
 
-def interpret(source):
+def interpret(source_files, environment=None):
+    interp = CyCy()
+
+    for file_path in source_files:
+        source_file = open_file_as_stream(file_path)
+        source = source_file.readall()
+        source_file.close()
+
+        program = parse(source, environment)
+
+        assert isinstance(program, ast.Program)
+        for function in program.functions():
+            assert isinstance(function, ast.Function)
+            byte_code = compiler.compile(function)
+            interp.compiled_functions[function.name] = byte_code
+
+    interp.run_main()
+    # TODO: duh, this should really come from the program
+    return 5
+
+def interpret_source(source):
     interp = CyCy()
     program = parse(source)
 
     assert isinstance(program, ast.Program)
-    for function in program.functions:
+    for function in program.functions():
         assert isinstance(function, ast.Function)
         byte_code = compiler.compile(function)
         interp.compiled_functions[function.name] = byte_code

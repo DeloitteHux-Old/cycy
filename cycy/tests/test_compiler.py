@@ -15,7 +15,7 @@ class TestCompiler(TestCase):
         """
 
         program = parse(source)
-        main_func_ast = next(func for func in program.functions if func.name == "main")
+        main_func_ast = next(func for func in program.functions() if func.name == "main")
         bytecode = compiler.compile(main_func_ast)
         expected = dedent(cleaned(to).strip("\n")).strip("\n")
         self.assertEqual(bytecode.dump(), expected)
@@ -26,5 +26,13 @@ class TestCompiler(TestCase):
             0 LOAD_CONST 0
             2 LOAD_CONST 1
             4 BINARY_NEQ
+            """
+        )
+
+    def test_char_array(self):
+        self.assertCompiles(
+            "int main(void) { const char* foo = \"foo\"; }", """
+            0 LOAD_CONST 0
+            2 STORE_VARIABLE 0
             """
         )

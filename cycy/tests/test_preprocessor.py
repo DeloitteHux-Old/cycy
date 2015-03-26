@@ -15,7 +15,7 @@ def clean(string):
 
 class TestParser(TestCase):
     def test_include_statement(self):
-        def fake_process_file(path):
+        def fake_process_file(path, env):
             return "int foo(void) { bar; }"
         with patch.object(preprocessor, "preprocess_file", fake_process_file):
             pp = preprocess("""

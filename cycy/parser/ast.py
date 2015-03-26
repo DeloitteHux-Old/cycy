@@ -38,18 +38,25 @@ class VariableDeclaration(Node):
         self.vtype = vtype
         self.value = value
 
-
 @attributes([Attribute(name="value")], apply_with_init=False)
 class Int32(Node):
     def __init__(self, value):
         self.value = value
 
+@attributes([Attribute(name="value")], apply_with_init=False)
+class Double(Node):
+    def __init__(self, value):
+        self.value = value
+
+@attributes([Attribute(name="value")], apply_with_init=False)
+class String(Node):
+    def __init__(self, value):
+        self.value = value
 
 @attributes([Attribute(name="name")], apply_with_init=False)
 class Variable(Node):
     def __init__(self, name):
         self.name = name
-
 
 @attributes(
     [
@@ -64,6 +71,18 @@ class PostOperation(Node):
         self.operator = operator
         self.variable = variable
 
+@attributes(
+    [
+        Attribute(name="operator"),
+        Attribute(name="variable"),
+    ],
+    apply_with_init=False,
+)
+class PreOperation(Node):
+    def __init__(self, operator, variable):
+        assert operator in ("++", "--")
+        self.operator = operator
+        self.variable = variable
 
 @attributes(
     [Attribute(name="left"), Attribute(name="right")],
@@ -121,16 +140,22 @@ class ReturnStatement(Node):
         Attribute(name="return_type"),
         Attribute(name="name"),
         Attribute(name="params"),
-        Attribute(name="body")
+        Attribute(name="body"),
+        Attribute(name="_prototype")
     ],
     apply_with_init=False
 )
 class Function(Node):
-    def __init__(self, return_type, name, params, body):
+    def __init__(self, return_type=None, name=None, params=None, body=None, prototype=False):
         self.return_type = return_type
         self.name = name
         self.params = params
         self.body = body
+        self._prototype = prototype
+
+    def prototype(self):
+        return self._prototype
+
 
 @attributes(
     [
@@ -176,16 +201,20 @@ class While(Node):
 
 @attributes(
     [
-        Attribute(name="functions")
+        Attribute(name="units")
     ],
     apply_with_init=False
 )
 class Program(Node):
-    def __init__(self, functions):
-        self.functions = functions
+    def __init__(self, units):
+        self.units = units
 
-    def add_function(self, func):
-        self.functions.append(func)
+    def add_unit(self, unit):
+        self.units.append(unit)
+
+    def functions(self):
+        return [unit for unit in self.units if not unit.prototype()]
+
 
 @attributes(
     [

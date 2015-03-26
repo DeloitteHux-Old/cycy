@@ -28,6 +28,13 @@ class W_Char(W_Object):
 
 
 @attributes([Attribute(name="value")], apply_with_init=False)
+class W_String(W_Object):
+    def __init__(self, value):
+        assert isinstance(value, str)
+        self.value = value
+
+
+@attributes([Attribute(name="value")], apply_with_init=False)
 class W_Int32(W_Object):
     def __init__(self, value):
         assert isinstance(value, int)
