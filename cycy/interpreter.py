@@ -40,7 +40,7 @@ class CyCy(object):
     def run(self, byte_code):
         pc = 0
         stack = []
-        variables = [None] * byte_code.number_of_variables
+        variables = [None] * len(byte_code.variables)
 
         while pc < len(byte_code.instructions):
             jitdriver.jit_merge_point(

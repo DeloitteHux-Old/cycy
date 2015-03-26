@@ -9,7 +9,7 @@ from cycy.parser import ast
     [
         Attribute(name="instructions"),
         Attribute(name="constants"),
-        Attribute(name="variable_indices"),
+        Attribute(name="variables"),
     ],
     apply_with_init=False,
 )
@@ -29,7 +29,7 @@ class Context(object):
 
             These are C-level objects (i.e. they're wrapped).
 
-    .. attribute:: variable_indices
+    .. attribute:: variables
 
         a mapping between variable names (:class:`str`\ s) and the
         indices in an array that they should be assigned to
@@ -39,15 +39,15 @@ class Context(object):
     def __init__(self):
         self.instructions = []
         self.constants = []
-        self.variable_indices = {}
+        self.variables = {}
 
     def emit(self, byte_code, arg=bytecode.NO_ARG):
         self.instructions.append(byte_code)
         self.instructions.append(arg)
 
     def register_variable(self, name):
-        self.variable_indices[name] = len(self.variable_indices)
-        return len(self.variable_indices) - 1
+        self.variables[name] = len(self.variables)
+        return len(self.variables) - 1
 
     def register_constant(self, constant):
         self.constants.append(constant)
@@ -58,7 +58,7 @@ class Context(object):
             instructions=self.instructions,
             name=name,
             constants=self.constants,
-            number_of_variables=len(self.variable_indices),
+            variables=self.variables,
         )
 
 class __extend__(ast.Function):
@@ -120,7 +120,7 @@ class __extend__(ast.VariableDeclaration):
 
 class __extend__(ast.Variable):
     def compile(self, context):
-        variable_index = context.variable_indices.get(self.name, -42)
+        variable_index = context.variables.get(self.name, -42)
         if variable_index == -42:
             # XXX: this should be either a runtime or compile time exception
             raise Exception("Attempt to use undeclared variable '%s'" % self.name)

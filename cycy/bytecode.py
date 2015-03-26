@@ -49,7 +49,7 @@ NO_ARG = -42
         Attribute(name="instructions", exclude_from_repr=True),
         Attribute(name="name"),
         Attribute(name="constants", exclude_from_repr=True),
-        Attribute(name="number_of_variables"),
+        Attribute(name="variables", exclude_from_repr=True),
     ],
     apply_with_init=False,
 )
@@ -63,9 +63,10 @@ class Bytecode(object):
         inherited from the :class:`cycy.compiler.Context` that produced this
         bytecode
 
-    .. attribute:: number_of_variables
+    .. attribute:: variables
 
-        Yeah, that.
+        a mapping between variable names (:class:`str`\ s) and the
+        indices in an array that they should be assigned to
 
     .. attribute:: name
 
@@ -73,11 +74,11 @@ class Bytecode(object):
 
     """
 
-    def __init__(self, instructions, constants, number_of_variables, name):
+    def __init__(self, instructions, constants, variables, name):
         self.instructions = instructions
         self.name = name
         self.constants = constants
-        self.number_of_variables = number_of_variables
+        self.variables = variables
 
     def __iter__(self):
         """Yield (offset, byte_code, arg) tuples.
