@@ -17,6 +17,7 @@ RULES = [
     "return",
     "void",
     "while",
+    "for",
     "ASM",
     "IDENTIFIER",
     "LEFT_SQUARE_BRACKET",
@@ -63,6 +64,7 @@ lg.add("UNSIGNED", "unsigned")
 lg.add("return", "return")
 lg.add("void", "void")
 lg.add("while", "while")
+lg.add("for", "for")
 lg.add("IDENTIFIER", "[_a-zA-Z][_a-zA-Z0-9]*")
 lg.add("LEFT_SQUARE_BRACKET", "\[")
 lg.add("RIGHT_SQUARE_BRACKET", "\]")

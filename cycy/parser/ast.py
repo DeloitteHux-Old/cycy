@@ -194,15 +194,19 @@ class Assembler(Node):
 
 @attributes(
     [
+        Attribute(name="initial"),
         Attribute(name="condition"),
-        Attribute(name="body")
+        Attribute(name="increment"),
+        Attribute(name="body"),
     ],
     apply_with_init=False
 )
-class While(Node):
-    def __init__(self, condition, body):
+class For(Node):
+    def __init__(self, condition=None, body=None, initial=None, increment=None):
         self.condition = condition
+        self.initial = initial
         self.body = body
+        self.increment = increment
 
 @attributes(
     [

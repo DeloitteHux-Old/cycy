@@ -115,7 +115,7 @@ class __extend__(ast.ReturnStatement):
             self.value.compile(context)
         context.emit(bytecode.RETURN, int(bool(self.value)))
 
-class __extend__(ast.While):
+class __extend__(ast.For):
     def compile(self, context):
         jump_ix = len(context.instructions)
         self.condition.compile(context)
