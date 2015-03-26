@@ -6,15 +6,20 @@ import sys
 from bp.filepath import FilePath
 from mock import patch
 
-from cycy.interpreter import interpret_source
+from cycy.interpreter import CyCy
 
 
 class TestExample(TestCase):
+    def setUp(self):
+        self.cycy = CyCy()
+
     @skip("Integration test, will work eventually")
     def test_it_works(self):
         stdout = StringIO()
         with patch.object(sys, "stdout", stdout):
-            interpret(FilePath(__file__).sibling("example.c").getContent())
+            self.cycy.interpret_source(
+                FilePath(__file__).sibling("example.c").getContent(),
+            )
         self.assertEqual(stdout.getvalue(), "Hello, world!\n")
 
     @skip("Integration test, will work eventually")
@@ -32,5 +37,5 @@ class TestExample(TestCase):
         }
         """)
 
-        main_return = interpret_source(source)
+        main_return = self.cycy.interpret_source(source)
         self.assertEqual(5, main_return)
