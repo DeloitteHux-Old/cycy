@@ -35,7 +35,6 @@ class BinaryOperation(Node):
 )
 class VariableDeclaration(Node):
     def __init__(self, name, vtype, value=None):
-        assert vtype in ("INT32", "CONST_CHAR_PTR")
         self.name = name
         self.vtype = vtype
         self.value = value
@@ -190,3 +189,27 @@ class Program(Node):
 
     def add_function(self, func):
         self.functions.append(func)
+
+@attributes(
+    [
+        Attribute(name="base_type"),
+        Attribute(name="const"),
+        Attribute(name="unsigned"),
+        Attribute(name="length"),
+        Attribute(name="reference"),
+    ],
+    apply_with_init=False
+)
+class Type(Node):
+    def __init__(self, base=None, const=False, unsigned=False, reference=None):
+        if base == 'int':
+            self.base_type = 'int'
+            self.length = 32
+
+        if base == 'char':
+            self.base_type = 'int'
+            self.length = 8
+
+        self.const = const
+        self.unsigned = unsigned
+        self.reference = reference

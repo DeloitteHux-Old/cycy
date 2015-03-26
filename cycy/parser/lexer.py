@@ -4,7 +4,7 @@ RULES = [
     "INTEGER",
     "CHAR",
     "STRING",
-    "INT32",
+    "INT",
     "CHAR",
     "CONST",
     "null",
@@ -29,7 +29,7 @@ lg = LexerGenerator()
 lg.add("INTEGER", "\d+")
 lg.add("CHAR", "'\\\\?.'")
 lg.add("STRING", "\".*\"")
-lg.add("INT32", "int")
+lg.add("INT", "int")
 lg.add("CHAR", "char")
 lg.add("null", "NULL")
 lg.add("CONST", "const")
