@@ -47,6 +47,7 @@ class Context(object):
 
     def register_int32_variable(self, name):
         self.variable_indices[name] = len(self.variable_indices)
+        return len(self.variable_indices) - 1
 
     def register_int32_constant(self, int32):
         self.constants.append(int32)
