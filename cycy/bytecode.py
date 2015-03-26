@@ -25,13 +25,22 @@ NO_ARG = -42
     [
         Attribute(name="instructions", exclude_from_repr=True),
         Attribute(name="name"),
-        Attribute(name="constants"),
+        Attribute(name="constants", exclude_from_repr=True),
         Attribute(name="number_of_variables"),
     ],
     apply_with_init=False,
 )
 class Bytecode(object):
-    def __init__(self, instructions, name, constants, number_of_variables):
+    def __init__(self, instructions, constants, number_of_variables, name):
+        """
+        :argument list instructions: the list of bytecode instructions
+        :argument list constants: the collection of constants indexed
+            into by the instructions
+        :argument int number_of_variables: yeah, that
+        :argument str name: an optional source-file name
+
+        """
+
         self.instructions = instructions
         self.name = name
         self.constants = constants

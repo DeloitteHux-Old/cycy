@@ -14,7 +14,7 @@ class TestInterpreter(TestCase):
         byte_code = Bytecode(
             instructions=instructions,
             constants=constants,
-            name="<still don't know>",
+            name="<some test bytecode>",
             number_of_variables=0,
         )
 

@@ -26,7 +26,7 @@ class Context(object):
         self.constants.append(int32)
         return len(self.constants) - 1
 
-    def build(self, name):
+    def build(self, name="<input>"):
         return bytecode.Bytecode(
             instructions=self.instructions,
             name=name,
