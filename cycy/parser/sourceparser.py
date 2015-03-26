@@ -122,9 +122,14 @@ class SourceParser(object):
     def while_loop(self, p):
         return While(condition=p[2], body=p[4])
 
-    @pg.production("func_call_statement : IDENTIFIER LEFT_BRACKET param_list RIGHT_BRACKET ;")
-    def function_call_statement(self, p):
+    @pg.production("func_call : IDENTIFIER LEFT_BRACKET param_list RIGHT_BRACKET")
+    def function_call(self, p):
         return Call(name=p[0].getstr(), args=p[2].get_items())
+
+    @pg.production("func_call_statement : func_call ;")
+    @pg.production("expr : func_call")
+    def function_call_expr(self, p):
+        return p[0]
 
     @pg.production("param_list : expr")
     def param_list(self, p):
@@ -141,6 +146,10 @@ class SourceParser(object):
     @pg.production("expr : expr + expr")
     def binop_add(self, p):
         return BinaryOperation(operator="+", left=p[0], right=p[2])
+
+    @pg.production("expr : expr - expr")
+    def binop_sub(self, p):
+        return BinaryOperation(operator="-", left=p[0], right=p[2])
 
     @pg.production("expr : expr <= expr")
     def binop_le(self, p):
@@ -185,6 +194,13 @@ class SourceParser(object):
         return VariableDeclaration(
             name=p[3].getstr(),
             vtype="CONST_CHAR_PTR"
+        )
+
+    @pg.production("arg_decl : INT32 IDENTIFIER")
+    def int32_param(self, p):
+        return VariableDeclaration(
+            name=p[1].getstr(),
+            vtype="INT32"
         )
 
     @pg.production("expr : primary_expression ++")

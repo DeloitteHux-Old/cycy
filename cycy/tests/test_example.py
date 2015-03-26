@@ -1,4 +1,5 @@
 from StringIO import StringIO
+from textwrap import dedent
 from unittest import TestCase, skip
 import sys
 
@@ -15,3 +16,20 @@ class TestExample(TestCase):
         with patch.object(sys, "stdout", stdout):
             interpret(FilePath(__file__).sibling("example.c").getContent())
         self.assertEqual(stdout.getvalue(), "Hello, world!\n")
+
+    def test_it_does_fibonacci(self):
+        source = dedent("""\
+        int fib(int x) {
+            int x;
+            while (x <= 2) {
+                return 1;
+            }
+            return fib(x - 1) + fib(x - 2);
+        }
+        int main(void) {
+            return fib(5);
+        }
+        """)
+
+        main_return = interpret(source)
+        self.assertEqual(5, main_return)

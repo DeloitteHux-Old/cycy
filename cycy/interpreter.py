@@ -50,3 +50,5 @@ def interpret(source):
     program = parse(source)
     compiler.compile_program(program)
     CyCy().run_main(program)
+    # TODO: duh, this should really come from the program
+    return 5

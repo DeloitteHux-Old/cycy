@@ -45,6 +45,9 @@ class Context(object):
         self.instructions.append(byte_code)
         self.instructions.append(arg)
 
+    def register_int32_variable(self, name):
+        self.variable_indices[name] = len(self.variable_indices)
+
     def register_int32_constant(self, int32):
         self.constants.append(int32)
         return len(self.constants) - 1
@@ -72,12 +75,52 @@ class __extend__(ast.BinaryOperation):
         self.right.compile(context=context)
         context.emit(bytecode.BINARY_OPERATION_BYTECODE[self.operator])
 
-
 class __extend__(ast.Int32):
     def compile(self, context):
         wrapped = W_Int32(value=self.value)
         index = context.register_int32_constant(wrapped)
         context.emit(bytecode.LOAD_CONST, index)
+
+class __extend__(ast.ReturnStatement):
+    def compile(self, context):
+        if self.value:
+            self.value.compile(context)
+        context.emit(bytecode.RETURN)
+
+class __extend__(ast.While):
+    def compile(self, context):
+        self.condition.compile(context)
+        jump_ix = len(context.instructions)
+        context.emit(bytecode.JUMP_IF_NOT_ZERO, 0)
+        self.body.compile(context)
+        context.emit(bytecode.JUMP, jump_ix + 2)
+        context.instructions[jump_ix + 1] = len(context.instructions)
+
+class __extend__(ast.VariableDeclaration):
+    def compile(self, context):
+        if self.vtype == "INT32":
+            variable_index = context.register_int32_variable(self.name)
+            if self.value:
+                self.value.compile(context)
+                context.emit(bytecode.STORE_VARIABLE, variable_index)
+            # else we've declared the variable, but it is
+            # uninitialized... TODO: how to handle this
+        else:
+            raise NotImplementedError("I'm lazy")
+
+class __extend__(ast.Variable):
+    def compile(self, context):
+        variable_index = context.variable_indices.get(self.name)
+        if variable_index is None:
+            raise Exception("Attempt to use undeclared variable %r" % self.name)
+        context.emit(bytecode.LOAD_VARIABLE, variable_index)
+
+class __extend__(ast.Call):
+    def compile(self, context):
+        assert len(self.args) < 256  # technically probably should be smaller?
+        for arg in reversed(self.args):
+            arg.compile(context)
+        context.emit(bytecode.CALL, len(self.args))
 
 
 def compile(ast):
