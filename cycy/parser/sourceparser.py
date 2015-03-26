@@ -219,6 +219,16 @@ class SourceParser(object):
             return Char(p[0].getstr().strip("'"))
         raise AssertionError("Bad token type in const")
 
+    @pg.error
+    def error_handler(self, token):
+        raise ValueError(
+            "Unexpected %s at line %s col %s" % (
+                token.gettokentype(),
+                token.source_pos.lineno,
+                token.source_pos.colno,
+            )
+        )
+
     parser = pg.build()
 
 def parse(source):
