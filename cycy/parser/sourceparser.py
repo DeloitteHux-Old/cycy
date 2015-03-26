@@ -98,8 +98,13 @@ class SourceParser(object):
         )
 
     @pg.production("arg_decl_list : declaration")
-    def arg_decl_list_arg_decl(self, p):
+    def arg_decl_list_declaration(self, p):
         return NodeList([p[0]])
+
+    @pg.production("arg_decl_list : arg_decl_list , declaration")
+    def arg_decl_list(self, p):
+        p[0].append(p[2])
+        return p[0]
 
     @pg.production("block : LEFT_CURLY_BRACKET statement_list RIGHT_CURLY_BRACKET")
     def block_statement_list(self, p):
