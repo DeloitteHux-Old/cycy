@@ -10,6 +10,7 @@ from .ast import (
     Block,
     Call,
     Char,
+    For,
     Function,
     Int32,
     Double,
@@ -22,7 +23,6 @@ from .ast import (
     String,
     Variable,
     VariableDeclaration,
-    While,
     Type,
 )
 
@@ -159,12 +159,16 @@ class SourceParser(object):
     @pg.production("statement : return_statement")
     @pg.production("statement : expr ;")
     @pg.production("statement : declaration ;")
-    @pg.production("statement : assignment ;")
     @pg.production("statement : primary_expression ;")
     @pg.production("statement : func_call_statement")
     @pg.production("statement : while_loop")
+    @pg.production("statement : for_loop")
     @pg.production("statement : assembler ;")
     def statement_list_return(self, p):
+        return p[0]
+
+    @pg.production("expr : assignment")
+    def expr_assignment(self, p):
         return p[0]
     
     @pg.production("assembler : ASM LEFT_BRACKET STRING_LITERAL RIGHT_BRACKET")
@@ -173,11 +177,19 @@ class SourceParser(object):
 
     @pg.production("while_loop : while LEFT_BRACKET expr RIGHT_BRACKET block")
     def while_loop(self, p):
-        return While(condition=p[2], body=p[4])
+        return For(condition=p[2], body=p[4])
 
     @pg.production("while_loop : while LEFT_BRACKET expr RIGHT_BRACKET statement")
     def while_loop_single_line(self, p):
-        return While(condition=p[2], body=Block(statements=[p[4]]))
+        return For(condition=p[2], body=Block(statements=[p[4]]))
+
+    @pg.production("for_loop : for LEFT_BRACKET expr ; expr ; expr RIGHT_BRACKET statement")
+    def for_loop_single_line(self, p):
+        return For(initial=p[2], condition=p[4], increment=p[6], body=Block(statements=[p[8]]))
+
+    @pg.production("for_loop : for LEFT_BRACKET expr ; expr ; expr RIGHT_BRACKET block")
+    def for_loop(self, p):
+        return For(initial=p[2], condition=p[4], increment=p[6], body=p[8])
 
     @pg.production("func_call : IDENTIFIER LEFT_BRACKET param_list RIGHT_BRACKET")
     def function_call(self, p):

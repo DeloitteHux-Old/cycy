@@ -21,7 +21,7 @@ from cycy.parser.ast import (
     String,
     Variable,
     VariableDeclaration,
-    While,
+    For,
     Type,
 )
 
@@ -467,7 +467,7 @@ class TestParser(TestCase):
                     i++;
                 """)),
             self.function_wrap_node(
-                While(
+                For(
                     condition=BinaryOperation(operator="<", left=Variable(name="i"), right=Int32(value=10)),
                     body=Block([PostOperation(operator="++", variable=Variable(name="i"))]),
                     )
@@ -478,7 +478,7 @@ class TestParser(TestCase):
         self.assertEqual(
             parse(self.function_wrap("while (string[i] != NULL) { putc(string[i++]); }")),
             self.function_wrap_node(
-                While(
+                For(
                     condition=BinaryOperation(operator="!=",
                                               left=ArrayDereference(array=Variable(name="string"), index=Variable("i")),
                                               right=Null()),
@@ -488,6 +488,35 @@ class TestParser(TestCase):
                 )
             )
         )
+
+    def test_braceless_for_loop(self):
+        self.assertEqual(
+            parse(self.function_wrap("""
+                for ( i = 0; i < 10; i++ )
+                    putc(i);
+                """)),
+            self.function_wrap_node(
+                For(
+                    initial=Assignment(left=Variable(name="i"), right=Int32(value=0)),
+                    condition=BinaryOperation(operator="<", left=Variable(name="i"), right=Int32(value=10)),
+                    increment=PostOperation(operator="++", variable=Variable(name="i")),
+                    body=Block([Call(name="putc", args=[Variable(name="i")])]),
+                    )
+                )
+            )
+        
+    def test_for_loop(self):
+        self.assertEqual(
+            parse(self.function_wrap("for ( i = 0; i < 10; i++ ) { putc(i); }")),
+            self.function_wrap_node(
+                For(
+                    initial=Assignment(left=Variable(name="i"), right=Int32(value=0)),
+                    condition=BinaryOperation(operator="<", left=Variable(name="i"), right=Int32(value=10)),
+                    increment=PostOperation(operator="++", variable=Variable(name="i")),
+                    body=Block([Call(name="putc", args=[Variable(name="i")])]),
+                    )
+                )
+            )
 
     def test_prototype_with_named_arguments(self):
         self.assertEqual(
@@ -544,7 +573,7 @@ class TestParser(TestCase):
                     params=[VariableDeclaration(name="string", vtype=Type(base="pointer", const=True, reference=Type(base="char")))],
                     body=Block([
                         VariableDeclaration(name="i", vtype=Type(base="int"), value=Int32(value=0)),
-                        While(
+                        For(
                             condition=BinaryOperation(
                                 operator="!=",
                                 left=ArrayDereference(array=Variable(name="string"), index=Variable(name="i")),
@@ -611,7 +640,7 @@ class TestParser(TestCase):
                     params=[VariableDeclaration(name="string", vtype=Type(base="pointer", const=True, reference=Type(base="char")))],
                     body=Block([
                         VariableDeclaration(name="i", vtype=Type(base="int"), value=Int32(value=0)),
-                        While(
+                        For(
                             condition=BinaryOperation(
                                 operator="!=",
                                 left=ArrayDereference(array=Variable(name="string"), index=Variable(name="i")),
