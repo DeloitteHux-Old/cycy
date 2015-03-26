@@ -20,8 +20,8 @@ def get_location(pc, stack, variables):
     return "%s %s" % (pc, stack, variables)
 
 jitdriver = JitDriver(
-    greens=['pc', "stack", "variables"],
-    reds=['byte_code'],
+    greens=["pc", "stack", "variables"],
+    reds=["byte_code"],
     get_printable_location=get_location
 )
 
