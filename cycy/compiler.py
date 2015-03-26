@@ -53,10 +53,11 @@ class Context(object):
         self.constants.append(constant)
         return len(self.constants) - 1
 
-    def build(self, name="<input>"):
+    def build(self, arguments=[], name="<input>"):
         return bytecode.Bytecode(
             instructions=self.instructions,
             name=name,
+            arguments=arguments,
             constants=self.constants,
             variables=self.variables,
         )
@@ -137,7 +138,14 @@ class __extend__(ast.Call):
         context.emit(bytecode.CALL, func_index)
 
 
-def compile(ast):
+def compile(an_ast):
     context = Context()
-    ast.compile(context=context)
-    return context.build(name="<don't know>")
+    an_ast.compile(context=context)
+    if isinstance(an_ast, ast.Function):
+        arguments = []
+        for param in an_ast.params:
+            assert isinstance(param, ast.VariableDeclaration)
+            arguments.append(param.name)
+    else:
+        arguments = []
+    return context.build(arguments=arguments, name="<don't know>")

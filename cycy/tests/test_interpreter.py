@@ -17,6 +17,7 @@ class TestInterpreter(TestCase):
             ],
             constants=[W_Char("x")],
             name="<some test bytecode>",
+            arguments=(),
             variables={},
         )
 
@@ -37,6 +38,7 @@ class TestInterpreter(TestCase):
             ],
             constants=[],
             name="<some test bytecode>",
+            arguments=(),
             variables={},
         )
 
@@ -51,6 +53,7 @@ class TestInterpreter(TestCase):
             ],
             constants=[W_Int32(0)],
             name="<test_load_const>",
+            arguments=(),
             variables={},
         )
 
@@ -67,6 +70,7 @@ class TestInterpreter(TestCase):
             ],
             constants=[W_Int32(0), W_Int32(1)],
             name="<test_binary_neq>",
+            arguments=(),
             variables={},
         )
         byte_code_eq = Bytecode(
@@ -78,6 +82,7 @@ class TestInterpreter(TestCase):
             ],
             constants=[W_Int32(0)],
             name="<test_binary_neq>",
+            arguments=(),
             variables={},
         )
 
@@ -97,6 +102,7 @@ class TestInterpreter(TestCase):
             ],
             constants=[W_Int32(1), W_Int32(0)],
             name="<test_binary_neq>",
+            arguments=(),
             variables={},
         )
         byte_code_leq = Bytecode(
@@ -108,6 +114,7 @@ class TestInterpreter(TestCase):
             ],
             constants=[W_Int32(0)],
             name="<test_binary_neq>",
+            arguments=(),
             variables={},
         )
         byte_code_gt = Bytecode(
@@ -119,6 +126,7 @@ class TestInterpreter(TestCase):
             ],
             constants=[W_Int32(0), W_Int32(1)],
             name="<test_binary_neq>",
+            arguments=(),
             variables={},
         )
 
@@ -141,6 +149,7 @@ class TestInterpreter(TestCase):
             ],
             constants=[W_Int32(1), W_Int32(2)],
             name="<test_binary_add>",
+            arguments=(),
             variables={},
         )
 
@@ -157,6 +166,7 @@ class TestInterpreter(TestCase):
             ],
             constants=[W_Int32(1), W_Int32(2)],
             name="<test_binary_add>",
+            arguments=(),
             variables={},
         )
 
@@ -173,6 +183,7 @@ class TestInterpreter(TestCase):
             ],
             constants=[W_Int32(1)],
             name="<test_binary_add>",
+            arguments=(),
             variables={"x": 0},
         )
 
@@ -187,6 +198,7 @@ class TestInterpreter(TestCase):
             ],
             constants=[W_Function("callee", 0)],
             name="<test_calls_a_function_with_no_args>",
+            arguments=(),
             variables={},
         )
 
@@ -197,6 +209,7 @@ class TestInterpreter(TestCase):
             ],
             constants=[W_Int32(42)],
             name="<test_calls_a_function_with_no_args>",
+            arguments=(),
             variables={},
         )
 

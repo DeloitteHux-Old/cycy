@@ -48,6 +48,7 @@ NO_ARG = -42
     [
         Attribute(name="instructions", exclude_from_repr=True),
         Attribute(name="name"),
+        Attribute(name="arguments"),
         Attribute(name="constants", exclude_from_repr=True),
         Attribute(name="variables", exclude_from_repr=True),
     ],
@@ -58,6 +59,10 @@ class Bytecode(object):
     The bytecode, man.
 
     .. attribute:: instructions
+    .. attribute:: arguments
+
+        a tuple of argument names
+
     .. attribute:: constants
 
         inherited from the :class:`cycy.compiler.Context` that produced this
@@ -74,9 +79,10 @@ class Bytecode(object):
 
     """
 
-    def __init__(self, instructions, constants, variables, name):
+    def __init__(self, instructions, arguments, constants, variables, name):
         self.instructions = instructions
         self.name = name
+        self.arguments = arguments
         self.constants = constants
         self.variables = variables
 

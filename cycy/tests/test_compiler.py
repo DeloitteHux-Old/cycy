@@ -16,7 +16,7 @@ class TestCompiler(TestCase):
 
         program = parse(source)
         main_func_ast = next(func for func in program.functions if func.name == "main")
-        bytecode = compiler.compile(ast=main_func_ast)
+        bytecode = compiler.compile(main_func_ast)
         expected = dedent(cleaned(to).strip("\n")).strip("\n")
         self.assertEqual(bytecode.dump(), expected)
 
