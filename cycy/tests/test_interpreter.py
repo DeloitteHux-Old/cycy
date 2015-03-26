@@ -266,8 +266,43 @@ class TestInterpreter(TestCase):
             constants=[W_String("bar"), W_Int32(1)],
             name="<test_array_dereferences>",
             arguments=[],
-            variables={"x": 0},
+            variables={"foo": ""},
         )
 
         rv = interpreter.CyCy().run(byte_code)
         self.assertEqual(rv, W_Char("a"))
+
+    def test_jump(self):
+        byte_code = Bytecode(
+            instructions=[
+                LOAD_CONST, 0,
+                JUMP, 6,   # jump to just past LOAD_CONST 1
+                LOAD_CONST, 1,
+                RETURN, 1,
+            ],
+            constants=[W_Int32(0), W_Int32(1)],
+            name="<test_array_dereferences>",
+            arguments=[],
+            variables={},
+        )
+
+        rv = interpreter.CyCy().run(byte_code)
+        self.assertEqual(rv, W_Int32(0))
+
+    def test_jump_if_not_zero(self):
+        byte_code = Bytecode(
+            instructions=[
+                LOAD_CONST, 1,
+                LOAD_CONST, 1,
+                JUMP_IF_NOT_ZERO, 8,   # jump to just past LOAD_CONST 0
+                LOAD_CONST, 0,
+                RETURN, 1,
+            ],
+            constants=[W_Int32(0), W_Int32(1)],
+            name="<test_array_dereferences>",
+            arguments=[],
+            variables={},
+        )
+
+        rv = interpreter.CyCy().run(byte_code)
+        self.assertEqual(rv, W_Int32(1))

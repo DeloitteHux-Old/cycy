@@ -45,6 +45,9 @@ class W_Int32(W_Object):
         assert -2**32 <= value < 2**32
         self.value = value
 
+    def is_true(self):
+        return self.value != 0
+
     def leq(self, other):
         return self.value <= other.value
 
@@ -62,6 +65,9 @@ class W_Int32(W_Object):
 class W_Bool(W_Object):
     def __init__(self, value):
         self.value = bool(value)
+
+    def is_true(self):
+        return self.value == True
 
 
 @attributes([Attribute(name="name"), Attribute(name="num_args")], apply_with_init=False)

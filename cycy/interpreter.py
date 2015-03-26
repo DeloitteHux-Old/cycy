@@ -121,6 +121,12 @@ class CyCy(object):
                 assert isinstance(array, W_String)
                 assert isinstance(index, W_Int32)
                 stack.append(W_Char(array.dereference(index)))
+            elif opcode == bytecode.JUMP:
+                pc = arg
+            elif opcode == bytecode.JUMP_IF_NOT_ZERO:
+                val = stack.pop()
+                if val.is_true():
+                    pc = arg
 
         assert False, "bytecode exited the main loop without returning"
 
