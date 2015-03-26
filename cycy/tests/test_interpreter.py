@@ -352,3 +352,19 @@ class TestInterperterWithC(TestCase):
         byte_code = self.get_bytecode("int main(void) { return 7 - 3; }")
         rv = interpreter.CyCy().run(byte_code)
         self.assertEqual(rv, W_Int32(4))
+
+    def test_while_loop(self):
+        byte_code = self.get_bytecode(
+            "int main(void) {"
+            "  int x = 0;"
+            "  int i = 3;"
+            "  while (i) {"
+            "    x = x + 1;"
+            "    i = i - 1;"
+            "  }"
+            "  return x;"
+            "}"
+        )
+
+        rv = interpreter.CyCy().run(byte_code)
+        self.assertEqual(rv, W_Int32(3))

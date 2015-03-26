@@ -120,7 +120,7 @@ class __extend__(ast.While):
         jump_ix = len(context.instructions)
         self.condition.compile(context)
         jump_nz = len(context.instructions)
-        context.emit(bytecode.JUMP_IF_NOT_ZERO, 0)
+        context.emit(bytecode.JUMP_IF_ZERO, 0)
         self.body.compile(context)
         context.emit(bytecode.JUMP, jump_ix)
         context.instructions[jump_nz + 1] = len(context.instructions)
