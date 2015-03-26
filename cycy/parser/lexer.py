@@ -36,6 +36,8 @@ RULES = [
     "-",
     ";",
     "*",
+    "/",
+    "%",
 ]
 lg = LexerGenerator()
 lg.add("INTEGER", "\d+")
@@ -73,6 +75,8 @@ lg.add("+", "\+")
 lg.add("-", "-")
 lg.add(";", ";")
 lg.add("*", "\*")
+lg.add("/", "/")
+lg.add("%", "%")
 lg.ignore("\s+")
 lexer = lg.build()
 
