@@ -43,7 +43,15 @@ class W_Int32(W_Object):
     def neq(self, other):
         return self.value != other.value
 
+
 @attributes([Attribute(name="value")], apply_with_init=False)
 class W_Bool(W_Object):
     def __init__(self, value):
         self.value = bool(value)
+
+
+@attributes([Attribute(name="name"), Attribute(name="num_args")], apply_with_init=False)
+class W_Function(W_Object):
+    def __init__(self, name, num_args):
+        self.name = name
+        self.num_args = num_args
