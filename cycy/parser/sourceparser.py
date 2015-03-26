@@ -98,8 +98,13 @@ class SourceParser(object):
         )
 
     @pg.production("arg_decl_list : declaration")
-    def arg_decl_list_arg_decl(self, p):
+    def arg_decl_list_declaration(self, p):
         return NodeList([p[0]])
+
+    @pg.production("arg_decl_list : arg_decl_list , declaration")
+    def arg_decl_list(self, p):
+        p[0].append(p[2])
+        return p[0]
 
     @pg.production("block : LEFT_CURLY_BRACKET statement_list RIGHT_CURLY_BRACKET")
     def block_statement_list(self, p):
@@ -146,21 +151,16 @@ class SourceParser(object):
     def assign(self, p):
         return Assignment(left=Variable(p[0].getstr()), right=p[2])
 
-    @pg.production('expr : expr != expr')
-    def binop_ne(self, p):
-        return BinaryOperation(operator="!=", left=p[0], right=p[2])
-
-    @pg.production("expr : expr + expr")
-    def binop_add(self, p):
-        return BinaryOperation(operator="+", left=p[0], right=p[2])
-
     @pg.production("expr : expr - expr")
-    def binop_sub(self, p):
-        return BinaryOperation(operator="-", left=p[0], right=p[2])
-
+    @pg.production("expr : expr + expr")
+    @pg.production('expr : expr == expr')
+    @pg.production('expr : expr != expr')
     @pg.production("expr : expr <= expr")
-    def binop_le(self, p):
-        return BinaryOperation(operator="<=", left=p[0], right=p[2])
+    @pg.production("expr : expr >= expr")
+    @pg.production("expr : expr < expr")
+    @pg.production("expr : expr > expr")
+    def binop(self, p):
+        return BinaryOperation(operator=p[1].getstr(), left=p[0], right=p[2])
 
     @pg.production("expr : STRING_LITERAL")
     def expr_string(self, p):
@@ -281,11 +281,14 @@ class SourceParser(object):
 
     @pg.error
     def error_handler(self, token):
+        source_pos = token.source_pos
+        if source_pos is None:
+            raise ValueError("Unexpected %s" % (token.gettokentype()))
         raise ValueError(
             "Unexpected %s at line %s col %s" % (
                 token.gettokentype(),
-                token.source_pos.lineno,
-                token.source_pos.colno,
+                source_pos.lineno,
+                source_pos.colno,
             )
         )
 

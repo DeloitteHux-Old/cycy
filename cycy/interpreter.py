@@ -16,13 +16,13 @@ except ImportError:
         def can_enter_jit(self,**kw): pass
     def purefunction(f): return f
 
-def get_location(pc, stack):
-    return "%s %s" % (pc, stack)
+def get_location(pc, stack, variables):
+    return "%s %s" % (pc, stack, variables)
 
 jitdriver = JitDriver(
-    greens=['pc', 'stack'],
+    greens=['pc', "stack", "variables"],
     reds=['byte_code'],
-    get_printable_location=get_location,
+    get_printable_location=get_location
 )
 
 class CyCy(object):
@@ -40,9 +40,15 @@ class CyCy(object):
     def run(self, byte_code):
         pc = 0
         stack = []
+        variables = {}
 
         while pc < len(byte_code.instructions):
-            jitdriver.jit_merge_point(pc=pc, byte_code=byte_code, stack=stack)
+            jitdriver.jit_merge_point(
+                pc=pc,
+                stack=stack,
+                variables=variables,
+                byte_code=byte_code
+            )
 
             opcode = byte_code.instructions[pc]
             arg = byte_code.instructions[pc + 1]
@@ -80,6 +86,23 @@ class CyCy(object):
                     return stack.pop()
                 else:
                     return None
+            elif opcode == bytecode.STORE_VARIABLE:
+                val = stack.pop()
+                variables[arg] = val
+            elif opcode == bytecode.LOAD_VARIABLE:
+                stack.append(variables[arg])
+            elif opcode == bytecode.BINARY_ADD:
+                left = stack.pop()
+                right = stack.pop()
+                assert isinstance(left, W_Int32)
+                assert isinstance(right, W_Int32)
+                stack.append(W_Int32(left.add(right)))
+            elif opcode == bytecode.BINARY_SUB:
+                left = stack.pop()
+                right = stack.pop()
+                assert isinstance(left, W_Int32)
+                assert isinstance(right, W_Int32)
+                stack.append(W_Int32(left.sub(right)))
 
         assert False, "bytecode exited the main loop without returning"
 

@@ -131,6 +131,38 @@ class TestInterpreter(TestCase):
         rv = interpreter.CyCy().run(byte_code_gt)
         self.assertEqual(rv, W_Bool(False))
 
+    def test_binary_add(self):
+        byte_code = Bytecode(
+            instructions=[
+                LOAD_CONST, 0,
+                LOAD_CONST, 1,
+                BINARY_ADD, NO_ARG,
+                RETURN, 1
+            ],
+            constants=[W_Int32(1), W_Int32(2)],
+            name="<test_binary_add>",
+            number_of_variables=0,
+        )
+
+        rv = interpreter.CyCy().run(byte_code)
+        self.assertEqual(rv, W_Int32(3))
+
+    def test_binary_sub(self):
+        byte_code = Bytecode(
+            instructions=[
+                LOAD_CONST, 0,
+                LOAD_CONST, 1,
+                BINARY_SUB, NO_ARG,
+                RETURN, 1
+            ],
+            constants=[W_Int32(1), W_Int32(2)],
+            name="<test_binary_add>",
+            number_of_variables=0,
+        )
+
+        rv = interpreter.CyCy().run(byte_code)
+        self.assertEqual(rv, W_Int32(1))
+
     def test_it_calls_a_function_with_no_args(self):
         byte_code_caller = Bytecode(
             instructions=[

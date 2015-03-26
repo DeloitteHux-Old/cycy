@@ -41,6 +41,46 @@ class TestParser(TestCase):
             )
         )
 
+    def test_basic_eq(self):
+        self.assertEqual(
+            parse(self.function_wrap('2 == 3;')),
+            self.function_wrap_node(
+                BinaryOperation(operator="==", left=Int32(value=2), right=Int32(value=3))
+            )
+        )
+
+    def test_basic_gt(self):
+        self.assertEqual(
+            parse(self.function_wrap('2 > 3;')),
+            self.function_wrap_node(
+                BinaryOperation(operator=">", left=Int32(value=2), right=Int32(value=3))
+            )
+        )
+
+    def test_basic_gte(self):
+        self.assertEqual(
+            parse(self.function_wrap('2 >= 3;')),
+            self.function_wrap_node(
+                BinaryOperation(operator=">=", left=Int32(value=2), right=Int32(value=3))
+            )
+        )
+
+    def test_basic_lt(self):
+        self.assertEqual(
+            parse(self.function_wrap('2 < 3;')),
+            self.function_wrap_node(
+                BinaryOperation(operator="<", left=Int32(value=2), right=Int32(value=3))
+            )
+        )
+
+    def test_basic_lte(self):
+        self.assertEqual(
+            parse(self.function_wrap('2 <= 3;')),
+            self.function_wrap_node(
+                BinaryOperation(operator="<=", left=Int32(value=2), right=Int32(value=3))
+            )
+        )
+
     def test_char_variable_declaration(self):
         self.assertEqual(
             parse(self.function_wrap('char i;')),
@@ -224,17 +264,38 @@ class TestParser(TestCase):
             )
         )
 
-    def test_main_function(self):
+    def test_main_with_no_parameters(self):
         self.assertEqual(
             parse("int main(void) { return 0; }"),
-            Function(
-                return_type=Type(base='int'),
-                name="main",
-                params=[],
-                body=Block([
-                    ReturnStatement(value=Int32(value=0))
-                ])
-            )
+            Program(functions=[
+                Function(
+                    return_type=Type(base='int'),
+                    name="main",
+                    params=[],
+                    body=Block([
+                        ReturnStatement(value=Int32(value=0))
+                    ])
+                )
+            ])
+        )
+
+    def test_main_with_multiple_parameters(self):
+        self.assertEqual(
+            parse("int main(int argc, char **argv, char **env) { return 0; }"),
+            Program(functions=[
+                Function(
+                    return_type=Type(base='int'),
+                    name="main",
+                    params=[
+                        VariableDeclaration(name="argc", vtype=Type(base="int")),
+                        VariableDeclaration(name="argv", vtype=Type(base="pointer", reference=Type(base="pointer", reference=Type(base="char")))),
+                        VariableDeclaration(name="env", vtype=Type(base="pointer", reference=Type(base="pointer", reference=Type(base="char")))),
+                        ],
+                    body=Block([
+                        ReturnStatement(value=Int32(value=0))
+                    ])
+                )
+            ])
         )
 
     def test_function_arguments(self):
