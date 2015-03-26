@@ -177,3 +177,16 @@ class While(Node):
     def __init__(self, condition, body):
         self.condition = condition
         self.body = body
+
+@attributes(
+    [
+        Attribute(name="functions")
+    ],
+    apply_with_init=False
+)
+class Program(Node):
+    def __init__(self, functions):
+        self.functions = functions
+
+    def add_function(self, func):
+        self.functions.append(func)

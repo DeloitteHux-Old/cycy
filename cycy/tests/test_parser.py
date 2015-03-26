@@ -13,6 +13,7 @@ from cycy.parser.ast import (
     Int32,
     Null,
     PostOperation,
+    Program,
     ReturnStatement,
     Variable,
     VariableDeclaration,
@@ -24,12 +25,12 @@ class TestParser(TestCase):
         return "int main(void) { %s }" % source
 
     def function_wrap_node(self, node):
-        return Function(
+        return Program([Function(
             return_type="INT32",
             name="main",
             params=[],
             body=Block([node])
-)
+        )])
 
     def test_basic_ne(self):
         self.assertEqual(
@@ -109,15 +110,16 @@ class TestParser(TestCase):
     def test_function_arguments(self):
         self.assertEqual(
             parse("int puts(const char* string) { return 0; }"),
-            Function(
-                return_type="INT32",
-                name="puts",
-                params=[VariableDeclaration(name="string", vtype="CONST_CHAR_PTR")],
-                body=Block([
-                    ReturnStatement(value=Int32(value=0))
-                ])
-
-            )
+            Program([
+                Function(
+                    return_type="INT32",
+                    name="puts",
+                    params=[VariableDeclaration(name="string", vtype="CONST_CHAR_PTR")],
+                    body=Block([
+                        ReturnStatement(value=Int32(value=0))
+                    ])
+                )
+            ])
         )
 
     def test_function_call(self):
@@ -158,30 +160,111 @@ class TestParser(TestCase):
                     return i + 1;
                 }
             """),
-            Function(
-                return_type="INT32",
-                name="puts",
-                params=[VariableDeclaration(name="string", vtype="CONST_CHAR_PTR")],
-                body=Block([
-                    VariableDeclaration(name="i", vtype="INT32", value=Int32(value=0)),
-                    While(
-                        condition=BinaryOperation(
-                            operator="!=",
-                            left=ArrayDereference(array=Variable(name="string"), index=Variable(name="i")),
-                            right=Null()
+            Program([
+                Function(
+                    return_type="INT32",
+                    name="puts",
+                    params=[VariableDeclaration(name="string", vtype="CONST_CHAR_PTR")],
+                    body=Block([
+                        VariableDeclaration(name="i", vtype="INT32", value=Int32(value=0)),
+                        While(
+                            condition=BinaryOperation(
+                                operator="!=",
+                                left=ArrayDereference(array=Variable(name="string"), index=Variable(name="i")),
+                                right=Null()
+                            ),
+                            body=Block([
+                                Call(name="putc", args=[ArrayDereference(array=Variable("string"), index=PostOperation(operator="++", variable=Variable(name="i")))])
+                            ])
                         ),
-                        body=Block([
-                            Call(name="putc", args=[ArrayDereference(array=Variable("string"), index=PostOperation(operator="++", variable=Variable(name="i")))])
-                        ])
-                    ),
-                    Call(name="putc", args=[Char('\n')]),
-                    ReturnStatement(
-                        value=BinaryOperation(
-                            operator="+",
-                            left=Variable(name="i"),
-                            right=Int32(value=1)
+                        Call(name="putc", args=[Char('\n')]),
+                        ReturnStatement(
+                            value=BinaryOperation(
+                                operator="+",
+                                left=Variable(name="i"),
+                                right=Int32(value=1)
+                            )
                         )
-                    )
-                ])
-            )
+                    ])
+                )
+            ])
+        )
+
+    def test_main_function(self):
+        self.assertEqual(
+            parse("""
+                int main(void) {
+                    return puts("Hello, world!");
+                }
+            """),
+            Program([
+                Function(
+                    return_type="INT32",
+                    name="main",
+                    params=[],
+                    body=Block([
+                        ReturnStatement(
+                            value=Call(name="puts", args=[Array([Char('H'), Char('e'), Char('l'), Char('l'), Char('o'), Char(','), Char(' '), Char('w'), Char('o'), Char('r'), Char('l'), Char('d'), Char('!'), Char(chr(0))])])
+                        )
+                    ])
+                )
+            ])
+        )
+
+    def test_full_example(self):
+        self.assertEqual(
+            parse("""
+                int main(void) {
+                    return puts("Hello, world!");
+                }
+
+                int puts(const char * string) {
+                    int i = 0;
+                    while (string[i] != NULL) {
+                        putc(string[i++]);
+                    }
+                    putc('\\n');
+                    return i + 1;
+                }
+            """),
+            Program([
+                Function(
+                    return_type="INT32",
+                    name="puts",
+                    params=[VariableDeclaration(name="string", vtype="CONST_CHAR_PTR")],
+                    body=Block([
+                        VariableDeclaration(name="i", vtype="INT32", value=Int32(value=0)),
+                        While(
+                            condition=BinaryOperation(
+                                operator="!=",
+                                left=ArrayDereference(array=Variable(name="string"), index=Variable(name="i")),
+                                right=Null()
+                            ),
+                            body=Block([
+                                Call(name="putc", args=[ArrayDereference(array=Variable("string"), index=PostOperation(operator="++", variable=Variable(name="i")))])
+                            ])
+                        ),
+                        Call(name="putc", args=[Char('\n')]),
+                        ReturnStatement(
+                            value=BinaryOperation(
+                                operator="+",
+                                left=Variable(name="i"),
+                                right=Int32(value=1)
+                            )
+                        )
+
+                    ])
+                ),
+                Function(
+                    return_type="INT32",
+                    name="main",
+                    params=[],
+                    body=Block([
+                        ReturnStatement(
+                            value=Call(name="puts", args=[Array([Char('H'), Char('e'), Char('l'), Char('l'), Char('o'), Char(','), Char(' '), Char('w'), Char('o'), Char('r'), Char('l'), Char('d'), Char('!'), Char(chr(0))])])
+                        )
+                    ])
+                ),
+            ])
+
         )

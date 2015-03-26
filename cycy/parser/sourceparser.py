@@ -13,6 +13,7 @@ from .ast import (
     Node,
     Null,
     PostOperation,
+    Program,
     ReturnStatement,
     Variable,
     VariableDeclaration,
@@ -52,11 +53,21 @@ class SourceParser(object):
                          cache_id='cycy',
     )
 
-    @pg.production("main : function")
-    def main_function(self, p):
+    @pg.production("main : program")
+    def main_program(self, p):
         return p[0]
 
+    @pg.production("program : function")
+    def program_function(self, p):
+        return Program([p[0]])
+
+    @pg.production("program : function program")
+    def program_function_program(self, p):
+        p[1].add_function(p[0])
+        return p[1]
+
     @pg.production("return_statement : return expr ;")
+    @pg.production("return_statement : return func_call_statement")
     def return_statement(self, p):
         return ReturnStatement(value=p[1])
 
