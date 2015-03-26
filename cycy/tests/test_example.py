@@ -7,6 +7,7 @@ from bp.filepath import FilePath
 from mock import patch
 
 from cycy.interpreter import CyCy
+from cycy.objects import W_Int32
 
 
 class TestExample(TestCase):
@@ -22,11 +23,9 @@ class TestExample(TestCase):
             )
         self.assertEqual(stdout.getvalue(), "Hello, world!\n")
 
-    @skip("Integration test, will work eventually")
     def test_it_does_fibonacci(self):
         source = dedent("""\
         int fib(int x) {
-            int x;
             while (x <= 2) {
                 return 1;
             }
@@ -38,4 +37,4 @@ class TestExample(TestCase):
         """)
 
         main_return = self.cycy.interpret_source(source)
-        self.assertEqual(5, main_return)
+        self.assertEqual(W_Int32(5), main_return)
