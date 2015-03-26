@@ -99,7 +99,7 @@ class __extend__(ast.While):
 
 class __extend__(ast.VariableDeclaration):
     def compile(self, context):
-        if self.vtype == "INT32":
+        if self.vtype.base_type == "int" and self.vtype.length == 32:
             variable_index = context.register_int32_variable(self.name)
             if self.value:
                 self.value.compile(context)
@@ -107,7 +107,7 @@ class __extend__(ast.VariableDeclaration):
             # else we've declared the variable, but it is
             # uninitialized... TODO: how to handle this
         else:
-            raise NotImplementedError("I'm lazy")
+            raise NotImplementedError("Variable type %s not supported" % self.vtype)
 
 class __extend__(ast.Variable):
     def compile(self, context):
