@@ -12,3 +12,4 @@ env:
 script:
   - trial cycy
   - python `pwd`/../pypy-src/rpython/bin/rpython --batch --output=cycy-c cycy/target.py
+  - python `pwd`/../pypy-src/rpython/bin/rpython --batch --output=cycy-c --opt=jit cycy/target.py
