@@ -38,12 +38,15 @@ class VariableDeclaration(Node):
         self.vtype = vtype
         self.value = value
 
-
 @attributes([Attribute(name="value")], apply_with_init=False)
 class Int32(Node):
     def __init__(self, value):
         self.value = value
 
+@attributes([Attribute(name="value")], apply_with_init=False)
+class Double(Node):
+    def __init__(self, value):
+        self.value = value
 
 @attributes([Attribute(name="value")], apply_with_init=False)
 class String(Node):
@@ -54,7 +57,6 @@ class String(Node):
 class Variable(Node):
     def __init__(self, name):
         self.name = name
-
 
 @attributes(
     [
@@ -69,6 +71,18 @@ class PostOperation(Node):
         self.operator = operator
         self.variable = variable
 
+@attributes(
+    [
+        Attribute(name="operator"),
+        Attribute(name="variable"),
+    ],
+    apply_with_init=False,
+)
+class PreOperation(Node):
+    def __init__(self, operator, variable):
+        assert operator in ("++", "--")
+        self.operator = operator
+        self.variable = variable
 
 @attributes(
     [Attribute(name="left"), Attribute(name="right")],

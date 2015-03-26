@@ -11,8 +11,10 @@ from cycy.parser.ast import (
     Char,
     Function,
     Int32,
+    Double,
     Null,
     PostOperation,
+    PreOperation,
     Program,
     ReturnStatement,
     String,
@@ -79,6 +81,22 @@ class TestParser(TestCase):
             parse(self.function_wrap('2 <= 3;')),
             self.function_wrap_node(
                 BinaryOperation(operator="<=", left=Int32(value=2), right=Int32(value=3))
+            )
+        )
+
+    def test_basic_or(self):
+        self.assertEqual(
+            parse(self.function_wrap('1 || 0;')),
+            self.function_wrap_node(
+                BinaryOperation(operator="||", left=Int32(value=1), right=Int32(value=0))
+            )
+        )
+
+    def test_basic_and(self):
+        self.assertEqual(
+            parse(self.function_wrap('1 && 0;')),
+            self.function_wrap_node(
+                BinaryOperation(operator="&&", left=Int32(value=1), right=Int32(value=0))
             )
         )
 
@@ -187,6 +205,15 @@ class TestParser(TestCase):
             )
         )
 
+    def test_variable_declaration_with_floating_point_assignment(self):
+        self.assertEqual(
+            parse(self.function_wrap("float i = 0.0;")),
+            self.function_wrap_node(
+                VariableDeclaration(name="i", vtype=Type(base="float"), value=Double(value=0.0))
+            )
+        )
+
+
     def test_pointer_variable_declaration(self):
         self.assertEqual(
             parse(self.function_wrap('int* i;')),
@@ -241,11 +268,43 @@ class TestParser(TestCase):
             )
         )
 
+    def test_postdecrement(self):
+        self.assertEqual(
+            parse(self.function_wrap("i--;")),
+            self.function_wrap_node(
+                PostOperation(operator="--", variable=Variable(name="i"))
+            )
+        )
+
+    def test_preincrement(self):
+        self.assertEqual(
+            parse(self.function_wrap("++i;")),
+            self.function_wrap_node(
+                PreOperation(operator="++", variable=Variable(name="i"))
+            )
+        )
+
+    def test_predecrement(self):
+        self.assertEqual(
+            parse(self.function_wrap("--i;")),
+            self.function_wrap_node(
+                PreOperation(operator="--", variable=Variable(name="i"))
+            )
+        )
+
     def test_assignment(self):
         self.assertEqual(
             parse(self.function_wrap("i = 0;")),
             self.function_wrap_node(
                 Assignment(left=Variable(name="i"), right=Int32(value=0))
+            )
+        )
+
+    def test_floating_point_assignment(self):
+        self.assertEqual(
+            parse(self.function_wrap("i = 0.0;")),
+            self.function_wrap_node(
+                Assignment(left=Variable(name="i"), right=Double(value=0.0))
             )
         )
 

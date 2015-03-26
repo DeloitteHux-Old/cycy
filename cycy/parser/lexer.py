@@ -1,7 +1,8 @@
 from rply import LexerGenerator
 
 RULES = [
-    "INTEGER",
+    "INTEGER_LITERAL",
+    "FLOAT_LITERAL",
     "CHAR_LITERAL",
     "STRING_LITERAL",
     "CHAR",
@@ -23,6 +24,10 @@ RULES = [
     "RIGHT_BRACKET",
     "LEFT_CURLY_BRACKET",
     "RIGHT_CURLY_BRACKET",
+    "||",
+    "&&",
+    "++",
+    "--",
     "==",
     "!=",
     "<=",
@@ -31,7 +36,6 @@ RULES = [
     ">",
     "=",
     ",",
-    "++",
     "+",
     "-",
     ";",
@@ -40,7 +44,8 @@ RULES = [
     "%",
 ]
 lg = LexerGenerator()
-lg.add("INTEGER", "\d+")
+lg.add("FLOAT_LITERAL", "\d+.\d+")
+lg.add("INTEGER_LITERAL", "\d+")
 lg.add("CHAR_LITERAL", "'\\\\?.'")
 lg.add("STRING_LITERAL", "\".*\"")
 lg.add("CHAR", "char")
@@ -62,13 +67,16 @@ lg.add("LEFT_BRACKET", "\(")
 lg.add("RIGHT_BRACKET", "\)")
 lg.add("LEFT_CURLY_BRACKET", "{")
 lg.add("RIGHT_CURLY_BRACKET", "}")
+lg.add("||", "\|\|")
+lg.add("&&", "&&")
+lg.add("++", "\+\+")
+lg.add("--", "--")
 lg.add("==", "==")
 lg.add("!=", "!=")
 lg.add("<=", "<=")
 lg.add(">=", ">=")
 lg.add("<", "<")
 lg.add(">", ">")
-lg.add("++", "\+\+")
 lg.add("=", "=")
 lg.add(",", ",")
 lg.add("+", "\+")
