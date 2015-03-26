@@ -200,12 +200,18 @@ class Program(Node):
 )
 class Type(Node):
     def __init__(self, base=None, const=False, unsigned=False, reference=None):
-        if base == 'int':
-            self.base_type = 'int'
-            self.length = 32
-        elif base == 'char':
+        if base == 'char':
             self.base_type = 'int'
             self.length = 8
+        elif base == 'short':
+            self.base_type = 'int'
+            self.length = 16
+        elif base == 'int' or base == 'long':
+            self.base_type = 'int'
+            self.length = 32
+        elif base == 'long long':
+            self.base_type = 'int'
+            self.length = 64
         else:
             self.base_type = base
             self.length = -1

@@ -41,13 +41,16 @@ class TestParser(TestCase):
             )
         )
 
-    def test_variable_declaration(self):
+    def test_int_variable_declaration(self):
         self.assertEqual(
             parse(self.function_wrap('int i;')),
             self.function_wrap_node(
                 VariableDeclaration(name="i", vtype=Type(base="int"), value=None)
             )
         )
+        var = Type(base="int")
+        self.assertEqual( var.base_type, "int")
+        self.assertEqual( var.length, 32)
 
     def test_short_variable_declaration(self):
         self.assertEqual(
@@ -56,6 +59,9 @@ class TestParser(TestCase):
                 VariableDeclaration(name="i", vtype=Type(base="short"), value=None)
             )
         )
+        var = Type(base="short")
+        self.assertEqual( var.base_type, "int")
+        self.assertEqual( var.length, 16)
 
     def test_long_variable_declaration(self):
         self.assertEqual(
@@ -64,6 +70,9 @@ class TestParser(TestCase):
                 VariableDeclaration(name="i", vtype=Type(base="long"), value=None)
             )
         )
+        var = Type(base="long")
+        self.assertEqual( var.base_type, "int")
+        self.assertEqual( var.length, 32)
 
 
     def test_long_long_variable_declaration(self):
@@ -73,6 +82,9 @@ class TestParser(TestCase):
                 VariableDeclaration(name="i", vtype=Type(base="long long"), value=None)
             )
         )
+        var = Type(base="long long")
+        self.assertEqual( var.base_type, "int")
+        self.assertEqual( var.length, 64)
 
     def test_variable_declaration_with_assignment(self):
         self.assertEqual(
