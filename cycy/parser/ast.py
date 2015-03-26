@@ -127,7 +127,7 @@ class ReturnStatement(Node):
         Attribute(name="name"),
         Attribute(name="params"),
         Attribute(name="body"),
-        Attribute(name="prototype")
+        Attribute(name="_prototype")
     ],
     apply_with_init=False
 )
@@ -137,7 +137,11 @@ class Function(Node):
         self.name = name
         self.params = params
         self.body = body
-        self.prototype = prototype
+        self._prototype = prototype
+
+    def prototype(self):
+        return self._prototype
+
 
 @attributes(
     [
@@ -195,7 +199,7 @@ class Program(Node):
         self.units.append(unit)
 
     def functions(self):
-        return [unit for unit in self.units if not unit.prototype]
+        return [unit for unit in self.units if not unit.prototype()]
 
 
 @attributes(

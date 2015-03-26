@@ -4,6 +4,7 @@ from rpython.rlib.streamio import open_file_as_stream
 from rpython.rlib.rsre.rsre_re import match as re_match
 
 def find_file(file_path, environment=None):
+    assert file_path is not None
     if os.path.exists(file_path):
         return file_path
     if environment:
