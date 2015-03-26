@@ -41,6 +41,12 @@ class NodeList(Node):
     def get_items(self):
         return self.items
 
+class BoolWrapper(Node):
+    pass
+
+BoolTrue = BoolWrapper()
+BoolFalse = BoolWrapper()
+
 class SourceParser(object):
     """ Parse a given input using a lexer
     """
@@ -190,16 +196,18 @@ class SourceParser(object):
 
     @pg.production("type : optional_const core_or_pointer_type")
     def type_object(self, p):
-        p[1].const = p[0]
-        return p[1]
+        the_type = p[1]
+        assert isinstance(the_type, Type)
+        the_type.const = p[0] == BoolTrue
+        return the_type
 
     @pg.production("optional_const : ")
     def const_false(self, p):
-        return False
+        return BoolFalse
 
     @pg.production("optional_const : CONST")
     def const_true(self, p):
-        return True
+        return BoolTrue
 
     @pg.production("core_or_pointer_type : core_type")
     def core_type(self, p):
