@@ -14,6 +14,7 @@ from cycy.repl import REPL
 def main(argv):
     if len(argv) == 1:
         REPL().run()
+        return 0
 
     print_help = False
     env = Environment()
