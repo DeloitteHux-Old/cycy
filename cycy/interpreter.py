@@ -3,7 +3,7 @@ import os
 from rpython.rlib.streamio import open_file_as_stream
 
 from cycy import bytecode, compiler
-from cycy.objects import W_Char, W_Int32, W_Bool
+from cycy.objects import W_Char, W_Int32, W_Bool, W_String
 from cycy.parser import ast
 from cycy.parser.sourceparser import parse
 
@@ -115,6 +115,12 @@ class CyCy(object):
                 assert isinstance(left, W_Int32)
                 assert isinstance(right, W_Int32)
                 stack.append(W_Int32(left.sub(right)))
+            elif opcode == bytecode.DEREFERENCE:
+                array = stack.pop()
+                index = stack.pop()
+                assert isinstance(array, W_String)
+                assert isinstance(index, W_Int32)
+                stack.append(W_Char(array.dereference(index)))
 
         assert False, "bytecode exited the main loop without returning"
 

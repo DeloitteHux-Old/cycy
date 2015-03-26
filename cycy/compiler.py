@@ -152,6 +152,13 @@ class __extend__(ast.Call):
         func_index = context.register_constant(wrapped_func)
         context.emit(bytecode.CALL, func_index)
 
+class __extend__(ast.ArrayDereference):
+    def compile(self, context):
+        self.index.compile(context=context)
+        self.array.compile(context=context)
+
+        context.emit(bytecode.DEREFERENCE, bytecode.NO_ARG)
+
 
 def compile(an_ast):
     context = Context()

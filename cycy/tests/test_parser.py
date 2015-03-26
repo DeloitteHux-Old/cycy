@@ -84,6 +84,22 @@ class TestParser(TestCase):
             )
         )
 
+    def test_basic_or(self):
+        self.assertEqual(
+            parse(self.function_wrap('1 || 0;')),
+            self.function_wrap_node(
+                BinaryOperation(operator="||", left=Int32(value=1), right=Int32(value=0))
+            )
+        )
+
+    def test_basic_and(self):
+        self.assertEqual(
+            parse(self.function_wrap('1 && 0;')),
+            self.function_wrap_node(
+                BinaryOperation(operator="&&", left=Int32(value=1), right=Int32(value=0))
+            )
+        )
+
     def test_char_variable_declaration(self):
         self.assertEqual(
             parse(self.function_wrap('char i;')),
