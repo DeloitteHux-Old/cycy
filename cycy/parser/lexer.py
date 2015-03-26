@@ -16,6 +16,7 @@ RULES = [
     "null",
     "return",
     "void",
+    "if",
     "while",
     "for",
     "ASM",
@@ -63,6 +64,7 @@ lg.add("CONST", "const")
 lg.add("UNSIGNED", "unsigned")
 lg.add("return", "return")
 lg.add("void", "void")
+lg.add("if", "if")
 lg.add("while", "while")
 lg.add("for", "for")
 lg.add("IDENTIFIER", "[_a-zA-Z][_a-zA-Z0-9]*")

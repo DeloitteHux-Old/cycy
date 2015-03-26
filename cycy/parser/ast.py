@@ -210,6 +210,18 @@ class For(Node):
 
 @attributes(
     [
+        Attribute(name="condition"),
+        Attribute(name="body"),
+    ],
+    apply_with_init=False
+)
+class If(Node):
+    def __init__(self, condition=None, body=None):
+        self.condition = condition
+        self.body = body
+
+@attributes(
+    [
         Attribute(name="units")
     ],
     apply_with_init=False
