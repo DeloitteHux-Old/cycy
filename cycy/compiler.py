@@ -100,7 +100,7 @@ class __extend__(ast.ReturnStatement):
     def compile(self, context):
         if self.value:
             self.value.compile(context)
-        context.emit(bytecode.RETURN)
+        context.emit(bytecode.RETURN, int(bool(self.value)))
 
 class __extend__(ast.While):
     def compile(self, context):

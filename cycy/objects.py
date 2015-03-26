@@ -60,6 +60,9 @@ class W_Int32(W_Object):
     def sub(self, other):
         return self.value - other.value
 
+    def str(self):
+        return str(self.value)
+
 
 @attributes([Attribute(name="value")], apply_with_init=False)
 class W_Bool(W_Object):
