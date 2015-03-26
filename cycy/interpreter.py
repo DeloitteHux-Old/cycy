@@ -22,8 +22,8 @@ def get_location(pc, stack, variables):
     return "%s %s" % (pc, stack, variables)
 
 jitdriver = JitDriver(
-    greens=['pc', "stack", "variables"],
-    reds=['byte_code'],
+    greens=["pc", "stack", "variables"],
+    reds=["byte_code", "interpreter"],
     get_printable_location=get_location
 )
 
@@ -49,7 +49,8 @@ class CyCy(object):
                 pc=pc,
                 stack=stack,
                 variables=variables,
-                byte_code=byte_code
+                byte_code=byte_code,
+                interpreter=self,
             )
 
             opcode = byte_code.instructions[pc]
