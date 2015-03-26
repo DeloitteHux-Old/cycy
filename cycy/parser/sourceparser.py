@@ -191,6 +191,8 @@ class SourceParser(object):
     @pg.production("expr : expr * expr")
     @pg.production("expr : expr / expr")
     @pg.production("expr : expr % expr")
+    @pg.production('expr : expr || expr')
+    @pg.production('expr : expr && expr')
     @pg.production('expr : expr == expr')
     @pg.production('expr : expr != expr')
     @pg.production("expr : expr <= expr")
