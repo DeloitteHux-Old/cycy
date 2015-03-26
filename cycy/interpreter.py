@@ -65,8 +65,14 @@ class CyCy(object):
                 assert isinstance(left, W_Int32)
                 assert isinstance(right, W_Int32)
                 stack.append(W_Bool(left.leq(right)))
+            elif opcode == bytecode.RETURN:
+                if arg == 1:
+                    return stack.pop()
+                else:
+                    return None
 
-        return stack
+        assert False, "bytecode exited the main loop without returning"
+
 
 def interpret(source):
     interp = CyCy()
