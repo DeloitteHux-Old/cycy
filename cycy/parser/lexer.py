@@ -1,7 +1,8 @@
 from rply import LexerGenerator
 
 RULES = [
-    "INTEGER",
+    "INTEGER_LITERAL",
+    "FLOAT_LITERAL",
     "CHAR_LITERAL",
     "STRING_LITERAL",
     "CHAR",
@@ -40,7 +41,8 @@ RULES = [
     "%",
 ]
 lg = LexerGenerator()
-lg.add("INTEGER", "\d+")
+lg.add("FLOAT_LITERAL", "\d+.\d+")
+lg.add("INTEGER_LITERAL", "\d+")
 lg.add("CHAR_LITERAL", "'\\\\?.'")
 lg.add("STRING_LITERAL", "\".*\"")
 lg.add("CHAR", "char")

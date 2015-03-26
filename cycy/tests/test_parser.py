@@ -11,6 +11,7 @@ from cycy.parser.ast import (
     Char,
     Function,
     Int32,
+    Double,
     Null,
     PostOperation,
     Program,
@@ -187,6 +188,15 @@ class TestParser(TestCase):
             )
         )
 
+    def test_variable_declaration_with_floating_point_assignment(self):
+        self.assertEqual(
+            parse(self.function_wrap("float i = 0.0;")),
+            self.function_wrap_node(
+                VariableDeclaration(name="i", vtype=Type(base="float"), value=Double(value=0.0))
+            )
+        )
+
+
     def test_pointer_variable_declaration(self):
         self.assertEqual(
             parse(self.function_wrap('int* i;')),
@@ -246,6 +256,14 @@ class TestParser(TestCase):
             parse(self.function_wrap("i = 0;")),
             self.function_wrap_node(
                 Assignment(left=Variable(name="i"), right=Int32(value=0))
+            )
+        )
+
+    def test_floating_point_assignment(self):
+        self.assertEqual(
+            parse(self.function_wrap("i = 0.0;")),
+            self.function_wrap_node(
+                Assignment(left=Variable(name="i"), right=Double(value=0.0))
             )
         )
 

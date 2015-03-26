@@ -38,12 +38,15 @@ class VariableDeclaration(Node):
         self.vtype = vtype
         self.value = value
 
-
 @attributes([Attribute(name="value")], apply_with_init=False)
 class Int32(Node):
     def __init__(self, value):
         self.value = value
 
+@attributes([Attribute(name="value")], apply_with_init=False)
+class Double(Node):
+    def __init__(self, value):
+        self.value = value
 
 @attributes([Attribute(name="value")], apply_with_init=False)
 class String(Node):

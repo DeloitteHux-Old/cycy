@@ -11,6 +11,7 @@ from .ast import (
     Char,
     Function,
     Int32,
+    Double,
     Node,
     Null,
     PostOperation,
@@ -218,12 +219,20 @@ class SourceParser(object):
     def declare_int(self, p):
         return VariableDeclaration(name=p[1].getstr(), vtype=p[0], value=None)
 
-    @pg.production("declaration : type IDENTIFIER = INTEGER")
+    @pg.production("declaration : type IDENTIFIER = INTEGER_LITERAL")
     def declare_assign_int(self, p):
         return VariableDeclaration(
             name=p[1].getstr(),
             vtype=p[0],
             value=Int32(int(p[3].getstr()))
+        )
+
+    @pg.production("declaration : type IDENTIFIER = FLOAT_LITERAL")
+    def declare_assign_float(self, p):
+        return VariableDeclaration(
+            name=p[1].getstr(),
+            vtype=p[0],
+            value=Double(float(p[3].getstr()))
         )
 
     @pg.production("declaration : type IDENTIFIER = STRING_LITERAL")
@@ -319,11 +328,14 @@ class SourceParser(object):
         else:
             return p[1]
 
-    @pg.production("const : INTEGER")
+    @pg.production("const : FLOAT_LITERAL")
+    @pg.production("const : INTEGER_LITERAL")
     @pg.production("const : CHAR_LITERAL")
     def const(self, p):
-        if p[0].gettokentype() == "INTEGER":
+        if p[0].gettokentype() == "INTEGER_LITERAL":
             return Int32(int(p[0].getstr()))
+        elif p[0].gettokentype() == "FLOAT_LITERAL":
+            return Double(float(p[0].getstr()))
         elif p[0].gettokentype() == "CHAR_LITERAL":
             return Char(p[0].getstr().strip("'"))
         raise AssertionError("Bad token type in const")
