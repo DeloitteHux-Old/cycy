@@ -111,9 +111,9 @@ class __extend__(ast.VariableDeclaration):
 
 class __extend__(ast.Variable):
     def compile(self, context):
-        variable_index = context.variable_indices.get(self.name)
-        if variable_index is None:
-            raise Exception("Attempt to use undeclared variable %r" % self.name)
+        variable_index = context.variable_indices.get(self.name, -42)
+        if variable_index == -42:
+            raise Exception("Attempt to use undeclared variable '%s'" % self.name)
         context.emit(bytecode.LOAD_VARIABLE, variable_index)
 
 class __extend__(ast.Call):
