@@ -99,8 +99,6 @@ class Bytecode(object):
         while offset < len(self.instructions):
             byte_code = self.instructions[offset]
             arg = self.instructions[offset + 1]
-            if arg is NO_ARG:
-                arg = None
 
             yield (offset, byte_code, arg)
             offset += 2
@@ -110,14 +108,11 @@ class Bytecode(object):
 
         for offset, byte_code, arg in self:
             name = NAMES[byte_code]
-            if arg is None:
-                arg = ""
+            str_arg = ""
+            if arg != NO_ARG:
+                str_arg = "%s" % arg
 
-            line = "{offset:d} {name} {arg}".format(
-                offset=offset,
-                name=name,
-                arg=arg,
-            )
+            line = "%s %s %s" % (str(offset), name, str_arg)
             lines.append(line.strip())
 
         return "\n".join(lines)

@@ -100,7 +100,7 @@ class __extend__(ast.Assignment):
         self.right.compile(context=context)
         index = context.variables.get(self.left.name, -42)
         if index == -42:
-            raise Exception("Attempt to use undeclared variable '%s'" % self.name)
+            raise Exception("Attempt to use undeclared variable '%s'" % self.left.name)
         context.emit(bytecode.STORE_VARIABLE, index)
 
 class __extend__(ast.String):
