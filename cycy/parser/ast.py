@@ -58,7 +58,6 @@ class Variable(Node):
     def __init__(self, name):
         self.name = name
 
-
 @attributes(
     [
         Attribute(name="operator"),
@@ -72,6 +71,18 @@ class PostOperation(Node):
         self.operator = operator
         self.variable = variable
 
+@attributes(
+    [
+        Attribute(name="operator"),
+        Attribute(name="variable"),
+    ],
+    apply_with_init=False,
+)
+class PreOperation(Node):
+    def __init__(self, operator, variable):
+        assert operator in ("++", "--")
+        self.operator = operator
+        self.variable = variable
 
 @attributes(
     [Attribute(name="left"), Attribute(name="right")],

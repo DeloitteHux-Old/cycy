@@ -14,6 +14,7 @@ from cycy.parser.ast import (
     Double,
     Null,
     PostOperation,
+    PreOperation,
     Program,
     ReturnStatement,
     String,
@@ -248,6 +249,30 @@ class TestParser(TestCase):
             parse(self.function_wrap("i++;")),
             self.function_wrap_node(
                 PostOperation(operator="++", variable=Variable(name="i"))
+            )
+        )
+
+    def test_postdecrement(self):
+        self.assertEqual(
+            parse(self.function_wrap("i--;")),
+            self.function_wrap_node(
+                PostOperation(operator="--", variable=Variable(name="i"))
+            )
+        )
+
+    def test_preincrement(self):
+        self.assertEqual(
+            parse(self.function_wrap("++i;")),
+            self.function_wrap_node(
+                PreOperation(operator="++", variable=Variable(name="i"))
+            )
+        )
+
+    def test_predecrement(self):
+        self.assertEqual(
+            parse(self.function_wrap("--i;")),
+            self.function_wrap_node(
+                PreOperation(operator="--", variable=Variable(name="i"))
             )
         )
 

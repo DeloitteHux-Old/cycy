@@ -15,6 +15,7 @@ from .ast import (
     Node,
     Null,
     PostOperation,
+    PreOperation,
     Program,
     ReturnStatement,
     String,
@@ -304,6 +305,18 @@ class SourceParser(object):
     @pg.production("expr : primary_expression ++")
     def post_incr(self, p):
         return PostOperation(operator="++", variable=p[0])
+
+    @pg.production("expr : primary_expression --")
+    def post_incr(self, p):
+        return PostOperation(operator="--", variable=p[0])
+
+    @pg.production("expr : ++ primary_expression")
+    def post_incr(self, p):
+        return PreOperation(operator="++", variable=p[1])
+
+    @pg.production("expr : -- primary_expression")
+    def post_incr(self, p):
+        return PreOperation(operator="--", variable=p[1])
 
     @pg.production("expr : primary_expression")
     def expr_const(self, p):
