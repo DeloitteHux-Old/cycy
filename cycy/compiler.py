@@ -94,6 +94,15 @@ class __extend__(ast.Char):
         index = context.register_constant(wrapped)
         context.emit(bytecode.LOAD_CONST, index)
 
+
+class __extend__(ast.Assignment):
+    def compile(self, context):
+        self.right.compile(context=context)
+        index = context.variables.get(self.left.name, -42)
+        if index == -42:
+            raise Exception("Attempt to use undeclared variable '%s'" % self.name)
+        context.emit(bytecode.STORE_VARIABLE, index)
+
 class __extend__(ast.String):
     def compile(self, context):
         wrapped = W_String(value=self.value)
@@ -108,12 +117,13 @@ class __extend__(ast.ReturnStatement):
 
 class __extend__(ast.While):
     def compile(self, context):
-        self.condition.compile(context)
         jump_ix = len(context.instructions)
+        self.condition.compile(context)
+        jump_nz = len(context.instructions)
         context.emit(bytecode.JUMP_IF_NOT_ZERO, 0)
         self.body.compile(context)
-        context.emit(bytecode.JUMP, jump_ix + 2)
-        context.instructions[jump_ix + 1] = len(context.instructions)
+        context.emit(bytecode.JUMP, jump_ix)
+        context.instructions[jump_nz + 1] = len(context.instructions)
 
 class __extend__(ast.VariableDeclaration):
     def compile(self, context):
@@ -152,6 +162,11 @@ class __extend__(ast.Call):
         assert num_args < 256  # technically probably should be smaller?
         for arg in reversed(self.args):
             arg.compile(context)
+        if self.name == "putchar":
+            # TODO we should implement putchar in bytecode once we have
+            # working asm blocks
+            context.emit(bytecode.PUTC, bytecode.NO_ARG)
+            return
         wrapped_func = W_Function(self.name, len(self.args))
         func_index = context.register_constant(wrapped_func)
         context.emit(bytecode.CALL, func_index)

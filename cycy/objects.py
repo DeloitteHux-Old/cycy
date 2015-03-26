@@ -26,6 +26,10 @@ class W_Char(W_Object):
         assert len(char) == 1
         self.char = char
 
+    def neq(self, other):
+        if isinstance(other, W_Int32):
+            return ord(self.char) == other.value
+        raise NotImplementedError()
 
 @attributes([Attribute(name="value")], apply_with_init=False)
 class W_String(W_Object):
@@ -35,6 +39,8 @@ class W_String(W_Object):
 
     def dereference(self, index):
         assert isinstance(index, W_Int32)
+        if len(self.value) == index.value:
+            return "\0"
         return self.value[index.value]
 
 

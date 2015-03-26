@@ -2,10 +2,10 @@
 
 int puts(const char * string) {
     int i = 0;
-    while (string[i] != NULL) {
+    while (string[i] != 0) {
         putchar(string[i]);
         i = i + 1;
     }
-    putc('\n');
+    putchar('\n');
     return i + 1;
 }

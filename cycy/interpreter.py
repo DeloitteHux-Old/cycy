@@ -70,11 +70,11 @@ class CyCy(object):
             elif opcode == bytecode.BINARY_NEQ:
                 left = stack.pop()
                 right = stack.pop()
-                assert isinstance(left, W_Int32)
+                assert isinstance(left, W_Int32) or isinstance(left, W_Char)
                 assert isinstance(right, W_Int32)
                 stack.append(W_Bool(left.neq(right)))
             elif opcode == bytecode.PUTC:
-                value = byte_code.constants[arg]
+                value = stack.pop()
                 assert isinstance(value, W_Char)
                 os.write(1, value.char)
                 # TODO: error handling?
