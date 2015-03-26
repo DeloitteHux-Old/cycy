@@ -71,6 +71,7 @@ class CyCy(object):
             elif opcode == bytecode.BINARY_NEQ:
                 left = stack.pop()
                 right = stack.pop()
+
                 assert isinstance(left, W_Int32) or isinstance(left, W_Char)
                 assert isinstance(right, W_Int32)
                 stack.append(W_Bool(left.neq(right)))
@@ -154,7 +155,7 @@ class CyCy(object):
             source_file = open_file_as_stream(path)
             source = source_file.readall()
             source_file.close()
-            self.interpret_source(source)
+            self.compile(source)
 
         return_value = self.run_main()
         assert isinstance(return_value, W_Int32)

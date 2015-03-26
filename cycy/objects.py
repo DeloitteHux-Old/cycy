@@ -28,7 +28,7 @@ class W_Char(W_Object):
 
     def neq(self, other):
         if isinstance(other, W_Int32):
-            return ord(self.char) == other.value
+            return ord(self.char) != other.value
         raise NotImplementedError()
 
 @attributes([Attribute(name="value")], apply_with_init=False)
