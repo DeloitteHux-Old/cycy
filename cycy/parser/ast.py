@@ -208,7 +208,7 @@ class Type(Node):
             self.length = 8
         else:
             self.base_type = base
-            self.length = None
+            self.length = -1
 
         self.const = const
         self.unsigned = unsigned
