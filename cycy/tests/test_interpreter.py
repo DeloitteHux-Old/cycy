@@ -4,7 +4,7 @@ import os
 from mock import patch
 
 from cycy import interpreter
-from cycy.objects import W_Bool, W_Char, W_Function, W_Int32
+from cycy.objects import W_Bool, W_Char, W_Function, W_Int32, W_String
 from cycy.bytecode import *
 
 
@@ -191,3 +191,21 @@ class TestInterpreter(TestCase):
 
         rv = interp.run(byte_code_caller)
         self.assertEqual(W_Int32(42), rv)
+
+    def test_array_dereferences(self):
+        byte_code = Bytecode(
+            instructions=[
+                LOAD_CONST, 0,
+                STORE_VARIABLE, 0,
+                LOAD_CONST, 1,
+                LOAD_VARIABLE, 0,
+                DEREFERENCE, NO_ARG,
+                RETURN, 1,
+            ],
+            constants=[W_String("bar"), W_Int32(1)],
+            name="<test_array_dereferences>",
+            number_of_variables=1,
+        )
+
+        rv = interpreter.CyCy().run(byte_code)
+        self.assertEqual(rv, W_Char("a"))

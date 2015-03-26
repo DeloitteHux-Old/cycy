@@ -36,3 +36,14 @@ class TestCompiler(TestCase):
             2 STORE_VARIABLE 0
             """
         )
+
+    def test_array_dereference(self):
+        self.assertCompiles(
+            "int main(void) { const char* foo = \"foo\"; foo[3]; }", """
+            0 LOAD_CONST 0
+            2 STORE_VARIABLE 0
+            4 LOAD_CONST 1
+            6 LOAD_VARIABLE 0
+            8 DEREFERENCE
+            """
+        )

@@ -33,6 +33,10 @@ class W_String(W_Object):
         assert isinstance(value, str)
         self.value = value
 
+    def dereference(self, index):
+        assert isinstance(index, W_Int32)
+        return self.value[index.value]
+
 
 @attributes([Attribute(name="value")], apply_with_init=False)
 class W_Int32(W_Object):

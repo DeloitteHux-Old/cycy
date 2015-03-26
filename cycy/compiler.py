@@ -160,6 +160,13 @@ class __extend__(ast.Call):
         context.emit(bytecode.CALL, func_index)
 
 
+class __extend__(ast.ArrayDereference):
+    def compile(self, context):
+        self.index.compile(context=context)
+        self.array.compile(context=context)
+
+        context.emit(bytecode.DEREFERENCE, bytecode.NO_ARG)
+
 def compile(ast):
     context = Context()
     ast.compile(context=context)
