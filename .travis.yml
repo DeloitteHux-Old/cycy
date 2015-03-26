@@ -11,4 +11,4 @@ env:
   - PYTHONPATH=`pwd`/../pypy-src/:`pwd`
 script:
   - trial cycy
-  - python `pwd`/../pypy-src/rpython/bin/rpython --output=cycy-c cycy/target.py
+  - python `pwd`/../pypy-src/rpython/bin/rpython --batch --output=cycy-c cycy/target.py
