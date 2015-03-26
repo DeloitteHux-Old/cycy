@@ -41,6 +41,46 @@ class TestParser(TestCase):
             )
         )
 
+    def test_basic_eq(self):
+        self.assertEqual(
+            parse(self.function_wrap('2 == 3;')),
+            self.function_wrap_node(
+                BinaryOperation(operator="==", left=Int32(value=2), right=Int32(value=3))
+            )
+        )
+
+    def test_basic_gt(self):
+        self.assertEqual(
+            parse(self.function_wrap('2 > 3;')),
+            self.function_wrap_node(
+                BinaryOperation(operator=">", left=Int32(value=2), right=Int32(value=3))
+            )
+        )
+
+    def test_basic_gte(self):
+        self.assertEqual(
+            parse(self.function_wrap('2 >= 3;')),
+            self.function_wrap_node(
+                BinaryOperation(operator=">=", left=Int32(value=2), right=Int32(value=3))
+            )
+        )
+
+    def test_basic_lt(self):
+        self.assertEqual(
+            parse(self.function_wrap('2 < 3;')),
+            self.function_wrap_node(
+                BinaryOperation(operator="<", left=Int32(value=2), right=Int32(value=3))
+            )
+        )
+
+    def test_basic_lte(self):
+        self.assertEqual(
+            parse(self.function_wrap('2 <= 3;')),
+            self.function_wrap_node(
+                BinaryOperation(operator="<=", left=Int32(value=2), right=Int32(value=3))
+            )
+        )
+
     def test_char_variable_declaration(self):
         self.assertEqual(
             parse(self.function_wrap('char i;')),

@@ -151,21 +151,16 @@ class SourceParser(object):
     def assign(self, p):
         return Assignment(left=Variable(p[0].getstr()), right=p[2])
 
-    @pg.production('expr : expr != expr')
-    def binop_ne(self, p):
-        return BinaryOperation(operator="!=", left=p[0], right=p[2])
-
-    @pg.production("expr : expr + expr")
-    def binop_add(self, p):
-        return BinaryOperation(operator="+", left=p[0], right=p[2])
-
     @pg.production("expr : expr - expr")
-    def binop_sub(self, p):
-        return BinaryOperation(operator="-", left=p[0], right=p[2])
-
+    @pg.production("expr : expr + expr")
+    @pg.production('expr : expr == expr')
+    @pg.production('expr : expr != expr')
     @pg.production("expr : expr <= expr")
-    def binop_le(self, p):
-        return BinaryOperation(operator="<=", left=p[0], right=p[2])
+    @pg.production("expr : expr >= expr")
+    @pg.production("expr : expr < expr")
+    @pg.production("expr : expr > expr")
+    def binop(self, p):
+        return BinaryOperation(operator=p[1].getstr(), left=p[0], right=p[2])
 
     @pg.production("expr : STRING_LITERAL")
     def expr_string(self, p):

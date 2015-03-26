@@ -23,10 +23,14 @@ RULES = [
     "RIGHT_BRACKET",
     "LEFT_CURLY_BRACKET",
     "RIGHT_CURLY_BRACKET",
-    "=",
-    ",",
+    "==",
     "!=",
     "<=",
+    ">=",
+    "<",
+    ">",
+    "=",
+    ",",
     "++",
     "+",
     "-",
@@ -56,11 +60,15 @@ lg.add("LEFT_BRACKET", "\(")
 lg.add("RIGHT_BRACKET", "\)")
 lg.add("LEFT_CURLY_BRACKET", "{")
 lg.add("RIGHT_CURLY_BRACKET", "}")
-lg.add("=", "=")
-lg.add(",", ",")
+lg.add("==", "==")
 lg.add("!=", "!=")
 lg.add("<=", "<=")
+lg.add(">=", ">=")
+lg.add("<", "<")
+lg.add(">", ">")
 lg.add("++", "\+\+")
+lg.add("=", "=")
+lg.add(",", ",")
 lg.add("+", "\+")
 lg.add("-", "-")
 lg.add(";", ";")
