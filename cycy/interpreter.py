@@ -42,9 +42,11 @@ class CyCy(object):
         stack = []
         variables = [None] * len(byte_code.variables)
 
-        for name, value in zip(byte_code.arguments, arguments):
+        assert len(byte_code.arguments) == len(arguments)
+        for i in xrange(len(byte_code.arguments)):
+            name = byte_code.arguments[i]
             index = byte_code.variables[name]
-            variables[index] = value
+            variables[index] = variables[i]
 
         while pc < len(byte_code.instructions):
             jitdriver.jit_merge_point(
