@@ -17,7 +17,8 @@ class TestInterpreter(TestCase):
             ],
             constants=[W_Char("x")],
             name="<some test bytecode>",
-            number_of_variables=0,
+            arguments=(),
+            variables={},
         )
 
         with patch.object(os, "write") as os_write:
@@ -37,7 +38,8 @@ class TestInterpreter(TestCase):
             ],
             constants=[],
             name="<some test bytecode>",
-            number_of_variables=0,
+            arguments=(),
+            variables={},
         )
 
         rv = interpreter.CyCy().run(byte_code)
@@ -51,7 +53,8 @@ class TestInterpreter(TestCase):
             ],
             constants=[W_Int32(0)],
             name="<test_load_const>",
-            number_of_variables=0,
+            arguments=(),
+            variables={},
         )
 
         rv = interpreter.CyCy().run(byte_code)
@@ -67,7 +70,8 @@ class TestInterpreter(TestCase):
             ],
             constants=[W_Int32(0), W_Int32(1)],
             name="<test_binary_neq>",
-            number_of_variables=0,
+            arguments=(),
+            variables={},
         )
         byte_code_eq = Bytecode(
             instructions=[
@@ -78,7 +82,8 @@ class TestInterpreter(TestCase):
             ],
             constants=[W_Int32(0)],
             name="<test_binary_neq>",
-            number_of_variables=0,
+            arguments=(),
+            variables={},
         )
 
         rv = interpreter.CyCy().run(byte_code_ne)
@@ -97,7 +102,8 @@ class TestInterpreter(TestCase):
             ],
             constants=[W_Int32(1), W_Int32(0)],
             name="<test_binary_neq>",
-            number_of_variables=0,
+            arguments=(),
+            variables={},
         )
         byte_code_leq = Bytecode(
             instructions=[
@@ -108,7 +114,8 @@ class TestInterpreter(TestCase):
             ],
             constants=[W_Int32(0)],
             name="<test_binary_neq>",
-            number_of_variables=0,
+            arguments=(),
+            variables={},
         )
         byte_code_gt = Bytecode(
             instructions=[
@@ -119,7 +126,8 @@ class TestInterpreter(TestCase):
             ],
             constants=[W_Int32(0), W_Int32(1)],
             name="<test_binary_neq>",
-            number_of_variables=0,
+            arguments=(),
+            variables={},
         )
 
         rv = interpreter.CyCy().run(byte_code_lt)
@@ -141,7 +149,8 @@ class TestInterpreter(TestCase):
             ],
             constants=[W_Int32(1), W_Int32(2)],
             name="<test_binary_add>",
-            number_of_variables=0,
+            arguments=(),
+            variables={},
         )
 
         rv = interpreter.CyCy().run(byte_code)
@@ -157,7 +166,25 @@ class TestInterpreter(TestCase):
             ],
             constants=[W_Int32(1), W_Int32(2)],
             name="<test_binary_add>",
-            number_of_variables=0,
+            arguments=(),
+            variables={},
+        )
+
+        rv = interpreter.CyCy().run(byte_code)
+        self.assertEqual(rv, W_Int32(1))
+
+    def test_store_and_load_variable(self):
+        byte_code = Bytecode(
+            instructions=[
+                LOAD_CONST, 0,
+                STORE_VARIABLE, 0,
+                LOAD_VARIABLE, 0,
+                RETURN, 1
+            ],
+            constants=[W_Int32(1)],
+            name="<test_binary_add>",
+            arguments=(),
+            variables={"x": 0},
         )
 
         rv = interpreter.CyCy().run(byte_code)
@@ -171,7 +198,8 @@ class TestInterpreter(TestCase):
             ],
             constants=[W_Function("callee", 0)],
             name="<test_calls_a_function_with_no_args>",
-            number_of_variables=0,
+            arguments=(),
+            variables={},
         )
 
         byte_code_callee = Bytecode(
@@ -181,7 +209,40 @@ class TestInterpreter(TestCase):
             ],
             constants=[W_Int32(42)],
             name="<test_calls_a_function_with_no_args>",
-            number_of_variables=0,
+            arguments=(),
+            variables={},
+        )
+
+        interp = interpreter.CyCy()
+        interp.compiled_functions = {
+            "callee": byte_code_callee,
+        }
+
+        rv = interp.run(byte_code_caller)
+        self.assertEqual(W_Int32(42), rv)
+
+    def test_it_calls_a_function_with_one_arg(self):
+        byte_code_caller = Bytecode(
+            instructions=[
+                LOAD_CONST, 0,
+                CALL, 1,
+                RETURN, 1,
+            ],
+            constants=[W_Int32(42), W_Function("callee", 1)],
+            name="<test_calls_a_function_with_no_args>",
+            arguments=(),
+            variables={},
+        )
+
+        byte_code_callee = Bytecode(
+            instructions=[
+                LOAD_VARIABLE, 0,
+                RETURN, 1,
+            ],
+            constants=[],
+            name="<test_calls_a_function_with_no_args>",
+            arguments=["x"],
+            variables={"x": 0},
         )
 
         interp = interpreter.CyCy()

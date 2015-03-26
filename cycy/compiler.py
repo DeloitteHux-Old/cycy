@@ -10,7 +10,7 @@ from cycy.parser import ast
     [
         Attribute(name="instructions"),
         Attribute(name="constants"),
-        Attribute(name="variable_indices"),
+        Attribute(name="variables"),
     ],
     apply_with_init=False,
 )
@@ -30,7 +30,7 @@ class Context(object):
 
             These are C-level objects (i.e. they're wrapped).
 
-    .. attribute:: variable_indices
+    .. attribute:: variables
 
         a mapping between variable names (:class:`str`\ s) and the
         indices in an array that they should be assigned to
@@ -40,34 +40,27 @@ class Context(object):
     def __init__(self):
         self.instructions = []
         self.constants = []
-        self.variable_indices = {}
+        self.variables = {}
 
     def emit(self, byte_code, arg=bytecode.NO_ARG):
         self.instructions.append(byte_code)
         self.instructions.append(arg)
 
     def register_variable(self, name):
-        self.variable_indices[name] = len(self.variable_indices)
-        return len(self.variable_indices) - 1
+        self.variables[name] = len(self.variables)
+        return len(self.variables) - 1
 
     def register_constant(self, constant):
         self.constants.append(constant)
         return len(self.constants) - 1
 
-    def register_string_variable(self, name):
-        self.variable_indices[name] = len(self.variable_indices)
-        return len(self.variable_indices) - 1
-
-    def register_string_constant(self, string):
-        self.constants.append(string)
-        return len(self.constants) - 1
-
-    def build(self, name="<input>"):
+    def build(self, arguments=[], name="<input>"):
         return bytecode.Bytecode(
             instructions=self.instructions,
             name=name,
+            arguments=arguments,
             constants=self.constants,
-            number_of_variables=len(self.variable_indices),
+            variables=self.variables,
         )
 
 class __extend__(ast.Function):
@@ -100,7 +93,7 @@ class __extend__(ast.Char):
 class __extend__(ast.String):
     def compile(self, context):
         wrapped = W_String(value=self.value)
-        index = context.register_string_constant(wrapped)
+        index = context.register_constant(wrapped)
         context.emit(bytecode.LOAD_CONST, index)
 
 class __extend__(ast.ReturnStatement):
@@ -134,7 +127,7 @@ class __extend__(ast.VariableDeclaration):
             ref = vtype.reference
             assert isinstance(ref, ast.Type)
             if ref.base_type == "int" and ref.length == 8:
-                variable_index = context.register_string_variable(self.name)
+                variable_index = context.register_variable(self.name)
                 if self.value:
                     self.value.compile(context)
                     context.emit(bytecode.STORE_VARIABLE, variable_index)
@@ -143,7 +136,7 @@ class __extend__(ast.VariableDeclaration):
 
 class __extend__(ast.Variable):
     def compile(self, context):
-        variable_index = context.variable_indices.get(self.name, -42)
+        variable_index = context.variables.get(self.name, -42)
         if variable_index == -42:
             # XXX: this should be either a runtime or compile time exception
             raise Exception("Attempt to use undeclared variable '%s'" % self.name)
@@ -155,10 +148,9 @@ class __extend__(ast.Call):
         assert num_args < 256  # technically probably should be smaller?
         for arg in reversed(self.args):
             arg.compile(context)
-        wrapped_func = W_Function(self.name, num_args)
+        wrapped_func = W_Function(self.name, len(self.args))
         func_index = context.register_constant(wrapped_func)
         context.emit(bytecode.CALL, func_index)
-
 
 class __extend__(ast.ArrayDereference):
     def compile(self, context):
@@ -167,7 +159,15 @@ class __extend__(ast.ArrayDereference):
 
         context.emit(bytecode.DEREFERENCE, bytecode.NO_ARG)
 
-def compile(ast):
+
+def compile(an_ast):
     context = Context()
-    ast.compile(context=context)
-    return context.build(name="<don't know>")
+    an_ast.compile(context=context)
+    if isinstance(an_ast, ast.Function):
+        arguments = []
+        for param in an_ast.params:
+            assert isinstance(param, ast.VariableDeclaration)
+            arguments.append(param.name)
+    else:
+        arguments = []
+    return context.build(arguments=arguments, name="<don't know>")
