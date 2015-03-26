@@ -134,10 +134,16 @@ class CyCy(object):
     def compile(self, source):
         program = parse(source=source, environment=self.environment)
         assert isinstance(program, ast.Program)
+
+        newly_compiled_functions = []
+
         for function in program.functions():
             assert isinstance(function, ast.Function)
             byte_code = compiler.compile(function)
+            newly_compiled_functions.append(function.name)
             self.compiled_functions[function.name] = byte_code
+
+        return newly_compiled_functions
 
     def interpret(self, paths):
         for path in paths:

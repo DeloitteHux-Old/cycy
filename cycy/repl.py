@@ -28,13 +28,30 @@ class REPL(object):
         self.show_banner()
         while True:
             self.stdout.write(self.PROMPT)
-            program = self.stdin.readline()
-            self.interpret(program)
+
+            repl_input = self.stdin.readline()
+            if repl_input.startswith("dump "):
+                repl_input = repl_input[5:]
+                newly_compiled_functions = self.interpreter.compile(repl_input)
+                for function_name in newly_compiled_functions:
+                    self.dump(function_name)
+            else:
+                self.interpret(repl_input)
 
     def interpret(self, source):
         # XXX: multiple lines, and pass stdin / stdout / stderr down
         return_value = self.interpreter.interpret_source(source=source)
         self.stdout.write(return_value.str())
+        self.stdout.write("\n")
+
+    def dump(self, function_name):
+        """
+        Pretty-dump the bytecode for the function with the given name.
+
+        """
+
+        byte_code = self.interpreter.compiled_functions[function_name]
+        self.stdout.write(byte_code.dump())
         self.stdout.write("\n")
 
     def show_banner(self):
