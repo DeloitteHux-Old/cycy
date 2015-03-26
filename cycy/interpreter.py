@@ -16,8 +16,8 @@ except ImportError:
         def can_enter_jit(self,**kw): pass
     def purefunction(f): return f
 
-def get_location(pc, stack):
-    return "%s %s" % (pc, stack)
+def get_location(pc, stack, variables):
+    return "%s %s" % (pc, stack, variables)
 
 jitdriver = JitDriver(
     greens=['pc', "stack", "variables"],
