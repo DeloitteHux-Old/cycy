@@ -113,6 +113,7 @@ class __extend__(ast.Variable):
     def compile(self, context):
         variable_index = context.variable_indices.get(self.name, -42)
         if variable_index == -42:
+            # XXX: this should be either a runtime or compile time exception
             raise Exception("Attempt to use undeclared variable '%s'" % self.name)
         context.emit(bytecode.LOAD_VARIABLE, variable_index)
 
