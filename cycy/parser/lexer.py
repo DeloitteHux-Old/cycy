@@ -17,6 +17,7 @@ RULES = [
     "return",
     "void",
     "while",
+    "ASM",
     "IDENTIFIER",
     "LEFT_SQUARE_BRACKET",
     "RIGHT_SQUARE_BRACKET",
@@ -44,6 +45,8 @@ RULES = [
     "%",
 ]
 lg = LexerGenerator()
+lg.add("ASM", "__asm__")
+lg.add("ASM", "asm")
 lg.add("FLOAT_LITERAL", "\d+.\d+")
 lg.add("INTEGER_LITERAL", "\d+")
 lg.add("CHAR_LITERAL", "'\\\\?.'")

@@ -4,6 +4,7 @@ from cycy.parser import parse
 from cycy.parser.ast import (
     Array,
     ArrayDereference,
+    Assembler,
     Assignment,
     BinaryOperation,
     Block,
@@ -361,6 +362,22 @@ class TestParser(TestCase):
             parse(self.function_wrap('"foo";')),
             self.function_wrap_node(
                 String(value="foo")
+            )
+        )
+
+    def test_asm(self):
+        instruction = "movl %ecx %eax"
+        self.assertEqual(
+            parse(self.function_wrap('__asm__("%s");') % instruction),
+            self.function_wrap_node(
+                Assembler(instruction=instruction)
+            )
+        )
+
+        self.assertEqual(
+            parse(self.function_wrap('asm("%s");') % instruction),
+            self.function_wrap_node(
+                Assembler(instruction=instruction)
             )
         )
 
