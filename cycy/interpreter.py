@@ -1,7 +1,7 @@
 import os
 
-from cycy import bytecode
-from cycy import compiler
+from cycy import bytecode, compiler
+from cycy.objects import W_Char
 from cycy.parser.sourceparser import parse
 
 
@@ -19,7 +19,8 @@ class CyCy(object):
 
             if opcode == bytecode.PUTC:
                 value = byte_code.constants[arg]
-                os.write(1, chr(value))
+                assert isinstance(value, W_Char)
+                os.write(1, value.str())
                 # TODO: error handling?
 
 
