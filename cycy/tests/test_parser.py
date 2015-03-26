@@ -229,6 +229,17 @@ class TestParser(TestCase):
             )
         )
 
+    def test_array_variable_declaration(self):
+        self.assertEqual(
+            parse(self.function_wrap('int foo[10];')),
+            self.function_wrap_node(
+                VariableDeclaration(name="foo", vtype=Type(base="array", arraylength=Int32(value=10), reference=Type(base="int")), value=None)
+            )
+        )
+        var = Type(base="array", arraylength=Int32(value=10), reference=Type(base="int"))
+        self.assertEqual( var.base_type, "pointer")
+        self.assertEqual( var.length, Int32(value=10))
+
     def test_pointer_to_pointer_variable_declaration(self):
         self.assertEqual(
             parse(self.function_wrap('char **argv;')),

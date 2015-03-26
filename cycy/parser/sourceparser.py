@@ -232,6 +232,10 @@ class SourceParser(object):
     def declare_int(self, p):
         return VariableDeclaration(name=p[1].getstr(), vtype=p[0], value=None)
 
+    @pg.production("declaration : type IDENTIFIER LEFT_SQUARE_BRACKET INTEGER_LITERAL RIGHT_SQUARE_BRACKET")
+    def declare_array(self, p):
+        return VariableDeclaration(name=p[1].getstr(), vtype=Type(base="array", arraylength=Int32(int(p[3].getstr())), reference=p[0]))
+
     @pg.production("declaration : type IDENTIFIER = INTEGER_LITERAL")
     def declare_assign_int(self, p):
         return VariableDeclaration(
