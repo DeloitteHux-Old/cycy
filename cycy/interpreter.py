@@ -1,7 +1,6 @@
 import os
 
 from cycy import bytecode
-from cycy import compiler
 from cycy.parser.sourceparser import parse
 
 
@@ -24,6 +23,19 @@ class CyCy(object):
 
 
 def interpret(source):
+    from cycy import compiler
     ast = parse(source)
     byte_code = compiler.compile(ast=ast)
     CyCy().run(byte_code=byte_code)
+
+
+class WrappedThing(object):
+    pass
+
+
+class WrappedInt32(WrappedThing):
+    # TODO: different sizes of ints :\
+
+    def __init__(self, value):
+        assert isinstance(value, int)
+        self.value = value

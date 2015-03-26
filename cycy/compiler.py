@@ -1,6 +1,7 @@
 from characteristic import Attribute, attributes
 
 from cycy import bytecode
+from cycy.interpreter import WrappedInt32
 from cycy.parser import ast
 
 
@@ -57,7 +58,8 @@ class __extend__(ast.BinaryOperation):
 
 class __extend__(ast.Int32):
     def compile(self, context):
-        index = context.register_int32_constant(self.value)
+        wrapped = WrappedInt32(self.value)
+        index = context.register_int32_constant(wrapped)
         context.emit(bytecode.LOAD_CONST, index)
 
 
