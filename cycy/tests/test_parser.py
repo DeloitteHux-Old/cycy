@@ -249,6 +249,46 @@ class TestParser(TestCase):
             )
         )
 
+    def test_addition(self):
+        self.assertEqual(
+            parse(self.function_wrap("1 + 2;")),
+            self.function_wrap_node(
+                BinaryOperation(operator="+", left=Int32(value=1), right=Int32(value=2))
+            )
+        )
+
+    def test_subtraction(self):
+        self.assertEqual(
+            parse(self.function_wrap("1 - 2;")),
+            self.function_wrap_node(
+                BinaryOperation(operator="-", left=Int32(value=1), right=Int32(value=2))
+            )
+        )
+
+    def test_multiplication(self):
+        self.assertEqual(
+            parse(self.function_wrap("1 * 2;")),
+            self.function_wrap_node(
+                BinaryOperation(operator="*", left=Int32(value=1), right=Int32(value=2))
+            )
+        )
+
+    def test_division(self):
+        self.assertEqual(
+            parse(self.function_wrap("1 / 2;")),
+            self.function_wrap_node(
+                BinaryOperation(operator="/", left=Int32(value=1), right=Int32(value=2))
+            )
+        )
+
+    def test_modulus(self):
+        self.assertEqual(
+            parse(self.function_wrap("1 % 2;")),
+            self.function_wrap_node(
+                BinaryOperation(operator="%", left=Int32(value=1), right=Int32(value=2))
+            )
+        )
+
     def test_char_literal(self):
         self.assertEqual(
             parse(self.function_wrap("'c';")),
@@ -265,7 +305,7 @@ class TestParser(TestCase):
             )
         )
 
-    def test_array_deference(self):
+    def test_array_dereference(self):
         self.assertEqual(
             parse(self.function_wrap("array[4];")),
             self.function_wrap_node(
