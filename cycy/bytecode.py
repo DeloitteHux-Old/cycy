@@ -113,6 +113,18 @@ class Bytecode(object):
                 str_arg = "%s" % arg
 
             line = "%s %s %s" % (str(offset), name, str_arg)
+            if byte_code in (LOAD_CONST, CALL):
+                line += " => " + self.constants[arg].dump()
+            elif byte_code in (STORE_VARIABLE, LOAD_VARIABLE):
+                for name, index in self.variables.items():
+                    if index == arg:
+                        line += " => " + name
+                        break
+            elif byte_code == RETURN:
+                if arg:
+                    line += " (top of stack)"
+                else:
+                    line += " (void return)"
             lines.append(line.strip())
 
         return "\n".join(lines)

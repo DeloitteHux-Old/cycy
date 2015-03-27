@@ -31,6 +31,9 @@ class W_Char(W_Object):
             return ord(self.char[0]) != other.value
         raise NotImplementedError()
 
+    def dump(self):
+        return "(char)'%s'" % self.char
+
 @attributes([Attribute(name="value")], apply_with_init=False)
 class W_String(W_Object):
     def __init__(self, value):
@@ -42,6 +45,9 @@ class W_String(W_Object):
         if len(self.value) == index.value:
             return "\0"
         return self.value[index.value]
+
+    def dump(self):
+        return '(char *)"%s"' % self.value
 
 
 @attributes([Attribute(name="value")], apply_with_init=False)
@@ -69,6 +75,9 @@ class W_Int32(W_Object):
     def str(self):
         return str(self.value)
 
+    def dump(self):
+        return "(int32_t)%s" % self.value
+
 
 @attributes([Attribute(name="value")], apply_with_init=False)
 class W_Bool(W_Object):
@@ -78,9 +87,15 @@ class W_Bool(W_Object):
     def is_true(self):
         return self.value == True
 
+    def dump(self):
+        return "(bool)%s" % str(self.value).lower()
+
 
 @attributes([Attribute(name="name"), Attribute(name="num_args")], apply_with_init=False)
 class W_Function(W_Object):
     def __init__(self, name, num_args):
         self.name = name
         self.num_args = num_args
+
+    def dump(self):
+        return "(function)%s" % self.name
