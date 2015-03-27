@@ -124,6 +124,17 @@ class CyCy(object):
                 assert isinstance(index, W_Int32)
                 stack.append(W_Char(array.dereference(index)))
             elif opcode == bytecode.JUMP:
+                if arg < pc:
+                    # If we're jumping backwards, we're entering a loop
+                    # so we can probably enter the jit
+                    jitdriver.can_enter_jit(
+                        pc=pc,
+                        stack=stack,
+                        variables=variables,
+                        byte_code=byte_code,
+                        arguments=arguments,
+                        interpreter=self,
+                    )
                 pc = arg
             elif opcode == bytecode.JUMP_IF_NOT_ZERO:
                 val = stack.pop()
