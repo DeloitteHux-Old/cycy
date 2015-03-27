@@ -12,6 +12,9 @@ class W_Object(object):
 
     """
 
+    def rint(self):
+        raise NotImplementedError()
+
 
 @attributes([])
 class _W_Null(W_Object):
@@ -27,12 +30,11 @@ class W_Char(W_Object):
         self.char = char
 
     def neq(self, other):
-        if isinstance(other, W_Int32):
-            return ord(self.char[0]) != other.value
-        raise NotImplementedError()
+        return ord(self.char[0]) != other.rint()
 
     def dump(self):
         return "(char)'%s'" % self.char
+
 
 @attributes([Attribute(name="value")], apply_with_init=False)
 class W_String(W_Object):
@@ -42,9 +44,10 @@ class W_String(W_Object):
 
     def dereference(self, index):
         assert isinstance(index, W_Int32)
-        if len(self.value) == index.value:
+        rint = index.rint()
+        if len(self.value) == rint:
             return "\0"
-        return self.value[index.value]
+        return self.value[rint]
 
     def dump(self):
         return '(char *)"%s"' % self.value
