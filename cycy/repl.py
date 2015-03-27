@@ -30,11 +30,14 @@ class REPL(object):
             self.stdout.write(self.PROMPT)
 
             repl_input = self.stdin.readline()
+            if not repl_input:
+                return
             if repl_input.startswith("dump "):
                 repl_input = repl_input[5:]
                 newly_compiled_functions = self.interpreter.compile(repl_input)
                 for function_name in newly_compiled_functions:
                     self.dump(function_name)
+                    self.stdout.write("\n")
             else:
                 self.interpret(repl_input)
 
