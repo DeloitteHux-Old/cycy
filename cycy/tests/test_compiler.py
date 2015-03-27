@@ -18,7 +18,7 @@ class TestCompiler(TestCase):
         main_func_ast = next(func for func in program.functions() if func.name == "main")
         bytecode = compiler.compile(main_func_ast)
         expected = dedent(cleaned(to).strip("\n")).strip("\n")
-        self.assertEqual(bytecode.dump(), expected)
+        self.assertEqual(bytecode.dump(pretty=False), expected)
 
     def test_basic_neq(self):
         self.assertCompiles(
