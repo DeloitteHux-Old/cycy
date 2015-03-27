@@ -65,15 +65,16 @@ def parse_args(args):
             return CommandLine(action=print_help)
 
         if argument == "-I":
-            path = next(arguments, None)
-            if path is None:
+            try:
+                include_paths.append(next(arguments))
+            except StopIteration:
                 return CommandLine(
                     action=print_help, failure="-I expects an argument",
                 )
-            include_paths.append(path)
         elif argument == "-c":
-            source_string = next(arguments, None)
-            if source_string is None:
+            try:
+                source_string = next(arguments)
+            except StopIteration:
                 return CommandLine(
                     action=print_help, failure="-c expects an argument",
                 )
