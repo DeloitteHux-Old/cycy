@@ -32,8 +32,7 @@ def main(argv):
         print __doc__
         return 1
 
-    interpreter.interpret(source_files)
-    return 0
+    return interpreter.interpret(source_files).value
 
 
 def target(driver, args):

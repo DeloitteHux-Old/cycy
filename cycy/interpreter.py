@@ -160,8 +160,7 @@ class CyCy(object):
 
         return_value = self.run_main()
         assert isinstance(return_value, W_Int32)
-        # TODO: duh, this should really come from the program
-        return 5
+        return return_value
 
     def interpret_source(self, source):
         self.compile(source)
