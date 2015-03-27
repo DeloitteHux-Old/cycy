@@ -1,5 +1,6 @@
 import os
 
+from characteristic import Attribute, attributes
 from rpython.rlib.streamio import open_file_as_stream
 
 from cycy import bytecode, compiler
@@ -28,14 +29,25 @@ jitdriver = JitDriver(
     get_printable_location=get_location
 )
 
+
+@attributes(
+    [
+        Attribute(name="environment"),
+        Attribute(name="compiled_functions"),
+    ],
+    apply_with_init=False
+)
 class CyCy(object):
     """
     The main CyCy interpreter.
     """
 
-    def __init__(self):
+    def __init__(self, environment=None):
+        if environment is None:
+            environment = Environment()
+
         self.compiled_functions = {}
-        self.environment = Environment()
+        self.environment = environment
 
     def run_main(self):
         main_byte_code = self.compiled_functions["main"]

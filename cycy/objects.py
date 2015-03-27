@@ -78,6 +78,9 @@ class W_Int32(W_Object):
     def dump(self):
         return "(int32_t)%s" % self.value
 
+    def rint(self):
+        return self.value
+
 
 @attributes([Attribute(name="value")], apply_with_init=False)
 class W_Bool(W_Object):
