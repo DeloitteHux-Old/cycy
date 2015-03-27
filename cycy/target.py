@@ -8,7 +8,6 @@ import sys
 from rpython.jit.codewriter.policy import JitPolicy
 
 from cycy.interpreter import CyCy
-from cycy.environment import Environment
 from cycy.repl import REPL
 
 def main(argv):
@@ -17,8 +16,7 @@ def main(argv):
         return 0
 
     print_help = False
-    environment = Environment()
-    interpreter = CyCy(environment=environment)
+    interpreter = CyCy()
     source_files = []
 
     for arg in argv[1:]:
@@ -26,7 +24,7 @@ def main(argv):
             print_help = True
             break
         elif arg.startswith("-I"):
-            environment.add_include(arg[2:])
+            interpreter.environment.add_include(arg[2:])
         else:
             source_files.append(arg)
 
@@ -34,8 +32,7 @@ def main(argv):
         print __doc__
         return 1
 
-    interpreter.interpret(source_files)
-    return 0
+    return interpreter.interpret(source_files).value
 
 
 def target(driver, args):

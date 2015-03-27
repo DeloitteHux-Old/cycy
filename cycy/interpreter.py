@@ -3,6 +3,7 @@ import os
 from rpython.rlib.streamio import open_file_as_stream
 
 from cycy import bytecode, compiler
+from cycy.environment import Environment
 from cycy.objects import W_Bool, W_Char, W_Int32, W_Object, W_String
 from cycy.parser import ast
 from cycy.parser.sourceparser import parse
@@ -32,9 +33,9 @@ class CyCy(object):
     The main CyCy interpreter.
     """
 
-    def __init__(self, environment=None):
+    def __init__(self):
         self.compiled_functions = {}
-        self.environment = environment
+        self.environment = Environment()
 
     def run_main(self):
         main_byte_code = self.compiled_functions["main"]
@@ -170,8 +171,7 @@ class CyCy(object):
 
         return_value = self.run_main()
         assert isinstance(return_value, W_Int32)
-        # TODO: duh, this should really come from the program
-        return 5
+        return return_value
 
     def interpret_source(self, source):
         self.compile(source)
