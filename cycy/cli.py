@@ -26,6 +26,7 @@ from cycy.repl import REPL
         Attribute(name="cycy"),
         Attribute(name="failure"),
         Attribute(name="source_files"),
+        Attribute(name="source_string"),
     ],
     apply_with_init=False,
 )
@@ -41,14 +42,20 @@ class CommandLine(object):
         cycy=None,
         failure="",
         source_files=None,
+        source_string=None,
     ):
+        if source_files is None:
+            source_files = []
+
         self.action = action
         self.cycy = cycy
         self.failure = failure
         self.source_files = source_files
+        self.source_string = source_string
 
 
 def parse_args(args):
+    source_string = None
     source_files = []
     include_paths = []
 
@@ -58,7 +65,18 @@ def parse_args(args):
             return CommandLine(action=print_help)
 
         if argument == "-I":
-            include_paths.append(next(arguments))
+            path = next(arguments, None)
+            if path is None:
+                return CommandLine(
+                    action=print_help, failure="-I expects an argument",
+                )
+            include_paths.append(path)
+        elif argument == "-c":
+            source_string = next(arguments, None)
+            if source_string is None:
+                return CommandLine(
+                    action=print_help, failure="-c expects an argument",
+                )
         elif not argument.startswith("-"):
             source_files.append(argument)
         else:
@@ -68,11 +86,12 @@ def parse_args(args):
             )
 
     cycy = CyCy(environment=Environment(include_paths=include_paths))
-    if source_files:
+    if source_files or source_string:
         return CommandLine(
-            action=run_files,
+            action=run_source,
             cycy=cycy,
             source_files=source_files,
+            source_string=source_string,
         )
     else:
         return CommandLine(action=run_repl, cycy=cycy)
@@ -90,8 +109,14 @@ def print_help(command_line):
     return exit_status
 
 
-def run_files(command_line):
-    w_exit_status = command_line.cycy.interpret(command_line.source_files)
+def run_source(command_line):
+    cycy = command_line.cycy
+
+    if command_line.source_string:
+        w_exit_status = cycy.interpret_source(command_line.source_string)
+    else:
+        w_exit_status = cycy.interpret(command_line.source_files)
+
     return w_exit_status.rint()
 
 
