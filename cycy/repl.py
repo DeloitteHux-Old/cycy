@@ -29,9 +29,17 @@ class REPL(object):
         while True:
             self.stdout.write(self.PROMPT)
 
-            repl_input = self.stdin.readline()
+            try:
+                repl_input = self.stdin.readline()
+            except KeyboardInterrupt:
+                self.stdout.write("\n")
+                continue
+
             if not repl_input:
                 return
+            elif not repl_input.strip():
+                continue
+
             if repl_input.startswith("dump "):
                 repl_input = repl_input[5:]
                 newly_compiled_functions = self.interpreter.compile(repl_input)
@@ -40,12 +48,12 @@ class REPL(object):
                     self.stdout.write("\n")
             else:
                 self.interpret(repl_input)
+                self.stdout.write("\n")
 
     def interpret(self, source):
         # XXX: multiple lines, and pass stdin / stdout / stderr down
         return_value = self.interpreter.interpret_source(source=source)
         self.stdout.write(return_value.str())
-        self.stdout.write("\n")
 
     def dump(self, function_name):
         """
