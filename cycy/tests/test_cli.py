@@ -6,16 +6,6 @@ from cycy.interpreter import CyCy
 
 
 class TestArgumentParsing(TestCase):
-    def test_help(self):
-        self.assertEqual(
-            cli.parse_args(["-h"]),
-            cli.CommandLine(action=cli.print_help),
-        )
-        self.assertEqual(
-            cli.parse_args(["--help"]),
-            cli.CommandLine(action=cli.print_help),
-        )
-
     def test_run_source_files(self):
         self.assertEqual(
             cli.parse_args(["-I", "a/include", "-I", "b/include", "file.c"]),
@@ -64,4 +54,20 @@ class TestArgumentParsing(TestCase):
                 action=cli.print_help,
                 failure="-I expects an argument",
             ),
+        )
+
+    def test_help(self):
+        self.assertEqual(
+            cli.parse_args(["-h"]),
+            cli.CommandLine(action=cli.print_help),
+        )
+        self.assertEqual(
+            cli.parse_args(["--help"]),
+            cli.CommandLine(action=cli.print_help),
+        )
+
+    def test_version(self):
+        self.assertEqual(
+            cli.parse_args(["--version"]),
+            cli.CommandLine(action=cli.print_version),
         )

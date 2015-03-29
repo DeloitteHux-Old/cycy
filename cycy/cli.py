@@ -8,6 +8,14 @@ cycy [options] [C_FILE ...]
 Options
 -------
 
+-h, --help       display this help message
+--version        display version information
+
+
+-c PROGRAM       execute the given program, passed in
+                 as a string (terminates option list)
+-I, --include    specify an additional include path to search within
+
 """
 
 from textwrap import dedent
@@ -15,6 +23,7 @@ import os
 
 from characteristic import Attribute, attributes
 
+from cycy import __version__
 from cycy.interpreter import CyCy
 from cycy.environment import Environment
 from cycy.repl import REPL
@@ -42,7 +51,7 @@ class CommandLine(object):
         cycy=None,
         failure="",
         source_files=None,
-        source_string=None,
+        source_string="",
     ):
         if source_files is None:
             source_files = []
@@ -55,7 +64,7 @@ class CommandLine(object):
 
 
 def parse_args(args):
-    source_string = None
+    source_string = ""
     source_files = []
     include_paths = []
 
@@ -63,8 +72,10 @@ def parse_args(args):
     for argument in arguments:
         if argument in ("-h", "--help"):
             return CommandLine(action=print_help)
+        if argument == "--version":
+            return CommandLine(action=print_version)
 
-        if argument == "-I":
+        if argument in ("-I", "--include"):
             try:
                 include_paths.append(next(arguments))
             except StopIteration:
@@ -72,9 +83,12 @@ def parse_args(args):
                     action=print_help, failure="-I expects an argument",
                 )
         elif argument == "-c":
-            try:
-                source_string = next(arguments)
-            except StopIteration:
+            source = []  # this is the simplest valid RPython currently
+            for argument in arguments:
+                source.append(argument)
+            source_string = " ".join(source)
+
+            if not source_string:
                 return CommandLine(
                     action=print_help, failure="-c expects an argument",
                 )
@@ -98,18 +112,6 @@ def parse_args(args):
         return CommandLine(action=run_repl, cycy=cycy)
 
 
-def print_help(command_line):
-    exit_status = os.EX_OK
-
-    if command_line.failure:
-        os.write(2, command_line.failure)
-        os.write(2, "\n")
-        exit_status = os.EX_USAGE
-
-    os.write(2, __doc__)
-    return exit_status
-
-
 def run_source(command_line):
     cycy = command_line.cycy
 
@@ -123,4 +125,21 @@ def run_source(command_line):
 
 def run_repl(command_line):
     REPL().run()
+    return os.EX_OK
+
+
+def print_help(command_line):
+    exit_status = os.EX_OK
+
+    if command_line.failure:
+        os.write(2, command_line.failure)
+        os.write(2, "\n")
+        exit_status = os.EX_USAGE
+
+    os.write(2, __doc__)
+    return exit_status
+
+
+def print_version(command_line):
+    os.write(2, "CyCy %s" % (__version__,))
     return os.EX_OK
