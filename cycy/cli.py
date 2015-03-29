@@ -141,5 +141,5 @@ def print_help(command_line):
 
 
 def print_version(command_line):
-    os.write(2, "CyCy %s" % (__version__,))
+    os.write(2, "CyCy %s\n" % (__version__,))
     return os.EX_OK
