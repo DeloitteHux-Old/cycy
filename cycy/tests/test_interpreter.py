@@ -3,9 +3,8 @@ import os
 
 from mock import patch
 
-from cycy import interpreter
+from cycy import compiler, interpreter
 from cycy.bytecode import *
-from cycy.compiler import compile
 from cycy.objects import W_Bool, W_Char, W_Function, W_Int32, W_String
 from cycy.parser.sourceparser import parse
 
@@ -329,11 +328,17 @@ class TestInterpreterWithBytecode(TestCase):
         self.assertEqual(rv, W_Int32(0))
 
 
-class TestInterperterWithC(TestCase):
+class TestInterpreterWithC(TestCase):
+    """
+    Test interpretation of C bytecode in integration with the parser.
+
+    """
 
     def get_bytecode(self, source, func_name="main"):
         program = parse(source)
-        return compile(next(f for f in program.functions() if f.name == func_name))
+        return compiler.compile(
+            next(f for f in program.functions() if f.name == func_name)
+        )
 
     def test_binary_leq(self):
         byte_code_lt = self.get_bytecode("int main(void) { return 1 <= 2; }")
