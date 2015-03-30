@@ -2,8 +2,7 @@ language: python
 python:
   - 2.7
 before_install:
-  - wget https://bitbucket.org/pypy/pypy/get/default.tar.bz2 | tar xf - rpython
-  - ls
+  - curl --silent https://bitbucket.org/pypy/pypy/get/default.tar.bz2 | tar xf - rpython
 install:
   - pip install -Ur test-requirements.txt twisted
   - pip install -e .
