@@ -24,4 +24,4 @@ def untranslated_main():
     """
 
     import sys
-    sys.exit(main(sys.argv[1:]))
+    sys.exit(main(sys.argv))
