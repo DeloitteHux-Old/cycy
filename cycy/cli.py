@@ -22,6 +22,7 @@ from textwrap import dedent
 import os
 
 from characteristic import Attribute, attributes
+from rpython.rlib.streamio import open_file_as_stream
 
 from cycy import __version__
 from cycy.interpreter import CyCy
@@ -115,11 +116,19 @@ def parse_args(args):
 def run_source(command_line):
     cycy = command_line.cycy
 
-    if command_line.source_string:
-        w_exit_status = cycy.interpret_source(command_line.source_string)
+    sources = []
+    source_string = command_line.source_string
+    if source_string:
+        sources.append(source_string)
     else:
-        w_exit_status = cycy.interpret(command_line.source_files)
+        for source_path in command_line.source_files:
+            source_file = open_file_as_stream(source_path)
+            sources.append(source_file.readall())
+            source_file.close()
 
+    w_exit_status = cycy.interpret(*sources)
+    if w_exit_status is None:  # internal error during interpret
+        return 1
     return w_exit_status.rint()
 
 

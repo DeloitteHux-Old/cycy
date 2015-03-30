@@ -1,10 +1,10 @@
 import os
 
 from characteristic import Attribute, attributes
-from rpython.rlib.streamio import open_file_as_stream
 
 from cycy import bytecode, compiler
 from cycy.environment import Environment
+from cycy.exceptions import CyCyError
 from cycy.objects import W_Bool, W_Char, W_Int32, W_Object, W_String
 from cycy.parser import ast
 from cycy.parser.sourceparser import parse
@@ -20,8 +20,10 @@ except ImportError:
         def can_enter_jit(self,**kw): pass
     def purefunction(f): return f
 
+
 def get_location(pc, stack, variables):
     return "%s %s" % (pc, stack, variables)
+
 
 jitdriver = JitDriver(
     greens=["pc", "stack", "variables"],
@@ -42,12 +44,19 @@ class CyCy(object):
     The main CyCy interpreter.
     """
 
-    def __init__(self, environment=None):
+    def __init__(self, environment=None, handle_error=None):
         if environment is None:
             environment = Environment()
 
-        self.compiled_functions = {}
+        if handle_error is None:
+            def handle_error(error):
+                os.write(2, str(error))
+                os.write(2, "\n")
+
+        self._handle_error = handle_error
         self.environment = environment
+
+        self.compiled_functions = {}
 
     def run_main(self):
         main_byte_code = self.compiled_functions["main"]
@@ -175,19 +184,14 @@ class CyCy(object):
 
         return newly_compiled_functions
 
-    def interpret(self, paths):
-        for path in paths:
-            source_file = open_file_as_stream(path)
-            source = source_file.readall()
-            source_file.close()
-            self.compile(source)
+    def interpret(self, *sources):
+        for source in sources:
+            try:
+                self.compile(source)
+            except CyCyError as error:
+                self._handle_error(error)
+                return
 
         return_value = self.run_main()
         assert isinstance(return_value, W_Int32)
-        return return_value
-
-    def interpret_source(self, source):
-        self.compile(source)
-        return_value = self.run_main()
-        assert isinstance(return_value, W_Object)
         return return_value

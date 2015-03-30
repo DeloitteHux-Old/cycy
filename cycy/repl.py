@@ -15,14 +15,23 @@ class REPL(object):
 
     PROMPT = "CC-> "
 
-    def __init__(self, stdin=None, stdout=None, stderr=None):
+    def __init__(
+        self,
+        stdin=None,
+        stdout=None,
+        stderr=None,
+        interpreter=None,
+    ):
+        if interpreter is None:
+            interpreter = CyCy()
+
         # NOTE: This uses streamio, which by its own admission "isn't
         #       ready for general usage"
         self.stdin = stdin if stdin is not None else _open(fd=0)
         self.stdout = stdout if stdout is not None else _open(fd=1)
         self.stderr = stderr if stderr is not None else _open(fd=2)
 
-        self.interpreter = CyCy()
+        self.interpreter = interpreter
 
     def run(self):
         self.show_banner()
@@ -52,8 +61,9 @@ class REPL(object):
 
     def interpret(self, source):
         # XXX: multiple lines, and pass stdin / stdout / stderr down
-        return_value = self.interpreter.interpret_source(source=source)
-        self.stdout.write(return_value.str())
+        return_value = self.interpreter.interpret(source)
+        if return_value is not None:
+            self.stdout.write(return_value.str())
 
     def dump(self, function_name):
         """

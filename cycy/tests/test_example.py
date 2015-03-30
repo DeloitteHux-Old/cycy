@@ -18,7 +18,7 @@ class TestExample(TestCase):
     def test_it_works(self):
         stdout = StringIO()
         with patch.object(sys, "stdout", stdout):
-            self.cycy.interpret_source(
+            self.cycy.interpret(
                 FilePath(__file__).sibling("example.c").getContent(),
             )
         self.assertEqual(stdout.getvalue(), "Hello, world!\n")
@@ -36,5 +36,5 @@ class TestExample(TestCase):
         }
         """)
 
-        main_return = self.cycy.interpret_source(source)
+        main_return = self.cycy.interpret(source)
         self.assertEqual(W_Int32(5), main_return)

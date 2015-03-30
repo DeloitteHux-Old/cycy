@@ -1,4 +1,6 @@
 from rply import ParserGenerator
+
+from cycy.exceptions import CyCyError
 from .preprocessor import preprocess
 from .lexer import lexer, RULES
 from .ast import (
@@ -26,6 +28,27 @@ from .ast import (
     VariableDeclaration,
     Type,
 )
+
+
+class ParseError(CyCyError):
+    def __init__(self, token):
+        self.token = token
+
+    def __str__(self):
+        token_type = self.token.gettokentype()
+        token_value = self.token.value
+
+        source_pos = self.token.source_pos
+        if source_pos is None:
+            return "Unexpected %s %s" % (token_type, token_value)
+
+        return "Unexpected %s %s at line %s, column %s" % (
+            token_type,
+            repr(token_value),
+            source_pos.lineno,
+            source_pos.colno,
+        )
+
 
 class NodeList(Node):
     """
@@ -393,16 +416,7 @@ class SourceParser(object):
 
     @pg.error
     def error_handler(self, token):
-        source_pos = token.source_pos
-        if source_pos is None:
-            raise ValueError("Unexpected %s" % (token.gettokentype()))
-        raise ValueError(
-            "Unexpected %s at line %s col %s" % (
-                token.gettokentype(),
-                source_pos.lineno,
-                source_pos.colno,
-            )
-        )
+        raise ParseError(token=token)
 
     parser = pg.build()
 
