@@ -2,7 +2,7 @@ language: python
 python:
   - 2.7
 before_install:
-  - curl --silent https://bitbucket.org/pypy/pypy/get/default.tar.bz2 | tar xf - rpython
+  - curl --silent https://bitbucket.org/pypy/pypy/get/default.tar.bz2 | tar -xjf - --strip=1 --wildcards '*/rpython'
 install:
   - pip install -Ur test-requirements.txt twisted
   - pip install -e .
