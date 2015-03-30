@@ -1,5 +1,3 @@
-import os
-
 from rpython.rlib import streamio
 
 from cycy import __version__

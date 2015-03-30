@@ -18,7 +18,6 @@ Options
 
 """
 
-from textwrap import dedent
 import os
 
 from characteristic import Attribute, attributes

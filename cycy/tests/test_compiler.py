@@ -1,5 +1,5 @@
 from textwrap import dedent
-from unittest import TestCase, skip
+from unittest import TestCase
 
 from cycy import compiler
 from cycy.bytecode import cleaned

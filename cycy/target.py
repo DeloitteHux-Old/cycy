@@ -1,10 +1,6 @@
-import sys
-
 from rpython.jit.codewriter.policy import JitPolicy
 
 from cycy.cli import parse_args
-from cycy.interpreter import CyCy
-from cycy.repl import REPL
 
 
 def main(argv):

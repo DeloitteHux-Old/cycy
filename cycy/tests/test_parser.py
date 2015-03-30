@@ -2,7 +2,6 @@ from unittest import TestCase
 
 from cycy.parser import parse
 from cycy.parser.ast import (
-    Array,
     ArrayDereference,
     Assembler,
     Assignment,

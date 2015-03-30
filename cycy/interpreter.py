@@ -5,7 +5,7 @@ from characteristic import Attribute, attributes
 from cycy import bytecode, compiler
 from cycy.environment import Environment
 from cycy.exceptions import CyCyError
-from cycy.objects import W_Bool, W_Char, W_Int32, W_Object, W_String
+from cycy.objects import W_Bool, W_Char, W_Int32, W_String
 from cycy.parser import ast
 from cycy.parser.sourceparser import parse
 

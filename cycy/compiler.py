@@ -1,7 +1,6 @@
 from characteristic import Attribute, attributes
 
 from cycy import bytecode
-from cycy.objects import W_Int32
 from cycy.objects import W_Char, W_Function, W_Int32, W_String
 from cycy.parser import ast
 
