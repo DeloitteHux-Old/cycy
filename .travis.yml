@@ -2,14 +2,12 @@ language: python
 python:
   - 2.7
 before_install:
-  - wget https://bitbucket.org/pypy/pypy/get/default.tar.bz2 -O `pwd`/../pypy.tar.bz2
-  - tar -xf `pwd`/../pypy.tar.bz2 -C `pwd`/../
-  - mv `pwd`/../pypy-pypy-* `pwd`/../pypy-src
+  - wget https://bitbucket.org/pypy/pypy/get/default.tar.bz2 | tar xf - rpython
+  - ls
 install:
   - pip install -Ur test-requirements.txt twisted
-env:
-  - PYTHONPATH=`pwd`/../pypy-src/:`pwd`
+  - pip install -e .
 script:
   - trial cycy
-  - python `pwd`/../pypy-src/rpython/bin/rpython --batch --output=cycy-c cycy/target.py
-  - python `pwd`/../pypy-src/rpython/bin/rpython --batch --output=cycy-c --opt=jit cycy/target.py
+  - python rpython/bin/rpython --batch --output=cycy-c cycy/target.py
+  - python rpython/bin/rpython --batch --output=cycy-c --opt=jit cycy/target.py
