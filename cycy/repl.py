@@ -47,12 +47,25 @@ class REPL(object):
             elif not repl_input.strip():
                 continue
 
-            if repl_input.startswith("dump "):
-                repl_input = repl_input[5:]
-                newly_compiled_functions = self.interpreter.compile(repl_input)
-                for function_name in newly_compiled_functions:
-                    self.dump(function_name)
-                    self.stdout.write("\n")
+            if repl_input.startswith("##"):
+                command_and_argument = repl_input[2:].strip().split(" ", 1)
+                command = command_and_argument.pop(0)
+                if command_and_argument:
+                    repl_input = command_and_argument.pop()
+                else:
+                    repl_input = ""
+
+                if command == "dump":
+                    new_functions = self.interpreter.compile(repl_input)
+                    for function_name in new_functions:
+                        self.dump(function_name)
+                        self.stdout.write("\n")
+                elif command == "compile":
+                    source_file = streamio.open_file_as_stream(repl_input)
+                    self.interpreter.compile(source_file.readall())
+                    source_file.close()
+                else:
+                    self.stderr.write("Unknown command: '%s'\n" % (command,))
             else:
                 self.interpret(repl_input)
                 self.stdout.write("\n")
