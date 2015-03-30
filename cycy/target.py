@@ -15,3 +15,13 @@ def target(driver, args):
 
 def jitpolicy(driver):
     return JitPolicy()
+
+
+def untranslated_main():
+    """
+    Runs main, exiting with the appropriate exit status afterwards.
+
+    """
+
+    import sys
+    sys.exit(main(sys.argv[1:]))
