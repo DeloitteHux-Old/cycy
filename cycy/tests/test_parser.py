@@ -1,6 +1,5 @@
 from unittest import TestCase
 
-from cycy.parser import parse
 from cycy.parser.ast import (
     ArrayDereference,
     Assembler,
@@ -24,6 +23,8 @@ from cycy.parser.ast import (
     For,
     Type,
 )
+from cycy.parser.sourceparser import parse
+
 
 class TestParser(TestCase):
     def function_wrap(self, source):

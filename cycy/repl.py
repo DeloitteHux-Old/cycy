@@ -59,7 +59,7 @@ class REPL(object):
 
     def interpret(self, source):
         # XXX: multiple lines, and pass stdin / stdout / stderr down
-        return_value = self.interpreter.interpret(source)
+        return_value = self.interpreter.interpret([source])
         if return_value is not None:
             self.stdout.write(return_value.str())
 

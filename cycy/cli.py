@@ -125,7 +125,7 @@ def run_source(command_line):
             sources.append(source_file.readall())
             source_file.close()
 
-    w_exit_status = cycy.interpret(*sources)
+    w_exit_status = cycy.interpret(sources)
     if w_exit_status is None:  # internal error during interpret
         return 1
     return w_exit_status.rint()

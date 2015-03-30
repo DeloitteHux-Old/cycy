@@ -7,7 +7,7 @@ from cycy import interpreter
 from cycy.bytecode import *
 from cycy.compiler import compile
 from cycy.objects import W_Bool, W_Char, W_Function, W_Int32, W_String
-from cycy.parser import parse
+from cycy.parser.sourceparser import parse
 
 
 class TestInterpreterWithBytecode(TestCase):

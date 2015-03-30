@@ -184,7 +184,7 @@ class CyCy(object):
 
         return newly_compiled_functions
 
-    def interpret(self, *sources):
+    def interpret(self, sources):
         for source in sources:
             try:
                 self.compile(source)
