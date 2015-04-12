@@ -21,6 +21,11 @@ setup(
     name="cycy",
     packages=find_packages(),
     py_modules=(),
+    install_requires=[
+        "characteristic>=14.3.0",
+        "rply",
+        "rpython",
+    ],
     setup_requires=["vcversioner"],
     entry_points={
         "console_scripts" : ["cycy = cycy.target:untranslated_main"],
