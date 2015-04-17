@@ -1,4 +1,5 @@
 from rply import ParserGenerator
+from rply.errors import LexingError as _RPlyLexingError
 
 from cycy.exceptions import CyCyError
 from .preprocessor import preprocess
@@ -28,6 +29,17 @@ from .ast import (
     VariableDeclaration,
     Type,
 )
+
+
+class LexingError(CyCyError):
+    def __init__(self, source_pos, message):
+        self.message = message
+        self.source_pos = source_pos
+
+    def __str__(self):
+        return "Lexer failed at %s (message: %s)" % (
+            self.source_pos, self.message,
+        )
 
 
 class ParseError(CyCyError):
@@ -83,7 +95,13 @@ class SourceParser(object):
         self.lexer = lexer
 
     def parse(self):
-        return self.parser.parse(self.lexer, state=self)
+        try:
+            return self.parser.parse(self.lexer, state=self)
+        except _RPlyLexingError as error:
+            raise LexingError(
+                source_pos=error.source_pos,
+                message=error.message,
+            )
 
     pg = ParserGenerator(RULES,
                          cache_id='cycy',
