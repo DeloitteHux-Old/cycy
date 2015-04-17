@@ -50,7 +50,7 @@ class CyCy(object):
 
         if handle_error is None:
             def handle_error(error):
-                os.write(2, str(error))
+                os.write(2, error.rstr())
                 os.write(2, "\n")
 
         self._handle_error = handle_error

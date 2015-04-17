@@ -44,7 +44,7 @@ class ParseError(CyCyError):
 
         return "Unexpected %s %s at line %s, column %s" % (
             token_type,
-            repr(token_value),
+            "'%s'" % (token_value,),
             source_pos.lineno,
             source_pos.colno,
         )
