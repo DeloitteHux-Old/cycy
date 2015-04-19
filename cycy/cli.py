@@ -132,7 +132,7 @@ def run_source(command_line):
 
 
 def run_repl(command_line):
-    REPL().run()
+    REPL(interpreter=command_line.cycy).run()
     return os.EX_OK
 
 
