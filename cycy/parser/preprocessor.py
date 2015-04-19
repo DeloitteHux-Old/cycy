@@ -1,26 +1,29 @@
-import os
-
-from rpython.rlib.streamio import open_file_as_stream
 from rpython.rlib.rsre.rsre_re import match as re_match
 
-def find_file(file_path, environment=None):
-    assert file_path is not None
-    if os.path.exists(file_path):
-        return file_path
-    if environment:
-        for include_path in environment.include_paths:
-            path = os.path.join(include_path, file_path)
-            if os.path.exists(path):
-                return path
+from cycy.exceptions import CyCyError
 
-    raise OSError("No such file or directory: '%s'" % file_path)
 
-def preprocess_file(file_path, environment=None):
-    file_path = find_file(file_path, environment)
-    source_file = open_file_as_stream(file_path)
+class PreprocessorError(CyCyError):
+    pass
+
+
+class IncludeNotFound(PreprocessorError):
+    def __init__(self, path, searched):
+        self.path = path
+        self.searched = searched
+
+    def __str__(self):
+        return "Could not locate '%s'.\nSearched in: %s" % (
+            self.path, self.searched,
+        )
+
+
+def preprocess_file(file_path, environment):
+    source_file = environment.include(file_path)
     data = source_file.readall()
     source_file.close()
     return preprocess(data)
+
 
 def preprocess(source, environment=None):
     """

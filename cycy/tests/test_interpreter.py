@@ -1,3 +1,4 @@
+from textwrap import dedent
 from unittest import TestCase
 import os
 
@@ -373,3 +374,16 @@ class TestInterpreterWithC(TestCase):
 
         rv = interpreter.CyCy().run(byte_code)
         self.assertEqual(rv, W_Int32(3))
+
+
+class TestInterpreterIntegration(TestCase):
+    def setUp(self):
+        self.cycy = interpreter.CyCy(handle_error=self.fail)
+
+    def interpret(self, *sources):
+        return self.cycy.interpret([dedent(source) for source in sources])
+
+    def test_unknown_function_call(self):
+        with self.assertRaises(interpreter.NoSuchFunction) as e:
+            self.interpret("int main(void) { return canhazprint(0); }")
+        self.assertEqual(str(e.exception), "canhazprint")

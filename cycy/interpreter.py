@@ -25,6 +25,10 @@ def get_location(pc, stack, variables):
     return "%s %s" % (pc, stack, variables)
 
 
+class NoSuchFunction(CyCyError):
+    pass
+
+
 jitdriver = JitDriver(
     greens=["pc", "stack", "variables"],
     reds=["byte_code", "arguments", "interpreter"],
@@ -110,10 +114,16 @@ class CyCy(object):
                 stack.append(W_Bool(left.leq(right)))
             elif opcode == bytecode.CALL:
                 func = byte_code.constants[arg]
+                name = func.name
+
                 args = []
                 for _ in xrange(func.num_args):
                     args.append(stack.pop())
-                func_byte_code = self.compiled_functions[func.name]
+                try:
+                    func_byte_code = self.compiled_functions[name]
+                except KeyError:
+                    raise NoSuchFunction(name)
+
                 rv = self.run(func_byte_code, args)
                 if rv is not None:
                     stack.append(rv)
@@ -188,10 +198,10 @@ class CyCy(object):
         for source in sources:
             try:
                 self.compile(source)
+                return_value = self.run_main()
             except CyCyError as error:
                 self._handle_error(error)
                 return
 
-        return_value = self.run_main()
         assert isinstance(return_value, W_Int32)
         return return_value
