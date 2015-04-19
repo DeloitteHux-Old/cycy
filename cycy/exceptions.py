@@ -5,4 +5,4 @@ class CyCyError(Exception):
     """
 
     def rstr(self):
-        return self.__str__()
+        return "%s: %s" % (self.__class__.__name__, self.__str__())
