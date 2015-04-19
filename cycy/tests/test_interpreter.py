@@ -378,7 +378,9 @@ class TestInterpreterWithC(TestCase):
 
 class TestInterpreterIntegration(TestCase):
     def setUp(self):
-        self.cycy = interpreter.CyCy(handle_error=self.fail)
+        def reraise(exception):
+            raise exception
+        self.cycy = interpreter.CyCy(handle_error=reraise)
 
     def interpret(self, *sources):
         return self.cycy.interpret([dedent(source) for source in sources])
