@@ -26,7 +26,11 @@ def get_location(pc, stack, variables):
 
 
 class NoSuchFunction(CyCyError):
-    pass
+    def __init__(self, name):
+        self.name = name
+
+    def __str__(self):
+        return self.name
 
 
 jitdriver = JitDriver(
@@ -202,6 +206,6 @@ class CyCy(object):
             except CyCyError as error:
                 self._handle_error(error)
                 return
-
-        assert isinstance(return_value, W_Int32)
-        return return_value
+            else:
+                assert isinstance(return_value, W_Int32)
+                return return_value
