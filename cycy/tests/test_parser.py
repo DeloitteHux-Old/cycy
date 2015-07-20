@@ -505,7 +505,7 @@ class TestParser(TestCase):
                     )
                 )
             )
-        
+
     def test_for_loop(self):
         self.assertEqual(
             parse(self.function_wrap("for ( i = 0; i < 10; i++ ) { putc(i); }")),
