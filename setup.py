@@ -30,7 +30,7 @@ setup(
     entry_points={
         "console_scripts" : ["cycy = cycy.target:untranslated_main"],
     },
-    vcversioner={"version_module_paths": ["cycy/__init__.py"]},
+    vcversioner={"version_module_paths": ["cycy/_version.py"]},
     author="Julian Berman",
     author_email="Julian@GrayVines.com",
     classifiers=classifiers,

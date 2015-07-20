@@ -1,6 +1,5 @@
-*.pyc
 bin/cycy
 bin/cycy-nojit
 cycy-nojit
-/cycy/__init__.py
+/cycy/_version.py
 version.txt
