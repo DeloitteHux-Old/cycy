@@ -38,25 +38,30 @@ class VariableDeclaration(Node):
         self.vtype = vtype
         self.value = value
 
+
 @attributes([Attribute(name="value")], apply_with_init=False)
 class Int32(Node):
     def __init__(self, value):
         self.value = value
+
 
 @attributes([Attribute(name="value")], apply_with_init=False)
 class Double(Node):
     def __init__(self, value):
         self.value = value
 
+
 @attributes([Attribute(name="value")], apply_with_init=False)
 class String(Node):
     def __init__(self, value):
         self.value = value
 
+
 @attributes([Attribute(name="name")], apply_with_init=False)
 class Variable(Node):
     def __init__(self, name):
         self.name = name
+
 
 @attributes(
     [
@@ -71,6 +76,7 @@ class PostOperation(Node):
         self.operator = operator
         self.variable = variable
 
+
 @attributes(
     [
         Attribute(name="operator"),
@@ -83,6 +89,7 @@ class PreOperation(Node):
         assert operator in ("++", "--")
         self.operator = operator
         self.variable = variable
+
 
 @attributes(
     [Attribute(name="left"), Attribute(name="right")],
@@ -127,6 +134,7 @@ class ArrayDereference(Node):
         self.array = array
         self.index = index
 
+
 @attributes(
     [Attribute(name="value")],
     apply_with_init=False
@@ -134,6 +142,7 @@ class ArrayDereference(Node):
 class ReturnStatement(Node):
     def __init__(self, value):
         self.value = value
+
 
 @attributes(
     [
@@ -167,6 +176,7 @@ class Block(Node):
     def __init__(self, statements):
         self.statements = statements
 
+
 @attributes(
     [
         Attribute(name="name"),
@@ -178,6 +188,7 @@ class Call(Node):
     def __init__(self, name, args):
         self.name = name
         self.args = args
+
 
 class Null(Node):
     # This isn't actually a type in C, but we don't support macros, or pointers
@@ -208,6 +219,7 @@ class For(Node):
         self.body = body
         self.increment = increment
 
+
 @attributes(
     [
         Attribute(name="condition"),
@@ -219,6 +231,7 @@ class If(Node):
     def __init__(self, condition=None, body=None):
         self.condition = condition
         self.body = body
+
 
 @attributes(
     [
@@ -249,29 +262,29 @@ class Program(Node):
 )
 class Type(Node):
     def __init__(self, base=None, const=False, unsigned=False, reference=None, arraylength=-1):
-        if base == 'char':
-            self.base_type = 'int'
+        if base == "char":
+            self.base_type = "int"
             self.length = 8
-        elif base == 'short':
-            self.base_type = 'int'
+        elif base == "short":
+            self.base_type = "int"
             self.length = 16
-        elif base == 'int' or base == 'long':
-            self.base_type = 'int'
+        elif base == "int" or base == "long":
+            self.base_type = "int"
             self.length = 32
-        elif base == 'long long':
-            self.base_type = 'int'
+        elif base == "long long":
+            self.base_type = "int"
             self.length = 64
-        elif base == 'float':
-            self.base_type = 'float'
+        elif base == "float":
+            self.base_type = "float"
             self.length = 32
-        elif base == 'double':
-            self.base_type = 'float'
+        elif base == "double":
+            self.base_type = "float"
             self.length = 64
-        elif base == 'long double':
-            self.base_type = 'float'
+        elif base == "long double":
+            self.base_type = "float"
             self.length = 80
-        elif base == 'array':
-            self.base_type = 'pointer'
+        elif base == "array":
+            self.base_type = "pointer"
             self.length = arraylength
         else:
             self.base_type = base

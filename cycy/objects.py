@@ -20,7 +20,9 @@ class W_Object(object):
 class _W_Null(W_Object):
     pass
 
-w_null = _W_Null()
+
+W_NULL = _W_Null()
+
 
 @attributes([Attribute(name="char")], apply_with_init=False)
 class W_Char(W_Object):
