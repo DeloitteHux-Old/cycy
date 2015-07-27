@@ -94,7 +94,3 @@ lg.add("/", "/")
 lg.add("%", "%")
 lg.ignore("\s+")
 lexer = lg.build()
-
-
-def lexer_run(source):
-    return lexer.lex(source)
