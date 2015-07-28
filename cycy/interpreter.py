@@ -1,13 +1,16 @@
 import os
 
 from characteristic import Attribute, attributes
+from rply.errors import LexingError as _RPlyLexingError
 
 from cycy import bytecode, compiler
 from cycy.environment import Environment
 from cycy.exceptions import CyCyError
 from cycy.objects import W_Bool, W_Char, W_Int32, W_String
 from cycy.parser import ast
-from cycy.parser.sourceparser import parse
+from cycy.parser.lexer import lexer
+from cycy.parser.sourceparser import PARSER
+from cycy.parser.preprocessor import preprocessed
 
 # So that you can still run this module under standard CPython, I add this
 # import guard that creates a dummy class instead.
@@ -50,6 +53,7 @@ jitdriver = JitDriver(
 class CyCy(object):
     """
     The main CyCy interpreter.
+
     """
 
     def __init__(self, environment=None, handle_error=None):
@@ -185,7 +189,7 @@ class CyCy(object):
         assert False, "bytecode exited the main loop without returning"
 
     def compile(self, source):
-        program = parse(source=source, environment=self.environment)
+        program = self.parse(source=source)
         assert isinstance(program, ast.Program)
 
         newly_compiled_functions = []
@@ -209,3 +213,15 @@ class CyCy(object):
             else:
                 assert isinstance(return_value, W_Int32)
                 return return_value
+
+    def parse(self, source, lexer=lexer, preprocessor=preprocessed, parser=PARSER):
+        tokens = lexer.lex(source)
+        preprocessed = preprocessor(tokens=tokens, interpreter=self)
+
+        try:
+            return parser.parse(preprocessed)
+        except _RPlyLexingError as error:
+            raise LexingError(
+                source_pos=error.source_pos,
+                message=error.message,
+            )

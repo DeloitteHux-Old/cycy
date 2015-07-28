@@ -3,7 +3,7 @@ from unittest import TestCase
 
 from cycy import compiler
 from cycy.bytecode import cleaned
-from cycy.parser.sourceparser import parse
+from cycy.interpreter import CyCy
 
 
 class TestCompiler(TestCase):
@@ -14,7 +14,7 @@ class TestCompiler(TestCase):
 
         """
 
-        program = parse(source)
+        program = CyCy().parse(source=source)
         main_func_ast = next(func for func in program.functions() if func.name == "main")
         bytecode = compiler.compile(main_func_ast)
         expected = dedent(cleaned(to).strip("\n")).strip("\n")
