@@ -25,7 +25,6 @@ from cycy.parser.ast import (
     For,
     Type,
 )
-from cycy.tests.utils import FakeEnvironment
 
 
 class TestParser(TestCase):
@@ -586,9 +585,10 @@ class TestParser(TestCase):
             )
 
     def test_include_string(self):
+        self.skipTest("Not sure how to handle this one yet.")
         self.assertEqual(
             self.parse(
-                '#include "stdio.h"\n' +
+                '#include "foo.h"\n' +
                 self.function_wrap("return 1;"),
             ),
             self.function_wrap_node(ReturnStatement(value=Int32(value=1))),

@@ -203,6 +203,13 @@ class Assembler(Node):
     def __init__(self, instruction=None):
         self.instruction = instruction
 
+
+@attributes([Attribute(name="name")], apply_with_init=False)
+class Include(Node):
+    def __init__(self, name=None):
+        self.name = name
+
+
 @attributes(
     [
         Attribute(name="initial"),

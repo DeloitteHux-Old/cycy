@@ -1,6 +1,7 @@
 from rply import LexerGenerator
 
 RULES = [
+    "INCLUDE",
     "INTEGER_LITERAL",
     "FLOAT_LITERAL",
     "CHAR_LITERAL",
@@ -47,6 +48,7 @@ RULES = [
     "%",
 ]
 lg = LexerGenerator()
+lg.add("INCLUDE", "#include")
 lg.add("ASM", "__asm__")
 lg.add("ASM", "asm")
 lg.add("FLOAT_LITERAL", "\d+\.\d+")

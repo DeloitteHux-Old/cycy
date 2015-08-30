@@ -13,8 +13,8 @@ class TestArgumentParsing(TestCase):
                 action=cli.run_source,
                 source_files=["file.c"],
                 cycy=CyCy(
-                    environment=Environment(
-                        include_paths=["a/include", "b/include"],
+                    environment=Environment.with_directories(
+                        ["a/include", "b/include"],
                     ),
                 ),
             ),
@@ -27,7 +27,7 @@ class TestArgumentParsing(TestCase):
                 action=cli.run_source,
                 source_string="int main (void) {}",
                 cycy=CyCy(
-                    environment=Environment(include_paths=["a/include"]),
+                    environment=Environment.with_directories(["a/include"]),
                 ),
             ),
         )

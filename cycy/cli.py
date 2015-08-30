@@ -100,7 +100,8 @@ def parse_args(args):
                 failure="Unknown argument %s" % (argument,),
             )
 
-    cycy = CyCy(environment=Environment(include_paths=include_paths))
+    environment = Environment.with_directories(directories=include_paths)
+    cycy = CyCy(environment=environment)
     if source_files or source_string:
         return CommandLine(
             action=run_source,
