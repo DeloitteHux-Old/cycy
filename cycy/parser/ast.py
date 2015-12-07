@@ -257,10 +257,7 @@ class Program(Node):
         self.units = units
 
     def add_unit(self, unit):
-        self.units.append(unit)
-
-    def functions(self):
-        return [unit for unit in self.units if not unit.prototype]
+        self.units.insert(0, unit)
 
 
 @attributes(

@@ -456,7 +456,7 @@ class TestParser(TestCase):
             ])
         )
 
-    def test_function_call(self):
+    def test_function_call_with_arguments(self):
         self.assertEqual(
             self.parse(self.function_wrap("putc(string);")),
             self.function_wrap_node(
@@ -465,6 +465,12 @@ class TestParser(TestCase):
                     args=[Variable(name="string")]
                 )
             )
+        )
+
+    def test_function_call_without_arguments(self):
+        self.assertEqual(
+            self.parse(self.function_wrap("putc();")),
+            self.function_wrap_node(Call(name="putc", args=[])),
         )
 
     def test_braceless_while_loop(self):
@@ -659,6 +665,42 @@ class TestParser(TestCase):
             ])
         )
 
+    def test_auxiliary_function(self):
+        self.assertEqual(
+            self.parse("""
+                int foo(void) {
+                    return 12;
+                }
+                int main(void) {
+                    return foo();
+                }
+            """),
+            Program(
+                [
+                    Function(
+                        return_type=Type(base='int'),
+                        name="foo",
+                        params=[],
+                        body=Block(
+                            [ReturnStatement(value=Int32(value=12))],
+                        )
+                    ),
+                    Function(
+                        return_type=Type(base='int'),
+                        name="main",
+                        params=[],
+                        body=Block(
+                            [
+                                ReturnStatement(
+                                    value=Call(name="foo", args=[]),
+                                ),
+                            ]
+                        )
+                    ),
+                ]
+            )
+        )
+
     def test_full_example(self):
         self.assertEqual(
             self.parse("""
@@ -675,45 +717,51 @@ class TestParser(TestCase):
                     return i + 1;
                 }
             """),
-            Program([
-                Function(
-                    return_type=Type(base='int'),
-                    name="puts",
-                    params=[VariableDeclaration(name="string", vtype=Type(base="pointer", const=True, reference=Type(base="char")))],
-                    body=Block([
-                        VariableDeclaration(name="i", vtype=Type(base="int"), value=Int32(value=0)),
-                        For(
-                            condition=BinaryOperation(
-                                operator="!=",
-                                left=ArrayDereference(array=Variable(name="string"), index=Variable(name="i")),
-                                right=Null()
-                            ),
-                            body=Block([
-                                Call(name="putc", args=[ArrayDereference(array=Variable("string"), index=PostOperation(operator="++", variable=Variable(name="i")))])
-                            ])
-                        ),
-                        Call(name="putc", args=[Char('\n')]),
-                        ReturnStatement(
-                            value=BinaryOperation(
-                                operator="+",
-                                left=Variable(name="i"),
-                                right=Int32(value=1)
-                            )
+            Program(
+                [
+                    Function(
+                        return_type=Type(base='int'),
+                        name="main",
+                        params=[],
+                        body=Block(
+                            [
+                                ReturnStatement(
+                                    value=Call(name="puts", args=[String("Hello, world!")])
+                                )
+                            ]
                         )
+                    ),
+                    Function(
+                        return_type=Type(base='int'),
+                        name="puts",
+                        params=[VariableDeclaration(name="string", vtype=Type(base="pointer", const=True, reference=Type(base="char")))],
+                        body=Block(
+                            [
+                                VariableDeclaration(name="i", vtype=Type(base="int"), value=Int32(value=0)),
+                                For(
+                                    condition=BinaryOperation(
+                                        operator="!=",
+                                        left=ArrayDereference(array=Variable(name="string"), index=Variable(name="i")),
+                                        right=Null()
+                                    ),
+                                    body=Block([
+                                        Call(name="putc", args=[ArrayDereference(array=Variable("string"), index=PostOperation(operator="++", variable=Variable(name="i")))])
+                                    ])
+                                ),
+                                Call(name="putc", args=[Char('\n')]),
+                                ReturnStatement(
+                                    value=BinaryOperation(
+                                        operator="+",
+                                        left=Variable(name="i"),
+                                        right=Int32(value=1)
+                                    )
+                                )
 
-                    ])
-                ),
-                Function(
-                    return_type=Type(base='int'),
-                    name="main",
-                    params=[],
-                    body=Block([
-                        ReturnStatement(
-                            value=Call(name="puts", args=[String("Hello, world!")])
+                            ]
                         )
-                    ])
-                ),
-            ])
+                    ),
+                ]
+            )
 
         )
 

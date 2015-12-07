@@ -129,7 +129,6 @@ def program_unit_program(p):
 
 
 @pg.production("return_statement : return expr ;")
-@pg.production("return_statement : return func_call_statement")
 def return_statement(p):
     return ReturnStatement(value=p[1])
 
@@ -294,8 +293,9 @@ def function_call_expr(p):
 
 
 @pg.production("param_list : expr")
+@pg.production("param_list : ")
 def param_list(p):
-    return NodeList(items=[p[0]])
+    return NodeList(items=[p[0]] if p else None)
 
 
 @pg.production("assignment : IDENTIFIER = expr")
