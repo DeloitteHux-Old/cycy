@@ -1,3 +1,4 @@
+from textwrap import dedent
 from unittest import TestCase
 
 from cycy.interpreter import CyCy
@@ -25,11 +26,12 @@ from cycy.parser.ast import (
     For,
     Type,
 )
+from cycy.parser.sourceparser import ParseError, Parser
 
 
 class TestParser(TestCase):
-    def parse(self, *args, **kwargs):
-        return CyCy().parse(*args, **kwargs)
+    def setUp(self):
+        self.parse = Parser().parse
 
     def function_wrap(self, source):
         return "int main(void) { %s }" % source
@@ -713,4 +715,24 @@ class TestParser(TestCase):
                 ),
             ])
 
+        )
+
+    def test_gibberish(self):
+        with self.assertRaises(ParseError) as e:
+            self.parse(
+                dedent(
+                    """
+                    One advantage of talking to yourself is that you know at
+                    least somebody's listening.
+
+                                                        -- Franklin P. Jones
+                    """
+                )
+            )
+
+        self.assertEqual(
+            str(e.exception),
+            "\n\nOne advantage of talking to yourself is that you know at\n"
+            "^\n"
+            "Unexpected IDENTIFIER 'One' at line 2, column 1",
         )

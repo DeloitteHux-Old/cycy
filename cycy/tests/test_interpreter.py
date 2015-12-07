@@ -7,6 +7,7 @@ from mock import patch
 from cycy import compiler, interpreter
 from cycy.bytecode import *
 from cycy.objects import W_Bool, W_Char, W_Function, W_Int32, W_String
+from cycy.parser.sourceparser import Parser
 
 
 class TestInterpreter(TestCase):
@@ -371,11 +372,12 @@ class TestInterpreterWithC(TestCase):
     """
 
     def setUp(self):
-        self.compiler = compiler.Compiler()
-        self.interpreter = interpreter.CyCy(compiler=compiler)
+        self.interpreter = interpreter.CyCy()
+        self.parser = self.interpreter.parser
+        self.compiler = self.interpreter.compiler
 
     def get_bytecode(self, source, func_name="main"):
-        self.compiler.compile(self.interpreter.parse(source))
+        self.compiler.compile(self.parser.parse(source))
         w_func = self.compiler.constants[self.compiler.functions[func_name]]
         return w_func.bytecode
 

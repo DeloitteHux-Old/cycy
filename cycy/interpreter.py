@@ -1,17 +1,13 @@
 import os
 
 from characteristic import Attribute, attributes
-from rply.errors import LexingError as _RPlyLexingError
 
 from cycy import bytecode
 from cycy.compiler import Compiler
 from cycy.environment import Environment
 from cycy.exceptions import CyCyError
 from cycy.objects import W_Bool, W_Char, W_Function, W_Int32, W_String
-from cycy.parser import ast
-from cycy.parser.lexer import lexer
-from cycy.parser.sourceparser import PARSER
-from cycy.parser.preprocessor import preprocessed
+from cycy.parser.sourceparser import Parser
 
 # So that you can still run this module under standard CPython, I add this
 # import guard that creates a dummy class instead.
@@ -48,6 +44,7 @@ jitdriver = JitDriver(
     [
         Attribute(name="environment"),
         Attribute(name="compiler"),
+        Attribute(name="parser"),
         Attribute(name="functions", exclude_from_repr=True),
     ],
     apply_with_init=False,
@@ -61,6 +58,7 @@ class CyCy(object):
     def __init__(
         self,
         compiler=None,
+        parser=None,
         environment=None,
         functions=(),
         handle_error=None,
@@ -69,6 +67,8 @@ class CyCy(object):
             environment = Environment()
         if compiler is None:
             compiler = Compiler()
+        if parser is None:
+            parser = Parser()
 
         if handle_error is None:
             def handle_error(error):
@@ -77,6 +77,7 @@ class CyCy(object):
 
         self._handle_error = handle_error
         self.compiler = compiler
+        self.parser = parser
         self.environment = environment
         self.functions = dict(functions)
 
@@ -191,9 +192,7 @@ class CyCy(object):
 
     def interpret(self, sources):
         for source in sources:
-            program = self.parse(source=source)
-            assert isinstance(program, ast.Program)
-
+            program = self.parser.parse(source=source)
             self.compiler.compile(program)
             try:
                 w_main = self.compiler.constants[
@@ -206,24 +205,6 @@ class CyCy(object):
             else:
                 assert isinstance(return_value, W_Int32)
                 return return_value
-
-    def parse(
-        self,
-        source,
-        lexer=lexer,
-        preprocessor=preprocessed,
-        parser=PARSER,
-    ):
-        tokens = lexer.lex(source)
-        preprocessed = preprocessor(tokens=tokens, interpreter=self)
-
-        try:
-            return parser.parse(preprocessed)
-        except _RPlyLexingError as error:
-            raise LexingError(
-                source_pos=error.source_pos,
-                message=error.message,
-            )
 
     def call(self, w_func, arguments):
         return self.run(w_func.bytecode, arguments=arguments)

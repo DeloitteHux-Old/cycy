@@ -1,4 +1,6 @@
+from characteristic import Attribute, attributes
 from rply import ParserGenerator
+from rply.errors import LexingError as _RPlyLexingError
 
 from cycy.exceptions import CyCyError
 from cycy.parser.ast import (
@@ -27,7 +29,8 @@ from cycy.parser.ast import (
     VariableDeclaration,
     Type,
 )
-from cycy.parser.lexer import RULES
+from cycy.parser.lexer import RULES, lexer
+from cycy.parser.preprocessor import preprocessed
 
 
 class LexingError(CyCyError):
@@ -42,8 +45,9 @@ class LexingError(CyCyError):
 
 
 class ParseError(CyCyError):
-    def __init__(self, token):
+    def __init__(self, token, source):
         self.token = token
+        self.source = source
 
     def __str__(self):
         token_type = self.token.gettokentype()
@@ -53,12 +57,27 @@ class ParseError(CyCyError):
         if source_pos is None:
             return "Unexpected %s %s" % (token_type, token_value)
 
-        return "Unexpected %s %s at line %s, column %s" % (
-            token_type,
-            "'%s'" % (token_value,),
-            source_pos.lineno,
-            source_pos.colno,
+        line, column = source_pos.lineno, source_pos.colno
+
+        return (
+            "\n\n" +
+            self._hint(line_number=line - 1, column_number=column - 1) +
+                "Unexpected %s %s at line %s, column %s" % (
+                token_type,
+                "'%s'" % (token_value,),
+                source_pos.lineno,
+                source_pos.colno,
+            )
         )
+
+    def _hint(self, line_number, column_number):
+        """
+        Find a hint in the source at the given line and column.
+
+        """
+
+        line = self.source.splitlines(keepends=True)[line_number]
+        return line + " " * column_number + "^\n"
 
 
 class NodeList(Node):
@@ -484,9 +503,35 @@ def const(p):
     raise AssertionError("Bad token type in const")
 
 
-@pg.error
-def error_handler(token):
-    raise ParseError(token=token)
+@attributes(
+    [
+        Attribute(name="lexer", exclude_from_repr=True),
+        Attribute(name="preprocessed", exclude_from_repr=True),
+    ],
+    apply_with_init=False,
+)
+class Parser(object):
+    def __init__(self, lexer=lexer, preprocessor=preprocessed):
+        self.preprocessed = preprocessor
+        self.lexer = lexer
 
+    def parse(self, source, parser=None):
+        if parser is None:
+            @pg.error
+            def error_handler(token):
+                raise ParseError(token=token, source=source)
+            parser = pg.build()
 
-PARSER = pg.build()
+        tokens = self.lexer.lex(source)
+        preprocessed = self.preprocessed(tokens=tokens, interpreter=self)
+
+        try:
+            program = parser.parse(preprocessed)
+        except _RPlyLexingError as error:
+            raise LexingError(
+                source_pos=error.source_pos,
+                message=error.message,
+            )
+
+        assert isinstance(program, Program)
+        return program
