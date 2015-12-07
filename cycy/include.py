@@ -33,7 +33,12 @@ class DirectoryIncluder(object):
             raise NotFound(path=name)
 
 
-@attributes([Attribute(name="libraries")], apply_with_init=False)
+@attributes(
+    [
+        Attribute(name="libraries", exclude_from_repr=True)
+    ],
+    apply_with_init=False,
+)
 class StandardLibraryIncluder(object):
     def __init__(self, libraries=None):
         if libraries is None:

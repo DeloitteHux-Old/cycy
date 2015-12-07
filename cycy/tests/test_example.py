@@ -36,5 +36,5 @@ class TestExample(TestCase):
         }
         """)
 
-        main_return = self.cycy.interpret([source])
-        self.assertEqual(W_Int32(5), main_return)
+        w_returned = self.cycy.interpret([source])
+        self.assertEqual(w_returned, W_Int32(5))

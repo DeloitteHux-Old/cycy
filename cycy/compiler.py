@@ -7,19 +7,43 @@ from cycy.parser import ast
 
 @attributes(
     [
-        Attribute(name="instructions"),
-        Attribute(name="constants"),
-        Attribute(name="variables"),
+        Attribute(name="_instructions", exclude_from_repr=True),
     ],
     apply_with_init=False,
 )
-class Context(object):
+class Tape(object):
     """
-    The compilation context, which stores the state during interpretation.
+    A tape carrying the bytecode instructions.
 
-    .. attribute:: instructions
+    """
 
-        a :class:`list` of bytecode instructions (:class:`int`\ s)
+    def __init__(self, instructions=None):
+        self._instructions = instructions or []
+
+    def __len__(self):
+        return len(self._instructions)
+
+    def __getitem__(self, index):
+        return self._instructions[index]
+
+    def __setitem__(self, index, value):
+        self._instructions[index] = value
+
+    def emit(self, byte_code, arg=bytecode.NO_ARG):
+        self._instructions.append(byte_code)
+        self._instructions.append(arg)
+
+
+@attributes(
+    [
+        Attribute(name="constants", exclude_from_repr=True),
+        Attribute(name="variables", exclude_from_repr=True),
+    ],
+    apply_with_init=False,
+)
+class Compiler(object):
+    """
+    A bytecode compiler.
 
     .. attribute:: constants
 
@@ -37,13 +61,25 @@ class Context(object):
     """
 
     def __init__(self):
-        self.instructions = []
         self.constants = []
         self.variables = {}
+        self.functions = {}
 
-    def emit(self, byte_code, arg=bytecode.NO_ARG):
-        self.instructions.append(byte_code)
-        self.instructions.append(arg)
+    def compile(self, an_ast):
+        """
+        Compile an AST into bytecode.
+
+        """
+
+        tape = Tape()
+        an_ast.compile(tape=tape, compiler=self)
+        return bytecode.Bytecode(
+            tape=tape,
+            name="<don't know>",
+            arguments=[],
+            constants=self.constants,
+            variables=self.variables,
+        )
 
     def register_variable(self, name):
         self.variables[name] = len(self.variables)
@@ -53,139 +89,151 @@ class Context(object):
         self.constants.append(constant)
         return len(self.constants) - 1
 
-    def build(self, arguments=[], name="<input>"):
-        return bytecode.Bytecode(
-            instructions=self.instructions,
-            name=name,
-            arguments=arguments,
-            constants=self.constants,
-            variables=self.variables,
-        )
+    def register_function(self, function):
+        self.functions[function.name] = self.register_constant(function)
+
+
+class __extend__(ast.Program):
+    def compile(self, tape, compiler):
+        for unit in self.units:
+            unit.compile(tape=tape, compiler=compiler)
+
 
 class __extend__(ast.Function):
-    def compile(self, context):
+    def compile(self, tape, compiler):
+        function_tape = Tape()
         for param in self.params:
-            param.compile(context=context)
-        self.body.compile(context=context)
+            param.compile(tape=function_tape, compiler=compiler)
+        self.body.compile(tape=function_tape, compiler=compiler)
+
+        compiler.register_function(
+            W_Function(
+                name=self.name,
+                arity=len(self.params),
+                bytecode=bytecode.Bytecode(
+                    tape=function_tape,
+                    name="<don't know>",
+                    arguments=[param.name for param in self.params],
+                    constants=compiler.constants,
+                    variables=compiler.variables,
+                ),
+            )
+        )
+
 
 class __extend__(ast.Block):
-    def compile(self, context):
+    def compile(self, tape, compiler):
         for statement in self.statements:
-            statement.compile(context=context)
+            statement.compile(tape=tape, compiler=compiler)
+
 
 class __extend__(ast.BinaryOperation):
-    def compile(self, context):
+    def compile(self, tape, compiler):
         # compile RHS then LHS so that their results end up on the stack
         # in reverse order; then we can pop in order in the interpreter
-        self.right.compile(context=context)
-        self.left.compile(context=context)
-        context.emit(bytecode.BINARY_OPERATION_BYTECODE[self.operator])
+        self.right.compile(tape=tape, compiler=compiler)
+        self.left.compile(tape=tape, compiler=compiler)
+        tape.emit(bytecode.BINARY_OPERATION_BYTECODE[self.operator])
+
 
 class __extend__(ast.Int32):
-    def compile(self, context):
+    def compile(self, tape, compiler):
         wrapped = W_Int32(value=self.value)
-        index = context.register_constant(wrapped)
-        context.emit(bytecode.LOAD_CONST, index)
+        index = compiler.register_constant(wrapped)
+        tape.emit(bytecode.LOAD_CONST, index)
+
 
 class __extend__(ast.Char):
-    def compile(self, context):
+    def compile(self, tape, compiler):
         wrapped = W_Char(char=self.value)
-        index = context.register_constant(wrapped)
-        context.emit(bytecode.LOAD_CONST, index)
+        index = compiler.register_constant(wrapped)
+        tape.emit(bytecode.LOAD_CONST, index)
 
 
 class __extend__(ast.Assignment):
-    def compile(self, context):
-        self.right.compile(context=context)
-        index = context.variables.get(self.left.name, -42)
+    def compile(self, tape, compiler):
+        self.right.compile(tape=tape, compiler=compiler)
+        index = compiler.variables.get(self.left.name, -42)
         if index == -42:
             raise Exception("Attempt to use undeclared variable '%s'" % self.left.name)
-        context.emit(bytecode.STORE_VARIABLE, index)
+        tape.emit(bytecode.STORE_VARIABLE, index)
+
 
 class __extend__(ast.String):
-    def compile(self, context):
+    def compile(self, tape, compiler):
         wrapped = W_String(value=self.value)
-        index = context.register_constant(wrapped)
-        context.emit(bytecode.LOAD_CONST, index)
+        index = compiler.register_constant(wrapped)
+        tape.emit(bytecode.LOAD_CONST, index)
+
 
 class __extend__(ast.ReturnStatement):
-    def compile(self, context):
+    def compile(self, tape, compiler):
         if self.value:
-            self.value.compile(context)
-        context.emit(bytecode.RETURN, int(bool(self.value)))
+            self.value.compile(tape=tape, compiler=compiler)
+        tape.emit(bytecode.RETURN, int(bool(self.value)))
+
 
 class __extend__(ast.For):
-    def compile(self, context):
-        jump_ix = len(context.instructions)
-        self.condition.compile(context)
-        jump_nz = len(context.instructions)
-        context.emit(bytecode.JUMP_IF_ZERO, 0)
-        self.body.compile(context)
-        context.emit(bytecode.JUMP, jump_ix)
-        context.instructions[jump_nz + 1] = len(context.instructions)
+    def compile(self, tape, compiler):
+        jump_ix = len(tape)
+        self.condition.compile(tape=tape, compiler=compiler)
+        jump_nz = len(tape)
+        tape.emit(bytecode.JUMP_IF_ZERO, 0)
+        self.body.compile(tape=tape, compiler=compiler)
+        tape.emit(bytecode.JUMP, jump_ix)
+        tape[jump_nz + 1] = len(tape)
+
 
 class __extend__(ast.VariableDeclaration):
-    def compile(self, context):
+    def compile(self, tape, compiler):
         vtype = self.vtype
         assert isinstance(vtype, ast.Type)
 
         if vtype.base_type == "int" and vtype.length == 32:
-            variable_index = context.register_variable(self.name)
+            variable_index = compiler.register_variable(self.name)
             if self.value:
-                self.value.compile(context)
-                context.emit(bytecode.STORE_VARIABLE, variable_index)
+                self.value.compile(tape=tape, compiler=compiler)
+                tape.emit(bytecode.STORE_VARIABLE, variable_index)
             # else we've declared the variable, but it is
             # uninitialized... TODO: how to handle this
         elif vtype.base_type == "pointer":
             ref = vtype.reference
             assert isinstance(ref, ast.Type)
             if ref.base_type == "int" and ref.length == 8:
-                variable_index = context.register_variable(self.name)
+                variable_index = compiler.register_variable(self.name)
                 if self.value:
-                    self.value.compile(context)
-                    context.emit(bytecode.STORE_VARIABLE, variable_index)
+                    self.value.compile(tape=tape, compiler=compiler)
+                    tape.emit(bytecode.STORE_VARIABLE, variable_index)
         else:
             raise NotImplementedError("Variable type %s not supported" % vtype)
 
+
 class __extend__(ast.Variable):
-    def compile(self, context):
-        variable_index = context.variables.get(self.name, -42)
+    def compile(self, tape, compiler):
+        variable_index = compiler.variables.get(self.name, -42)
         if variable_index == -42:
             # XXX: this should be either a runtime or compile time exception
             raise Exception("Attempt to use undeclared variable '%s'" % self.name)
-        context.emit(bytecode.LOAD_VARIABLE, variable_index)
+        tape.emit(bytecode.LOAD_VARIABLE, variable_index)
+
 
 class __extend__(ast.Call):
-    def compile(self, context):
-        num_args = len(self.args)
-        assert num_args < 256  # technically probably should be smaller?
+    def compile(self, tape, compiler):
+        arity = len(self.args)
+        assert arity < 256  # technically probably should be smaller?
         for arg in reversed(self.args):
-            arg.compile(context)
+            arg.compile(tape=tape, compiler=compiler)
         if self.name == "putchar":
             # TODO we should implement putchar in bytecode once we have
             # working asm blocks
-            context.emit(bytecode.PUTC, bytecode.NO_ARG)
+            tape.emit(bytecode.PUTC, bytecode.NO_ARG)
             return
-        wrapped_func = W_Function(self.name, len(self.args))
-        func_index = context.register_constant(wrapped_func)
-        context.emit(bytecode.CALL, func_index)
+        tape.emit(bytecode.CALL, compiler.functions[self.name])
+
 
 class __extend__(ast.ArrayDereference):
-    def compile(self, context):
-        self.index.compile(context=context)
-        self.array.compile(context=context)
+    def compile(self, tape, compiler):
+        self.index.compile(tape=tape, compiler=compiler)
+        self.array.compile(tape=tape, compiler=compiler)
 
-        context.emit(bytecode.DEREFERENCE, bytecode.NO_ARG)
-
-
-def compile(an_ast):
-    context = Context()
-    an_ast.compile(context=context)
-    if isinstance(an_ast, ast.Function):
-        arguments = []
-        for param in an_ast.params:
-            assert isinstance(param, ast.VariableDeclaration)
-            arguments.append(param.name)
-    else:
-        arguments = []
-    return context.build(arguments=arguments, name="<don't know>")
+        tape.emit(bytecode.DEREFERENCE, bytecode.NO_ARG)

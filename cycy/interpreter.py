@@ -3,10 +3,11 @@ import os
 from characteristic import Attribute, attributes
 from rply.errors import LexingError as _RPlyLexingError
 
-from cycy import bytecode, compiler
+from cycy import bytecode
+from cycy.compiler import Compiler
 from cycy.environment import Environment
 from cycy.exceptions import CyCyError
-from cycy.objects import W_Bool, W_Char, W_Int32, W_String
+from cycy.objects import W_Bool, W_Char, W_Function, W_Int32, W_String
 from cycy.parser import ast
 from cycy.parser.lexer import lexer
 from cycy.parser.sourceparser import PARSER
@@ -33,7 +34,7 @@ class NoSuchFunction(CyCyError):
         self.name = name
 
     def __str__(self):
-        return self.name
+        return repr(self.name)
 
 
 jitdriver = JitDriver(
@@ -46,9 +47,10 @@ jitdriver = JitDriver(
 @attributes(
     [
         Attribute(name="environment"),
-        Attribute(name="compiled_functions"),
+        Attribute(name="compiler"),
+        Attribute(name="functions", exclude_from_repr=True),
     ],
-    apply_with_init=False
+    apply_with_init=False,
 )
 class CyCy(object):
     """
@@ -56,9 +58,17 @@ class CyCy(object):
 
     """
 
-    def __init__(self, environment=None, handle_error=None):
+    def __init__(
+        self,
+        compiler=None,
+        environment=None,
+        functions=(),
+        handle_error=None,
+    ):
         if environment is None:
             environment = Environment()
+        if compiler is None:
+            compiler = Compiler()
 
         if handle_error is None:
             def handle_error(error):
@@ -66,13 +76,9 @@ class CyCy(object):
                 os.write(2, "\n")
 
         self._handle_error = handle_error
+        self.compiler = compiler
         self.environment = environment
-
-        self.compiled_functions = {}
-
-    def run_main(self):
-        main_byte_code = self.compiled_functions["main"]
-        return self.run(main_byte_code)
+        self.functions = dict(functions)
 
     def run(self, byte_code, arguments=[]):
         pc = 0
@@ -85,7 +91,7 @@ class CyCy(object):
             index = byte_code.variables[name]
             variables[index] = arguments[i]
 
-        while pc < len(byte_code.instructions):
+        while pc < len(byte_code.tape):
             jitdriver.jit_merge_point(
                 pc=pc,
                 stack=stack,
@@ -95,8 +101,8 @@ class CyCy(object):
                 interpreter=self,
             )
 
-            opcode = byte_code.instructions[pc]
-            arg = byte_code.instructions[pc + 1]
+            opcode = byte_code.tape[pc]
+            arg = byte_code.tape[pc + 1]
             pc += 2
 
             if opcode == bytecode.LOAD_CONST:
@@ -121,20 +127,15 @@ class CyCy(object):
                 assert isinstance(right, W_Int32)
                 stack.append(W_Bool(left.leq(right)))
             elif opcode == bytecode.CALL:
-                func = byte_code.constants[arg]
-                name = func.name
+                w_func = byte_code.constants[arg]
 
                 args = []
-                for _ in xrange(func.num_args):
+                for _ in xrange(w_func.arity):
                     args.append(stack.pop())
-                try:
-                    func_byte_code = self.compiled_functions[name]
-                except KeyError:
-                    raise NoSuchFunction(name)
 
-                rv = self.run(func_byte_code, args)
-                if rv is not None:
-                    stack.append(rv)
+                return_value = self.call(w_func, arguments=args)
+                if return_value is not None:
+                    stack.append(return_value)
             elif opcode == bytecode.RETURN:
                 if arg == 1:
                     return stack.pop()
@@ -188,25 +189,17 @@ class CyCy(object):
 
         assert False, "bytecode exited the main loop without returning"
 
-    def compile(self, source):
-        program = self.parse(source=source)
-        assert isinstance(program, ast.Program)
-
-        newly_compiled_functions = []
-
-        for function in program.functions():
-            assert isinstance(function, ast.Function)
-            byte_code = compiler.compile(function)
-            newly_compiled_functions.append(function.name)
-            self.compiled_functions[function.name] = byte_code
-
-        return newly_compiled_functions
-
     def interpret(self, sources):
         for source in sources:
+            program = self.parse(source=source)
+            assert isinstance(program, ast.Program)
+
+            self.compiler.compile(program)
             try:
-                self.compile(source)
-                return_value = self.run_main()
+                w_main = self.compiler.constants[
+                    self.compiler.functions["main"]
+                ]
+                return_value = self.call(w_main, arguments=[])
             except CyCyError as error:
                 self._handle_error(error)
                 return
@@ -214,7 +207,13 @@ class CyCy(object):
                 assert isinstance(return_value, W_Int32)
                 return return_value
 
-    def parse(self, source, lexer=lexer, preprocessor=preprocessed, parser=PARSER):
+    def parse(
+        self,
+        source,
+        lexer=lexer,
+        preprocessor=preprocessed,
+        parser=PARSER,
+    ):
         tokens = lexer.lex(source)
         preprocessed = preprocessor(tokens=tokens, interpreter=self)
 
@@ -225,3 +224,6 @@ class CyCy(object):
                 source_pos=error.source_pos,
                 message=error.message,
             )
+
+    def call(self, w_func, arguments):
+        return self.run(w_func.bytecode, arguments=arguments)

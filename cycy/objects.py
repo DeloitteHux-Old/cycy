@@ -99,11 +99,19 @@ class W_Bool(W_Object):
         return "(bool)%s" % str(self.value).lower()
 
 
-@attributes([Attribute(name="name"), Attribute(name="num_args")], apply_with_init=False)
+@attributes(
+    [
+        Attribute(name="name"),
+        Attribute(name="arity"),
+        Attribute(name="bytecode"),
+    ],
+    apply_with_init=False,
+)
 class W_Function(W_Object):
-    def __init__(self, name, num_args):
+    def __init__(self, name, arity, bytecode):
         self.name = name
-        self.num_args = num_args
+        self.arity = arity
+        self.bytecode = bytecode
 
     def dump(self):
         return "(function)%s" % self.name

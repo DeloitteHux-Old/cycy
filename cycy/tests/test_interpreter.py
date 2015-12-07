@@ -16,11 +16,13 @@ class TestInterpreter(TestCase):
 class TestInterpreterWithBytecode(TestCase):
     def test_it_handles_opcodes_with_args(self):
         byte_code = Bytecode(
-            instructions=[
-                LOAD_CONST, 0,
-                PUTC, 0,
-                RETURN, 0,
-            ],
+            tape=compiler.Tape(
+                instructions=[
+                    LOAD_CONST, 0,
+                    PUTC, 0,
+                    RETURN, 0,
+                ]
+            ),
             constants=[W_Char("x")],
             name="<some test bytecode>",
             arguments=(),
@@ -39,9 +41,7 @@ class TestInterpreterWithBytecode(TestCase):
         # this is not the same as a C function returning NULL,
         # it is a void C function that has no return value
         byte_code = Bytecode(
-            instructions=[
-                RETURN, 0,
-            ],
+            tape=compiler.Tape(instructions=[RETURN, 0]),
             constants=[],
             name="<some test bytecode>",
             arguments=(),
@@ -53,10 +53,12 @@ class TestInterpreterWithBytecode(TestCase):
 
     def test_it_handles_load_const(self):
         byte_code = Bytecode(
-            instructions=[
-                LOAD_CONST, 0,
-                RETURN, 1,
-            ],
+            tape=compiler.Tape(
+                instructions=[
+                    LOAD_CONST, 0,
+                    RETURN, 1,
+                ]
+            ),
             constants=[W_Int32(0)],
             name="<test_load_const>",
             arguments=(),
@@ -68,24 +70,28 @@ class TestInterpreterWithBytecode(TestCase):
 
     def test_binary_neq(self):
         byte_code_ne = Bytecode(
-            instructions=[
-                LOAD_CONST, 0,
-                LOAD_CONST, 1,
-                BINARY_NEQ, 0,
-                RETURN, 1,
-            ],
+            tape=compiler.Tape(
+                instructions=[
+                    LOAD_CONST, 0,
+                    LOAD_CONST, 1,
+                    BINARY_NEQ, 0,
+                    RETURN, 1,
+                ]
+            ),
             constants=[W_Int32(0), W_Int32(1)],
             name="<test_binary_neq>",
             arguments=(),
             variables={},
         )
         byte_code_eq = Bytecode(
-            instructions=[
-                LOAD_CONST, 0,
-                LOAD_CONST, 0,
-                BINARY_NEQ, 0,
-                RETURN, 1,
-            ],
+            tape=compiler.Tape(
+                instructions=[
+                    LOAD_CONST, 0,
+                    LOAD_CONST, 0,
+                    BINARY_NEQ, 0,
+                    RETURN, 1,
+                ]
+            ),
             constants=[W_Int32(0)],
             name="<test_binary_neq>",
             arguments=(),
@@ -100,36 +106,42 @@ class TestInterpreterWithBytecode(TestCase):
 
     def test_binary_leq(self):
         byte_code_lt = Bytecode(
-            instructions=[
-                LOAD_CONST, 0,
-                LOAD_CONST, 1,
-                BINARY_LEQ, 0,
-                RETURN, 1,
-            ],
+            tape=compiler.Tape(
+                instructions=[
+                    LOAD_CONST, 0,
+                    LOAD_CONST, 1,
+                    BINARY_LEQ, 0,
+                    RETURN, 1,
+                ]
+            ),
             constants=[W_Int32(1), W_Int32(0)],
             name="<test_binary_neq>",
             arguments=(),
             variables={},
         )
         byte_code_leq = Bytecode(
-            instructions=[
-                LOAD_CONST, 0,
-                LOAD_CONST, 0,
-                BINARY_LEQ, 0,
-                RETURN, 1,
-            ],
+            tape=compiler.Tape(
+                instructions=[
+                    LOAD_CONST, 0,
+                    LOAD_CONST, 0,
+                    BINARY_LEQ, 0,
+                    RETURN, 1,
+                ]
+            ),
             constants=[W_Int32(0)],
             name="<test_binary_neq>",
             arguments=(),
             variables={},
         )
         byte_code_gt = Bytecode(
-            instructions=[
-                LOAD_CONST, 0,
-                LOAD_CONST, 1,
-                BINARY_LEQ, 0,
-                RETURN, 1,
-            ],
+            tape=compiler.Tape(
+                instructions=[
+                    LOAD_CONST, 0,
+                    LOAD_CONST, 1,
+                    BINARY_LEQ, 0,
+                    RETURN, 1,
+                ]
+            ),
             constants=[W_Int32(0), W_Int32(1)],
             name="<test_binary_neq>",
             arguments=(),
@@ -147,12 +159,14 @@ class TestInterpreterWithBytecode(TestCase):
 
     def test_binary_add(self):
         byte_code = Bytecode(
-            instructions=[
-                LOAD_CONST, 0,
-                LOAD_CONST, 1,
-                BINARY_ADD, NO_ARG,
-                RETURN, 1
-            ],
+            tape=compiler.Tape(
+                instructions=[
+                    LOAD_CONST, 0,
+                    LOAD_CONST, 1,
+                    BINARY_ADD, NO_ARG,
+                    RETURN, 1
+                ]
+            ),
             constants=[W_Int32(1), W_Int32(2)],
             name="<test_binary_add>",
             arguments=(),
@@ -164,12 +178,14 @@ class TestInterpreterWithBytecode(TestCase):
 
     def test_binary_sub(self):
         byte_code = Bytecode(
-            instructions=[
-                LOAD_CONST, 0,
-                LOAD_CONST, 1,
-                BINARY_SUB, NO_ARG,
-                RETURN, 1
-            ],
+            tape=compiler.Tape(
+                instructions=[
+                    LOAD_CONST, 0,
+                    LOAD_CONST, 1,
+                    BINARY_SUB, NO_ARG,
+                    RETURN, 1
+                ]
+            ),
             constants=[W_Int32(1), W_Int32(2)],
             name="<test_binary_add>",
             arguments=(),
@@ -181,12 +197,14 @@ class TestInterpreterWithBytecode(TestCase):
 
     def test_store_and_load_variable(self):
         byte_code = Bytecode(
-            instructions=[
-                LOAD_CONST, 0,
-                STORE_VARIABLE, 0,
-                LOAD_VARIABLE, 0,
-                RETURN, 1
-            ],
+            tape=compiler.Tape(
+                instructions=[
+                    LOAD_CONST, 0,
+                    STORE_VARIABLE, 0,
+                    LOAD_VARIABLE, 0,
+                    RETURN, 1,
+                ]
+            ),
             constants=[W_Int32(1)],
             name="<test_binary_add>",
             arguments=(),
@@ -197,78 +215,86 @@ class TestInterpreterWithBytecode(TestCase):
         self.assertEqual(rv, W_Int32(1))
 
     def test_it_calls_a_function_with_no_args(self):
-        byte_code_caller = Bytecode(
-            instructions=[
-                CALL, 0,
-                RETURN, 1,
+        byte_code = Bytecode(
+            tape=compiler.Tape(
+                instructions=[
+                    CALL, 0,
+                    RETURN, 1,
+                ]
+            ),
+            constants=[
+                W_Function(
+                    name="callee",
+                    arity=0,
+                    bytecode=Bytecode(
+                        name="<the callee's bytecode>",
+                        arguments=(),
+                        variables={},
+                        constants=[W_Int32(42)],
+                        tape=compiler.Tape(
+                            instructions=[
+                                LOAD_CONST, 0,
+                                RETURN, 1,
+                            ]
+                        ),
+                    ),
+                )
             ],
-            constants=[W_Function("callee", 0)],
             name="<test_calls_a_function_with_no_args>",
             arguments=(),
             variables={},
         )
 
-        byte_code_callee = Bytecode(
-            instructions=[
-                LOAD_CONST, 0,
-                RETURN, 1,
-            ],
-            constants=[W_Int32(42)],
-            name="<test_calls_a_function_with_no_args>",
-            arguments=(),
-            variables={},
-        )
-
-        interp = interpreter.CyCy()
-        interp.compiled_functions = {
-            "callee": byte_code_callee,
-        }
-
-        rv = interp.run(byte_code_caller)
-        self.assertEqual(W_Int32(42), rv)
+        rv = interpreter.CyCy().run(byte_code)
+        self.assertEqual(rv, W_Int32(42))
 
     def test_it_calls_a_function_with_one_arg(self):
-        byte_code_caller = Bytecode(
-            instructions=[
-                LOAD_CONST, 0,
-                CALL, 1,
-                RETURN, 1,
+        byte_code = Bytecode(
+            tape=compiler.Tape(
+                instructions=[
+                    LOAD_CONST, 0,
+                    CALL, 1,
+                    RETURN, 1,
+                ],
+            ),
+            constants=[
+                W_Int32(42), W_Function(
+                    name="callee",
+                    arity=1,
+                    bytecode=Bytecode(
+                        name="<the callee's bytecode>",
+                        arguments=["x"],
+                        variables={"x": 0},
+                        constants=[W_Int32(42)],
+                        tape=compiler.Tape(
+                            instructions=[
+                                LOAD_VARIABLE, 0,
+                                RETURN, 1,
+                            ]
+                        ),
+                    ),
+                ),
             ],
-            constants=[W_Int32(42), W_Function("callee", 1)],
             name="<test_calls_a_function_with_no_args>",
             arguments=(),
             variables={},
         )
 
-        byte_code_callee = Bytecode(
-            instructions=[
-                LOAD_VARIABLE, 0,
-                RETURN, 1,
-            ],
-            constants=[],
-            name="<test_calls_a_function_with_no_args>",
-            arguments=["x"],
-            variables={"x": 0},
-        )
-
-        interp = interpreter.CyCy()
-        interp.compiled_functions = {
-            "callee": byte_code_callee,
-        }
-
-        rv = interp.run(byte_code_caller)
-        self.assertEqual(W_Int32(42), rv)
+        rv = interpreter.CyCy().run(byte_code)
+        self.assertEqual(rv, W_Int32(42))
 
     def test_array_dereferences(self):
         byte_code = Bytecode(
-            instructions=[
-                LOAD_CONST, 0,
-                STORE_VARIABLE, 0,
-                LOAD_CONST, 1,
-                LOAD_VARIABLE, 0,
-                DEREFERENCE, NO_ARG,
-                RETURN, 1,
-            ],
+            tape=compiler.Tape(
+                instructions=[
+                    LOAD_CONST, 0,
+                    STORE_VARIABLE, 0,
+                    LOAD_CONST, 1,
+                    LOAD_VARIABLE, 0,
+                    DEREFERENCE, NO_ARG,
+                    RETURN, 1,
+                ]
+            ),
             constants=[W_String("bar"), W_Int32(1)],
             name="<test_array_dereferences>",
             arguments=[],
@@ -280,12 +306,14 @@ class TestInterpreterWithBytecode(TestCase):
 
     def test_jump(self):
         byte_code = Bytecode(
-            instructions=[
-                LOAD_CONST, 0,
-                JUMP, 6,   # jump to just past LOAD_CONST 1
-                LOAD_CONST, 1,
-                RETURN, 1,
-            ],
+            tape=compiler.Tape(
+                instructions=[
+                    LOAD_CONST, 0,
+                    JUMP, 6,   # jump to just past LOAD_CONST 1
+                    LOAD_CONST, 1,
+                    RETURN, 1,
+                ]
+            ),
             constants=[W_Int32(0), W_Int32(1)],
             name="<test_array_dereferences>",
             arguments=[],
@@ -297,13 +325,15 @@ class TestInterpreterWithBytecode(TestCase):
 
     def test_jump_if_not_zero(self):
         byte_code = Bytecode(
-            instructions=[
-                LOAD_CONST, 1,
-                LOAD_CONST, 1,
-                JUMP_IF_NOT_ZERO, 8,   # jump to just past LOAD_CONST 0
-                LOAD_CONST, 0,
-                RETURN, 1,
-            ],
+            tape=compiler.Tape(
+                instructions=[
+                    LOAD_CONST, 1,
+                    LOAD_CONST, 1,
+                    JUMP_IF_NOT_ZERO, 8,   # jump to just past LOAD_CONST 0
+                    LOAD_CONST, 0,
+                    RETURN, 1,
+                ]
+            ),
             constants=[W_Int32(0), W_Int32(1)],
             name="<test_array_dereferences>",
             arguments=[],
@@ -315,13 +345,15 @@ class TestInterpreterWithBytecode(TestCase):
 
     def test_jump_if_zero(self):
         byte_code = Bytecode(
-            instructions=[
-                LOAD_CONST, 0,
-                LOAD_CONST, 0,
-                JUMP_IF_ZERO, 8,   # jump to just past LOAD_CONST 0
-                LOAD_CONST, 1,
-                RETURN, 1,
-            ],
+            tape=compiler.Tape(
+                instructions=[
+                    LOAD_CONST, 0,
+                    LOAD_CONST, 0,
+                    JUMP_IF_ZERO, 8,   # jump to just past LOAD_CONST 0
+                    LOAD_CONST, 1,
+                    RETURN, 1,
+                ]
+            ),
             constants=[W_Int32(0), W_Int32(1)],
             name="<test_array_dereferences>",
             arguments=[],
@@ -339,13 +371,13 @@ class TestInterpreterWithC(TestCase):
     """
 
     def setUp(self):
-        self.interpreter = interpreter.CyCy()
+        self.compiler = compiler.Compiler()
+        self.interpreter = interpreter.CyCy(compiler=compiler)
 
     def get_bytecode(self, source, func_name="main"):
-        program = self.interpreter.parse(source=source)
-        return compiler.compile(
-            next(f for f in program.functions() if f.name == func_name)
-        )
+        self.compiler.compile(self.interpreter.parse(source))
+        w_func = self.compiler.constants[self.compiler.functions[func_name]]
+        return w_func.bytecode
 
     def test_binary_leq(self):
         byte_code_lt = self.get_bytecode("int main(void) { return 1 <= 2; }")
@@ -394,4 +426,4 @@ class TestInterpreterIntegration(TestCase):
     def test_unknown_function_call(self):
         with self.assertRaises(interpreter.NoSuchFunction) as e:
             self.interpret("int main(void) { return canhazprint(0); }")
-        self.assertEqual(str(e.exception), "canhazprint")
+        self.assertEqual(str(e.exception), "'canhazprint'")

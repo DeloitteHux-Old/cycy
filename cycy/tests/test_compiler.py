@@ -6,23 +6,26 @@ from cycy.bytecode import cleaned
 from cycy.interpreter import CyCy
 
 
-class TestCompiler(TestCase):
+class TestCompilerIntegration(TestCase):
+    def setUp(self):
+        self.compiler = compiler.Compiler()
+
     def assertCompiles(self, source, to=None):
         """
-        Assert the given source code compiles, with an optional expected
-        output.
+        The given source code is successfully compiled, optionally to the
+        provided expected output.
 
         """
 
-        program = CyCy().parse(source=source)
-        main_func_ast = next(func for func in program.functions() if func.name == "main")
-        bytecode = compiler.compile(main_func_ast)
+        ast = CyCy().parse(source="int main(void) { " + source + "}")
+        self.compiler.compile(ast)
+        main = self.compiler.constants[self.compiler.functions["main"]]
         expected = dedent(cleaned(to).strip("\n")).strip("\n")
-        self.assertEqual(bytecode.dump(pretty=False), expected)
+        self.assertEqual(main.bytecode.dump(pretty=False), expected)
 
     def test_basic_neq(self):
         self.assertCompiles(
-            "int main(void) { 2 != 3; }", """
+            "2 != 3;", """
             0 LOAD_CONST 0
             2 LOAD_CONST 1
             4 BINARY_NEQ
@@ -31,7 +34,7 @@ class TestCompiler(TestCase):
 
     def test_char_array(self):
         self.assertCompiles(
-            "int main(void) { const char* foo = \"foo\"; }", """
+            "const char* foo = \"foo\";", """
             0 LOAD_CONST 0
             2 STORE_VARIABLE 0
             """
@@ -39,7 +42,7 @@ class TestCompiler(TestCase):
 
     def test_array_dereference(self):
         self.assertCompiles(
-            "int main(void) { const char* foo = \"foo\"; foo[3]; }", """
+            "const char* foo = \"foo\"; foo[3];", """
             0 LOAD_CONST 0
             2 STORE_VARIABLE 0
             4 LOAD_CONST 1

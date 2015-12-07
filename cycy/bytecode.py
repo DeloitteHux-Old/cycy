@@ -49,7 +49,7 @@ NO_ARG = -42
 
 @attributes(
     [
-        Attribute(name="instructions", exclude_from_repr=True),
+        Attribute(name="tape"),
         Attribute(name="name"),
         Attribute(name="arguments"),
         Attribute(name="constants", exclude_from_repr=True),
@@ -61,7 +61,7 @@ class Bytecode(object):
     """
     The bytecode, man.
 
-    .. attribute:: instructions
+    .. attribute:: tape
     .. attribute:: arguments
 
         a tuple of argument names
@@ -82,8 +82,8 @@ class Bytecode(object):
 
     """
 
-    def __init__(self, instructions, arguments, constants, variables, name):
-        self.instructions = instructions
+    def __init__(self, tape, arguments, constants, variables, name):
+        self.tape = tape
         self.name = name
         self.arguments = arguments
         self.constants = constants
@@ -96,9 +96,9 @@ class Bytecode(object):
         and `arg` may be None. `byte_code` and `arg` will be ints.
         """
         offset = 0
-        while offset < len(self.instructions):
-            byte_code = self.instructions[offset]
-            arg = self.instructions[offset + 1]
+        while offset < len(self.tape):
+            byte_code = self.tape[offset]
+            arg = self.tape[offset + 1]
 
             yield (offset, byte_code, arg)
             offset += 2
