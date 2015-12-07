@@ -1,6 +1,7 @@
 from rpython.rlib import streamio
 
 from cycy import __version__
+from cycy.exceptions import CyCyError
 from cycy.interpreter import CyCy
 
 
@@ -72,9 +73,14 @@ class REPL(object):
 
     def interpret(self, source):
         # XXX: multiple lines, and pass stdin / stdout / stderr down
-        return_value = self.interpreter.interpret([source])
-        if return_value is not None:
-            self.stdout.write(return_value.str())
+        try:
+            return_value = self.interpreter.interpret([source])
+        except CyCyError as error:
+            self.stdout.write(error.str())
+            self.stdout.write("\n")
+        else:
+            if return_value is not None:
+                self.stdout.write(return_value.str())
 
     def dump(self, function_name):
         """

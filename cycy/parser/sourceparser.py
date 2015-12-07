@@ -49,7 +49,7 @@ class ParseError(CyCyError):
         self.token = token
         self.source = source
 
-    def __str__(self):
+    def str(self):
         token_type = self.token.gettokentype()
         token_value = self.token.value
 
@@ -69,6 +69,8 @@ class ParseError(CyCyError):
                 source_pos.colno,
             )
         )
+
+    __str__ = str
 
     def _hint(self, line_number, column_number):
         """
