@@ -1,12 +1,10 @@
 language: python
 python:
   - 2.7
-before_install:
-  - curl --silent https://bitbucket.org/pypy/pypy/get/default.tar.bz2 | tar -xjf - --strip=1 --wildcards '*/rpython'
 install:
   - pip install -Ur test-requirements.txt twisted
   - pip install -e .
 script:
   - trial cycy
-  - python rpython/bin/rpython --batch --output=cycy-c cycy/target.py
-  - python rpython/bin/rpython --batch --output=cycy-c --opt=jit cycy/target.py
+  - rpython --batch --output=cycy-nojit cycy/target.py
+  - rpython --batch --output=cycy --opt=jit cycy/target.py
