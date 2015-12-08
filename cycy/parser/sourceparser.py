@@ -30,7 +30,6 @@ from cycy.parser.ast import (
     Type,
 )
 from cycy.parser.lexer import RULES, lexer
-from cycy.parser.preprocessor import preprocessed
 
 
 class LexingError(CyCyError):
@@ -111,18 +110,20 @@ BoolFalse = BoolWrapper()
 @attributes(
     [
         Attribute(name="lexer", exclude_from_repr=True),
-        Attribute(name="preprocessed", exclude_from_repr=True),
+        Attribute(name="preprocessor", exclude_from_repr=True),
     ],
     apply_with_init=False,
 )
 class Parser(object):
-    def __init__(self, lexer=lexer, preprocessor=preprocessed):
-        self.preprocessed = preprocessor
+    def __init__(self, preprocessor, lexer=lexer):
+        self.preprocessor = preprocessor
         self.lexer = lexer
 
     def parse(self, source):
         tokens = self.lexer.lex(source)
-        preprocessed = self.preprocessed(tokens=tokens, interpreter=self)
+        preprocessed = self.preprocessor.preprocessed(
+            tokens=tokens, parser=self,
+        )
 
         # Nasty -- saved in case it's needed for a parsing error
         self.source = source
@@ -256,7 +257,7 @@ class Parser(object):
 
     @_pg.production("include : INCLUDE STRING_LITERAL")
     def include(self, p):
-        return Include(name=p[1].getstr()[1:-1])
+        return Include(name=p[1].getstr().strip('"'))
 
     @_pg.production("if_loop : if LEFT_BRACKET expr RIGHT_BRACKET block")
     def if_loop(self, p):

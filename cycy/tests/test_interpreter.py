@@ -7,7 +7,6 @@ from mock import patch
 from cycy import compiler, interpreter
 from cycy.bytecode import *
 from cycy.objects import W_Bool, W_Char, W_Function, W_Int32, W_String
-from cycy.parser.sourceparser import Parser
 
 
 class TestInterpreter(TestCase):

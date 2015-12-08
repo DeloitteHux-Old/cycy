@@ -27,7 +27,9 @@ class DirectoryIncluder(_Includer):
     def __init__(self, path):
         self.path = os.path.abspath(os.path.normpath(path))
 
-    def include(self, name):
+    def include(self, name, parser):
+        # XXX: Can't decide on the right interface yet
+        raise NotFound(path=name)
         try:
             return open_file_as_stream(os.path.join(self.path, name))
         except OSError as error:
@@ -49,8 +51,8 @@ class StandardLibraryIncluder(_Includer):
             }
         self.libraries = libraries
 
-    def include(self, name):
-        library = self.libraries.get(name)
+    def include(self, name, parser):
+        library = self.libraries.get(name, None)
         if library is None:
             raise NotFound(path=name)
         return library

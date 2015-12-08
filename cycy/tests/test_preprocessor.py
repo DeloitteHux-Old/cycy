@@ -2,8 +2,8 @@ from unittest import TestCase
 
 from cycy.environment import Environment
 from cycy.interpreter import CyCy
-from cycy.parser.lexer import lexer
-from cycy.parser.preprocessor import preprocessed
+from cycy.parser.preprocessor import Preprocessor
+from cycy.parser.sourceparser import Parser
 
 
 class FakeIncluder(object):
@@ -14,15 +14,14 @@ class FakeIncluder(object):
 class TestParser(TestCase):
     def setUp(self):
         self.environment = Environment(includers=[FakeIncluder()])
-        self.cycy = CyCy(environment=self.environment)
+        self.preprocessor = Preprocessor(environment=self.environment)
+        self.parser = Parser(preprocessor=self.preprocessor)
 
     def preprocess(self, source):
         return list(
-            preprocessed(
-                tokens=lexer.lex(source),
-                interpreter=self.cycy,
-            )
+            self.preprocessor.preprocessed(tokens=self.parser.parse(source))
         )
+
     def test_include_statement(self):
         self.skipTest("Skipped until this is easier.")
         tokens = self.preprocess(

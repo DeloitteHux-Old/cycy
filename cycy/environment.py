@@ -15,10 +15,10 @@ class Environment(object):
             includers = []
         self.includers = includers + [include.StandardLibraryIncluder()]
 
-    def include(self, name):
+    def include(self, name, parser):
         for includer in self.includers:
             try:
-                return includer.include(name)
+                return includer.include(name=name, parser=parser)
             except include.NotFound:
                 pass
         raise include.NotFound(path=name, searched=self.includers)

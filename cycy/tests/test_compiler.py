@@ -3,14 +3,17 @@ from unittest import TestCase
 
 from cycy import compiler
 from cycy.bytecode import cleaned
+from cycy.environment import Environment
 from cycy.interpreter import CyCy
+from cycy.parser.preprocessor import Preprocessor
 from cycy.parser.sourceparser import Parser
 
 
 class TestCompilerIntegration(TestCase):
     def setUp(self):
         self.compiler = compiler.Compiler()
-        self.parser = Parser()
+        self.preprocessor = Preprocessor(environment=Environment())
+        self.parser = Parser(preprocessor=self.preprocessor)
 
     def assertCompiles(self, source, to=None):
         """

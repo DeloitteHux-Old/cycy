@@ -7,6 +7,7 @@ from cycy.compiler import Compiler
 from cycy.environment import Environment
 from cycy.exceptions import CyCyError
 from cycy.objects import W_Bool, W_Char, W_Function, W_Int32, W_String
+from cycy.parser.preprocessor import Preprocessor
 from cycy.parser.sourceparser import Parser
 
 # So that you can still run this module under standard CPython, I add this
@@ -57,10 +58,10 @@ class CyCy(object):
     ):
         if compiler is None:
             compiler = Compiler()
-        if parser is None:
-            parser = Parser()
         if environment is None:
             environment = Environment()
+        if parser is None:
+            parser = Parser(preprocessor=Preprocessor(environment=environment))
         if functions is None:
             functions = {}
 
