@@ -31,6 +31,8 @@ class REPL(object):
         self.stderr = stderr if stderr is not None else _open(fd=2)
 
         self.interpreter = interpreter
+        self.compiler = interpreter.compiler
+        self.parser = interpreter.parser
 
     def run(self):
         self.show_banner()
@@ -57,13 +59,15 @@ class REPL(object):
                     repl_input = ""
 
                 if command == "dump":
-                    new_functions = self.interpreter.compile(repl_input)
+                    ast = self.parser.parse(repl_input)
+                    new_functions = self.compiler.compile(ast)
                     for function_name in new_functions:
                         self.dump(function_name)
                         self.stdout.write("\n")
                 elif command == "compile":
                     source_file = streamio.open_file_as_stream(repl_input)
-                    self.interpreter.compile(source_file.readall())
+                    ast = self.parser.parse(source_file.readall())
+                    self.compiler.compile(ast)
                     source_file.close()
                 else:
                     self.stderr.write("Unknown command: '%s'\n" % (command,))
@@ -88,6 +92,7 @@ class REPL(object):
 
         """
 
+        assert isinstance(function_name, str)
         self.stdout.write(function_name)
         self.stdout.write("\n")
         self.stdout.write("-" * len(function_name))

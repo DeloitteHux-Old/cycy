@@ -116,15 +116,18 @@ class __extend__(ast.Function):
         )
         compiler.register_function(function)
 
+        arguments = []
         function_tape = Tape()
         for param in self.params:
+            assert isinstance(param, ast.VariableDeclaration)
+            arguments.append(param.name)
             param.compile(tape=function_tape, compiler=compiler)
         self.body.compile(tape=function_tape, compiler=compiler)
 
         function.bytecode = bytecode.Bytecode(
             tape=function_tape,
             name="<don't know>",
-            arguments=[param.name for param in self.params],
+            arguments=arguments,
             constants=compiler.constants,
             variables=compiler.variables,
         )
@@ -237,8 +240,8 @@ class __extend__(ast.Call):
             # working asm blocks
             tape.emit(bytecode.PUTC, bytecode.NO_ARG)
             return
-        index = compiler.functions.get(self.name)
-        if index is None:
+        index = compiler.functions.get(self.name, -1)
+        if index == -1:
             raise NoSuchFunction(self.name)
         tape.emit(bytecode.CALL, index)
 

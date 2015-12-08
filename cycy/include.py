@@ -5,7 +5,6 @@ from characteristic import Attribute, attributes
 from rpython.rlib.streamio import open_file_as_stream
 
 from cycy.exceptions import CyCyError
-from cycy.stdlib import stdio
 
 
 class NotFound(CyCyError):
@@ -19,8 +18,12 @@ class NotFound(CyCyError):
         )
 
 
+class _Includer(object):
+    pass
+
+
 @attributes([Attribute(name="path")], apply_with_init=False)
-class DirectoryIncluder(object):
+class DirectoryIncluder(_Includer):
     def __init__(self, path):
         self.path = os.path.abspath(os.path.normpath(path))
 
@@ -39,11 +42,10 @@ class DirectoryIncluder(object):
     ],
     apply_with_init=False,
 )
-class StandardLibraryIncluder(object):
+class StandardLibraryIncluder(_Includer):
     def __init__(self, libraries=None):
         if libraries is None:
             libraries = {
-                "stdio.h" : stdio,
             }
         self.libraries = libraries
 
