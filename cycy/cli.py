@@ -23,9 +23,8 @@ import os
 from characteristic import Attribute, attributes
 from rpython.rlib.streamio import open_file_as_stream
 
-from cycy import __version__
+from cycy import __version__, environment
 from cycy.interpreter import CyCy
-from cycy.environment import Environment
 from cycy.repl import REPL
 
 
@@ -100,8 +99,9 @@ def parse_args(args):
                 failure="Unknown argument %s" % (argument,),
             )
 
-    environment = Environment.with_directories(directories=include_paths)
-    cycy = CyCy(environment=environment)
+    cycy = CyCy(
+        environment=environment.with_directories(directories=include_paths),
+    )
     if source_files or source_string:
         return CommandLine(
             action=run_source,

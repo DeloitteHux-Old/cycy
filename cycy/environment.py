@@ -15,15 +15,6 @@ class Environment(object):
             includers = []
         self.includers = includers + [include.StandardLibraryIncluder()]
 
-    @classmethod
-    def with_directories(cls, directories):
-        return cls(
-            includers=[
-                include.DirectoryIncluder(path=directory)
-                for directory in directories
-            ],
-        )
-
     def include(self, name):
         for includer in self.includers:
             try:
@@ -31,3 +22,12 @@ class Environment(object):
             except include.NotFound:
                 pass
         raise include.NotFound(path=name, searched=self.includers)
+
+
+def with_directories(directories):
+    return Environment(
+        includers=[
+            include.DirectoryIncluder(path=directory)
+            for directory in directories
+        ],
+    )

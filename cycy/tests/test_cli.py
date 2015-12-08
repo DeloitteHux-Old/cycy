@@ -1,7 +1,6 @@
 from unittest import TestCase
 
-from cycy import cli
-from cycy.environment import Environment
+from cycy import cli, environment
 from cycy.interpreter import CyCy
 
 
@@ -13,7 +12,7 @@ class TestArgumentParsing(TestCase):
                 action=cli.run_source,
                 source_files=["file.c"],
                 cycy=CyCy(
-                    environment=Environment.with_directories(
+                    environment=environment.with_directories(
                         ["a/include", "b/include"],
                     ),
                 ),
@@ -27,7 +26,7 @@ class TestArgumentParsing(TestCase):
                 action=cli.run_source,
                 source_string="int main (void) {}",
                 cycy=CyCy(
-                    environment=Environment.with_directories(["a/include"]),
+                    environment=environment.with_directories(["a/include"]),
                 ),
             ),
         )

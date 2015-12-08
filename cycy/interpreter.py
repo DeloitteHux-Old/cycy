@@ -52,15 +52,17 @@ class CyCy(object):
         compiler=None,
         parser=None,
         environment=None,
-        functions=(),
+        functions=None,
         handle_error=None,
     ):
-        if environment is None:
-            environment = Environment()
         if compiler is None:
             compiler = Compiler()
         if parser is None:
             parser = Parser()
+        if environment is None:
+            environment = Environment()
+        if functions is None:
+            functions = {}
 
         if handle_error is None:
             def handle_error(error):
@@ -71,7 +73,7 @@ class CyCy(object):
         self.compiler = compiler
         self.parser = parser
         self.environment = environment
-        self.functions = dict(functions)
+        self.functions = functions
 
     def run(self, byte_code, arguments=[]):
         pc = 0
