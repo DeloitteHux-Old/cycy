@@ -28,8 +28,8 @@ class TestCompilerIntegration(TestCase):
     def test_basic_neq(self):
         self.assertCompiles(
             "2 != 3;", """
-            0 LOAD_CONST 0
-            2 LOAD_CONST 1
+            0 LOAD_CONST 1
+            2 LOAD_CONST 2
             4 BINARY_NEQ
             """
         )
@@ -37,7 +37,7 @@ class TestCompilerIntegration(TestCase):
     def test_char_array(self):
         self.assertCompiles(
             "const char* foo = \"foo\";", """
-            0 LOAD_CONST 0
+            0 LOAD_CONST 1
             2 STORE_VARIABLE 0
             """
         )
@@ -45,9 +45,9 @@ class TestCompilerIntegration(TestCase):
     def test_array_dereference(self):
         self.assertCompiles(
             "const char* foo = \"foo\"; foo[3];", """
-            0 LOAD_CONST 0
+            0 LOAD_CONST 1
             2 STORE_VARIABLE 0
-            4 LOAD_CONST 1
+            4 LOAD_CONST 2
             6 LOAD_VARIABLE 0
             8 DEREFERENCE
             """

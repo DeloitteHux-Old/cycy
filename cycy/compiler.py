@@ -1,8 +1,17 @@
 from characteristic import Attribute, attributes
 
 from cycy import bytecode
+from cycy.exceptions import CyCyError
 from cycy.objects import W_Char, W_Function, W_Int32, W_String
 from cycy.parser import ast
+
+
+class NoSuchFunction(CyCyError):
+    def __init__(self, name):
+        self.name = name
+
+    def __str__(self):
+        return repr(self.name)
 
 
 @attributes(
@@ -101,23 +110,23 @@ class __extend__(ast.Program):
 
 class __extend__(ast.Function):
     def compile(self, tape, compiler):
+        # Register the function AOT, to handle cases where it calls itself.
+        function = W_Function(
+            name=self.name, arity=len(self.params), bytecode=None,
+        )
+        compiler.register_function(function)
+
         function_tape = Tape()
         for param in self.params:
             param.compile(tape=function_tape, compiler=compiler)
         self.body.compile(tape=function_tape, compiler=compiler)
 
-        compiler.register_function(
-            W_Function(
-                name=self.name,
-                arity=len(self.params),
-                bytecode=bytecode.Bytecode(
-                    tape=function_tape,
-                    name="<don't know>",
-                    arguments=[param.name for param in self.params],
-                    constants=compiler.constants,
-                    variables=compiler.variables,
-                ),
-            )
+        function.bytecode = bytecode.Bytecode(
+            tape=function_tape,
+            name="<don't know>",
+            arguments=[param.name for param in self.params],
+            constants=compiler.constants,
+            variables=compiler.variables,
         )
 
 
@@ -228,7 +237,10 @@ class __extend__(ast.Call):
             # working asm blocks
             tape.emit(bytecode.PUTC, bytecode.NO_ARG)
             return
-        tape.emit(bytecode.CALL, compiler.functions[self.name])
+        index = compiler.functions.get(self.name)
+        if index is None:
+            raise NoSuchFunction(self.name)
+        tape.emit(bytecode.CALL, index)
 
 
 class __extend__(ast.ArrayDereference):

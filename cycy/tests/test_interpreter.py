@@ -426,6 +426,6 @@ class TestInterpreterIntegration(TestCase):
         return self.cycy.interpret([dedent(source) for source in sources])
 
     def test_unknown_function_call(self):
-        with self.assertRaises(interpreter.NoSuchFunction) as e:
+        with self.assertRaises(compiler.NoSuchFunction) as e:
             self.interpret("int main(void) { return canhazprint(0); }")
         self.assertEqual(str(e.exception), "'canhazprint'")
