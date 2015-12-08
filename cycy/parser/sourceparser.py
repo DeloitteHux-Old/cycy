@@ -79,6 +79,13 @@ class ParseError(CyCyError):
         return line + " " * column_number + "^\n"
 
 
+class UnexpectedEnd(ParseError):
+    """
+    There was an unexpected end in the input.
+
+    """
+
+
 class NodeList(Node):
     """
     A list of nodes used for temporary accumulation during parsing, this
@@ -476,6 +483,11 @@ class Parser(object):
 
     @_pg.error
     def error_handler(self, token):
-        raise ParseError(token=token, source=self.source)
+        is_unexpected_end = token.gettokentype() == "$end"
+        if is_unexpected_end:
+            ParseException = UnexpectedEnd
+        else:
+            ParseException = ParseError
+        raise ParseException(token=token, source=self.source)
 
     _parser = _pg.build()

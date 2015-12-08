@@ -3,6 +3,7 @@ from rpython.rlib import streamio
 from cycy import __version__
 from cycy.exceptions import CyCyError
 from cycy.interpreter import CyCy
+from cycy.parser.sourceparser import UnexpectedEnd
 
 
 def _open(fd):
@@ -13,6 +14,8 @@ def _open(fd):
 class REPL(object):
 
     PROMPT = "CC-> "
+    INPUT_IN_PROGRESS_PROMPT = " ... "
+    _buffered_input = ""
 
     def __init__(
         self,
@@ -34,10 +37,16 @@ class REPL(object):
         self.compiler = interpreter.compiler
         self.parser = interpreter.parser
 
+    @property
+    def prompt(self):
+        if self._buffered_input:
+            return self.INPUT_IN_PROGRESS_PROMPT
+        return self.PROMPT
+
     def run(self):
         self.show_banner()
         while True:
-            self.stdout.write(self.PROMPT)
+            self.stdout.write(self.prompt)
 
             try:
                 repl_input = self.stdin.readline()
@@ -78,11 +87,15 @@ class REPL(object):
     def interpret(self, source):
         # XXX: multiple lines, and pass stdin / stdout / stderr down
         try:
-            return_value = self.interpreter.interpret([source])
+            entire_source = self._buffered_input + source
+            return_value = self.interpreter.interpret([entire_source])
+        except UnexpectedEnd as error:
+            self._buffered_input += source
         except CyCyError as error:
             self.stdout.write(error.rstr())
             self.stdout.write("\n")
         else:
+            self._buffered_input = ""
             if return_value is not None:
                 self.stdout.write(return_value.str())
 
