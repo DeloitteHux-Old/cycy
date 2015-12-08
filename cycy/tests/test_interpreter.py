@@ -427,4 +427,4 @@ class TestInterpreterIntegration(TestCase):
     def test_unknown_function_call(self):
         with self.assertRaises(compiler.NoSuchFunction) as e:
             self.interpret("int main(void) { return canhazprint(0); }")
-        self.assertEqual(str(e.exception), "'canhazprint'")
+        self.assertEqual(str(e.exception), '"canhazprint"')

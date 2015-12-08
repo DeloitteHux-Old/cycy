@@ -11,7 +11,11 @@ class NoSuchFunction(CyCyError):
         self.name = name
 
     def __str__(self):
-        return repr(self.name)
+        name = self.name
+        if '"' in name:
+            sections = name.split('"')
+            name = '\\"'.join(sections)
+        return '"' + name + '"'
 
 
 @attributes(
