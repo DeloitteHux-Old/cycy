@@ -780,7 +780,7 @@ class TestParser(TestCase):
 
         self.assertEqual(
             str(e.exception),
-            "\n\nOne advantage of talking to yourself is that you know at\n"
+            "\nOne advantage of talking to yourself is that you know at\n"
             "^\n"
             "Unexpected IDENTIFIER 'One' at line 2, column 1",
         )

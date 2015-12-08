@@ -76,7 +76,7 @@ class REPL(object):
         try:
             return_value = self.interpreter.interpret([source])
         except CyCyError as error:
-            self.stdout.write(error.str())
+            self.stdout.write(error.rstr())
             self.stdout.write("\n")
         else:
             if return_value is not None:

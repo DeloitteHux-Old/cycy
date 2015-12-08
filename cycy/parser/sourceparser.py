@@ -49,7 +49,7 @@ class ParseError(CyCyError):
         self.token = token
         self.source = source
 
-    def str(self):
+    def __str__(self):
         token_type = self.token.gettokentype()
         token_value = self.token.value
 
@@ -60,7 +60,7 @@ class ParseError(CyCyError):
         line, column = source_pos.lineno, source_pos.colno
 
         return (
-            "\n\n" +
+            "\n" +
             self._hint(line_number=line - 1, column_number=column - 1) +
                 "Unexpected %s %s at line %s, column %s" % (
                 token_type,

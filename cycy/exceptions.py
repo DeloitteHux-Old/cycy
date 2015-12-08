@@ -5,4 +5,5 @@ class CyCyError(Exception):
     """
 
     def rstr(self):
-        return "%s: %s" % (self.__class__.__name__, self.__str__())
+        name = self.__class__.__name__
+        return "%s\n%s\n%s" % (name, "-" * len(name), self.__str__())

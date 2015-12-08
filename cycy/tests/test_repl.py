@@ -14,7 +14,9 @@ class TestREPL(TestCase):
         self.repl.interpret("asdf\n")
         self.assertEqual(
             self.stdout.getvalue(), dedent(
-                """
+                """\
+                ParseError
+                ----------
 
                 asdf
                 ^
