@@ -132,10 +132,9 @@ class Parser(object):
             tokens=tokens, parser=self,
         )
 
-        # Nasty -- saved in case it's needed for a parsing error
-        self.source = source
+        state = _ParseState(source=source)
         try:
-            program = self._parser.parse(preprocessed, state=self)
+            program = self._parser.parse(preprocessed, state=state)
         except _RPlyLexingError as error:
             raise LexingError(
                 source_pos=error.source_pos,
@@ -491,3 +490,8 @@ class Parser(object):
         raise ParseException(token=token, source=self.source)
 
     _parser = _pg.build()
+
+
+class _ParseState(object):
+    def __init__(self, source):
+        self.source = source
