@@ -2,6 +2,7 @@ language: python
 python:
   - pypy
 install:
+  - pip install -U pip
   - pip install -Ur test-requirements.txt twisted
   - pip install -e .
 script:
