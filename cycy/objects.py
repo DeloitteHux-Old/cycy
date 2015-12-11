@@ -113,5 +113,8 @@ class W_Function(W_Object):
         self.arity = arity
         self.bytecode = bytecode
 
+    def call(self, interpreter, arguments):
+        return interpreter.run(self.bytecode, arguments=arguments)
+
     def dump(self):
         return "(function)%s" % self.name

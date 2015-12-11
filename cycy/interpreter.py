@@ -129,7 +129,7 @@ class CyCy(object):
                 for _ in xrange(w_func.arity):
                     args.append(stack.pop())
 
-                return_value = self.call(w_func, arguments=args)
+                return_value = w_func.call(arguments=args, interpreter=self)
                 if return_value is not None:
                     stack.append(return_value)
             elif opcode == bytecode.RETURN:
@@ -193,13 +193,10 @@ class CyCy(object):
                 w_main = self.compiler.constants[
                     self.compiler.functions["main"]
                 ]
-                return_value = self.call(w_main, arguments=[])
+                return_value = w_main.call(arguments=[], interpreter=self)
             except CyCyError as error:
                 self._handle_error(error)
                 return
             else:
                 assert isinstance(return_value, W_Int32)
                 return return_value
-
-    def call(self, w_func, arguments):
-        return self.run(w_func.bytecode, arguments=arguments)
