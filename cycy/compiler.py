@@ -6,6 +6,10 @@ from cycy.objects import W_Char, W_Function, W_Int32, W_String
 from cycy.parser import ast
 
 
+@attributes(
+    [Attribute(name="name")],
+    apply_with_init=False,
+)
 class NoSuchFunction(CyCyError):
     def __init__(self, name):
         self.name = name
