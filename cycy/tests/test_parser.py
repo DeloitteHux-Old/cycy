@@ -1,7 +1,6 @@
 from textwrap import dedent
 from unittest import TestCase
 
-from cycy.interpreter import CyCy
 from cycy.parser.ast import (
     ArrayDereference,
     Assembler,
@@ -27,7 +26,6 @@ from cycy.parser.ast import (
     Type,
 )
 from cycy.parser.core import ParseError, Parser
-from cycy.parser.preprocessor import Preprocessor
 
 
 class TestParser(TestCase):

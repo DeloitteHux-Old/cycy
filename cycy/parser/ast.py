@@ -1,9 +1,6 @@
 from characteristic import Attribute, attributes
-from rpython.tool.pairtype import extendabletype
-
 from rply.token import BaseBox
-
-from cycy.objects import W_Function
+from rpython.tool.pairtype import extendabletype
 
 
 class Node(BaseBox):

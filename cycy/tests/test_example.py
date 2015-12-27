@@ -1,10 +1,8 @@
 from StringIO import StringIO
 from textwrap import dedent
 from unittest import TestCase, skip
-import sys
 
 from bp.filepath import FilePath
-from mock import patch
 
 from cycy.interpreter import CyCy
 from cycy.objects import W_Int32

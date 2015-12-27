@@ -6,7 +6,7 @@ from rpython.rlib import streamio
 from cycy import bytecode
 from cycy.compiler import Compiler
 from cycy.exceptions import CyCyError
-from cycy.objects import W_Bool, W_Char, W_Function, W_Int32, W_String
+from cycy.objects import W_Bool, W_Char, W_Int32, W_String
 from cycy.parser.core import Parser
 from cycy.parser.preprocessor import Preprocessor
 

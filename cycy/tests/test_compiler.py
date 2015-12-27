@@ -3,9 +3,7 @@ from unittest import TestCase
 
 from cycy import compiler
 from cycy.bytecode import cleaned
-from cycy.interpreter import CyCy
 from cycy.parser.core import Parser
-from cycy.parser.preprocessor import Preprocessor
 
 
 class TestCompilerIntegration(TestCase):

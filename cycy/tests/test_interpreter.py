@@ -1,4 +1,3 @@
-from textwrap import dedent
 from unittest import TestCase
 import os
 
@@ -6,7 +5,24 @@ from mock import patch
 from rply.token import Token
 
 from cycy import compiler, interpreter
-from cycy.bytecode import *
+from cycy.bytecode import (
+    BINARY_ADD,
+    BINARY_LEQ,
+    BINARY_NEQ,
+    BINARY_SUB,
+    CALL,
+    DEREFERENCE,
+    JUMP,
+    JUMP_IF_NOT_ZERO,
+    JUMP_IF_ZERO,
+    LOAD_CONST,
+    LOAD_VARIABLE,
+    NO_ARG,
+    PUTC,
+    RETURN,
+    STORE_VARIABLE,
+    Bytecode,
+)
 from cycy.objects import W_Bool, W_Char, W_Function, W_Int32, W_String
 from cycy.parser.core import ParseError
 
