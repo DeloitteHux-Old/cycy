@@ -3,7 +3,7 @@ from textwrap import dedent
 from unittest import TestCase
 
 from cycy.interpreter import CyCy
-from cycy.parser.sourceparser import IncrementalParser
+from cycy.parser.core import IncrementalParser
 from cycy.repl import REPL
 
 

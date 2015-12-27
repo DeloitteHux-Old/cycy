@@ -26,8 +26,8 @@ from cycy.parser.ast import (
     For,
     Type,
 )
+from cycy.parser.core import ParseError, Parser
 from cycy.parser.preprocessor import Preprocessor
-from cycy.parser.sourceparser import ParseError, Parser
 
 
 class TestParser(TestCase):

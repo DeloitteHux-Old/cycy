@@ -25,8 +25,9 @@ from rpython.rlib.streamio import open_file_as_stream
 
 from cycy import __version__
 from cycy.interpreter import CyCy
+from cycy.parser import preprocessor
+from cycy.parser.core import Parser
 from cycy.repl import REPL
-from cycy.parser import preprocessor, sourceparser
 
 
 @attributes(
@@ -101,7 +102,7 @@ def parse_args(args):
             )
 
     cycy = CyCy(
-        parser=sourceparser.Parser(
+        parser=Parser(
             preprocessor=preprocessor.with_directories(
                 directories=include_paths,
             ),

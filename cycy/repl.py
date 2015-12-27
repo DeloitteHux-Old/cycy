@@ -3,7 +3,7 @@ from rpython.rlib import streamio
 from cycy import __version__
 from cycy.exceptions import CyCyError
 from cycy.interpreter import CyCy
-from cycy.parser.sourceparser import IncrementalParser
+from cycy.parser.core import IncrementalParser
 
 
 class REPL(object):

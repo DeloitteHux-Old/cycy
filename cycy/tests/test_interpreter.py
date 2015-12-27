@@ -8,7 +8,7 @@ from rply.token import Token
 from cycy import compiler, interpreter
 from cycy.bytecode import *
 from cycy.objects import W_Bool, W_Char, W_Function, W_Int32, W_String
-from cycy.parser.sourceparser import ParseError
+from cycy.parser.core import ParseError
 
 
 class TestInterpreter(TestCase):

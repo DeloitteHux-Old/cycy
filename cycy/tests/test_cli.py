@@ -2,7 +2,8 @@ from unittest import TestCase
 
 from cycy import cli
 from cycy.interpreter import CyCy
-from cycy.parser import preprocessor, sourceparser
+from cycy.parser import preprocessor
+from cycy.parser.core import Parser
 
 
 class TestArgumentParsing(TestCase):
@@ -13,7 +14,7 @@ class TestArgumentParsing(TestCase):
                 action=cli.run_source,
                 source_files=["file.c"],
                 cycy=CyCy(
-                    parser=sourceparser.Parser(
+                    parser=Parser(
                         preprocessor=preprocessor.with_directories(
                             ["a/include", "b/include"],
                         ),
@@ -29,7 +30,7 @@ class TestArgumentParsing(TestCase):
                 action=cli.run_source,
                 source_string="int main (void) {}",
                 cycy=CyCy(
-                    parser=sourceparser.Parser(
+                    parser=Parser(
                         preprocessor=preprocessor.with_directories(
                             ["a/include"],
                         ),
