@@ -67,7 +67,6 @@ class ParseError(CyCyError):
         line, column = source_pos.lineno, source_pos.colno
 
         return (
-            "\n" +
             self._hint(line_number=line - 1, column_number=column - 1) +
                 "Unexpected %s %s at line %s, column %s" % (
                 token_type,
