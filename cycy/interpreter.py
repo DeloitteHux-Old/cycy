@@ -1,10 +1,10 @@
 import os
 
 from characteristic import Attribute, attributes
+from rpython.rlib import streamio
 
 from cycy import bytecode
 from cycy.compiler import Compiler
-from cycy.environment import Environment
 from cycy.exceptions import CyCyError
 from cycy.objects import W_Bool, W_Char, W_Function, W_Int32, W_String
 from cycy.parser.preprocessor import Preprocessor
@@ -35,7 +35,6 @@ jitdriver = JitDriver(
 
 @attributes(
     [
-        Attribute(name="environment"),
         Attribute(name="compiler"),
         Attribute(name="parser"),
         Attribute(name="functions", exclude_from_repr=True),
@@ -52,29 +51,31 @@ class CyCy(object):
         self,
         compiler=None,
         parser=None,
-        environment=None,
         functions=None,
+        stdin=None,
+        stdout=None,
+        stderr=None,
         handle_error=None,
     ):
         if compiler is None:
             compiler = Compiler()
-        if environment is None:
-            environment = Environment()
         if parser is None:
-            parser = Parser(preprocessor=Preprocessor(environment=environment))
+            parser = Parser(preprocessor=Preprocessor())
         if functions is None:
             functions = {}
-
         if handle_error is None:
-            def handle_error(error):
-                os.write(2, error.rstr())
-                os.write(2, "\n")
+            handle_error = self._show_traceback
 
         self._handle_error = handle_error
         self.compiler = compiler
         self.parser = parser
-        self.environment = environment
         self.functions = functions
+
+        # NOTE: This uses streamio, which by its own admission "isn't
+        #       ready for general usage"
+        self.stdin = stdin if stdin is not None else _open(fd=0)
+        self.stdout = stdout if stdout is not None else _open(fd=1)
+        self.stderr = stderr if stderr is not None else _open(fd=2)
 
     def run(self, byte_code, arguments=[]):
         pc = 0
@@ -107,7 +108,6 @@ class CyCy(object):
             elif opcode == bytecode.BINARY_NEQ:
                 left = stack.pop()
                 right = stack.pop()
-
                 assert isinstance(left, W_Int32) or isinstance(left, W_Char)
                 assert isinstance(right, W_Int32)
                 stack.append(W_Bool(left.neq(right)))
@@ -187,16 +187,26 @@ class CyCy(object):
 
     def interpret(self, sources):
         for source in sources:
-            program = self.parser.parse(source=source)
-            self.compiler.compile(program)
             try:
-                w_main = self.compiler.constants[
-                    self.compiler.functions["main"]
-                ]
-                return_value = w_main.call(arguments=[], interpreter=self)
+                program = self.parser.parse(source=source)
+                if program is None:
+                    return
+                self.compiler.compile(program)
             except CyCyError as error:
-                self._handle_error(error)
-                return
-            else:
-                assert isinstance(return_value, W_Int32)
-                return return_value
+                if self._handle_error(error) is None:
+                    return
+                raise
+
+            w_main = self.compiler.constants[self.compiler.functions["main"]]
+            return_value = w_main.call(arguments=[], interpreter=self)
+            assert isinstance(return_value, W_Int32)
+            return return_value
+
+    def _show_traceback(self, error):
+        self.stdout.write(error.rstr())
+        self.stdout.write("\n")
+
+
+def _open(fd):
+    base = streamio.DiskFile(fd)
+    return streamio.BufferingInputStream(base)

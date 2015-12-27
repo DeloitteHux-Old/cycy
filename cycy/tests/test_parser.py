@@ -1,7 +1,6 @@
 from textwrap import dedent
 from unittest import TestCase
 
-from cycy.environment import Environment
 from cycy.interpreter import CyCy
 from cycy.parser.ast import (
     ArrayDereference,
@@ -33,8 +32,7 @@ from cycy.parser.sourceparser import ParseError, Parser
 
 class TestParser(TestCase):
     def setUp(self):
-        preprocessor = Preprocessor(environment=Environment())
-        self.parse = Parser(preprocessor=preprocessor).parse
+        self.parse = Parser().parse
 
     def function_wrap(self, source):
         return "int main(void) { %s }" % source

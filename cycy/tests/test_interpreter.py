@@ -3,10 +3,12 @@ from unittest import TestCase
 import os
 
 from mock import patch
+from rply.token import Token
 
 from cycy import compiler, interpreter
 from cycy.bytecode import *
 from cycy.objects import W_Bool, W_Char, W_Function, W_Int32, W_String
+from cycy.parser.sourceparser import ParseError
 
 
 class TestInterpreter(TestCase):
@@ -416,15 +418,18 @@ class TestInterpreterWithC(TestCase):
 
 
 class TestInterpreterIntegration(TestCase):
-    def setUp(self):
-        def reraise(exception):
-            raise exception
-        self.cycy = interpreter.CyCy(handle_error=reraise)
-
-    def interpret(self, *sources):
-        return self.cycy.interpret([dedent(source) for source in sources])
-
     def test_unknown_function_call(self):
-        with self.assertRaises(compiler.NoSuchFunction) as e:
-            self.interpret("int main(void) { return canhazprint(0); }")
-        self.assertEqual(str(e.exception), '"canhazprint"')
+        errors = []
+        cycy = interpreter.CyCy(handle_error=errors.append)
+        cycy.interpret(["int main(void) { return canhazprint(0); }"])
+        self.assertEqual(errors, [compiler.NoSuchFunction("canhazprint")])
+
+    def test_parse_error(self):
+        errors = []
+        cycy = interpreter.CyCy(handle_error=errors.append)
+        cycy.interpret(["asdf"])
+        self.assertEqual(
+            errors, [
+                ParseError(token=Token("IDENTIFIER", "asdf"), source="asdf"),
+            ],
+        )

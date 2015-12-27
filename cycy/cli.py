@@ -23,9 +23,10 @@ import os
 from characteristic import Attribute, attributes
 from rpython.rlib.streamio import open_file_as_stream
 
-from cycy import __version__, environment
+from cycy import __version__
 from cycy.interpreter import CyCy
 from cycy.repl import REPL
+from cycy.parser import preprocessor, sourceparser
 
 
 @attributes(
@@ -100,7 +101,11 @@ def parse_args(args):
             )
 
     cycy = CyCy(
-        environment=environment.with_directories(directories=include_paths),
+        parser=sourceparser.Parser(
+            preprocessor=preprocessor.with_directories(
+                directories=include_paths,
+            ),
+        )
     )
     if source_files or source_string:
         return CommandLine(

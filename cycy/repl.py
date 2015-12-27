@@ -3,43 +3,28 @@ from rpython.rlib import streamio
 from cycy import __version__
 from cycy.exceptions import CyCyError
 from cycy.interpreter import CyCy
-from cycy.parser.sourceparser import UnexpectedEnd
-
-
-def _open(fd):
-    base = streamio.DiskFile(fd)
-    return streamio.BufferingInputStream(base)
+from cycy.parser.sourceparser import IncrementalParser
 
 
 class REPL(object):
 
     PROMPT = "CC-> "
     INPUT_IN_PROGRESS_PROMPT = " ... "
-    _buffered_input = ""
 
-    def __init__(
-        self,
-        stdin=None,
-        stdout=None,
-        stderr=None,
-        interpreter=None,
-    ):
+    def __init__(self, interpreter=None):
         if interpreter is None:
-            interpreter = CyCy()
-
-        # NOTE: This uses streamio, which by its own admission "isn't
-        #       ready for general usage"
-        self.stdin = stdin if stdin is not None else _open(fd=0)
-        self.stdout = stdout if stdout is not None else _open(fd=1)
-        self.stderr = stderr if stderr is not None else _open(fd=2)
+            interpreter = CyCy(parser=IncrementalParser())
 
         self.interpreter = interpreter
+        self.stdin = interpreter.stdin
+        self.stdout = interpreter.stdout
+        self.stderr = interpreter.stderr
         self.compiler = interpreter.compiler
         self.parser = interpreter.parser
 
     @property
     def prompt(self):
-        if self._buffered_input:
+        if self.interpreter.parser.input_in_progress:
             return self.INPUT_IN_PROGRESS_PROMPT
         return self.PROMPT
 
@@ -85,19 +70,9 @@ class REPL(object):
                 self.stdout.write("\n")
 
     def interpret(self, source):
-        # XXX: multiple lines, and pass stdin / stdout / stderr down
-        try:
-            entire_source = self._buffered_input + source
-            return_value = self.interpreter.interpret([entire_source])
-        except UnexpectedEnd as error:
-            self._buffered_input += source
-        except CyCyError as error:
-            self.stdout.write(error.rstr())
-            self.stdout.write("\n")
-        else:
-            self._buffered_input = ""
-            if return_value is not None:
-                self.stdout.write(return_value.str())
+        return_value = self.interpreter.interpret([source])
+        if return_value is not None:
+            self.stdout.write(return_value.str())
 
     def dump(self, function_name):
         """

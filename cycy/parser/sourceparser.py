@@ -30,6 +30,7 @@ from cycy.parser.ast import (
     Type,
 )
 from cycy.parser.lexer import RULES, lexer
+from cycy.parser.preprocessor import Preprocessor
 
 
 class LexingError(CyCyError):
@@ -43,6 +44,13 @@ class LexingError(CyCyError):
         )
 
 
+@attributes(
+    [
+        Attribute(name="token"),
+        Attribute(name="source", exclude_from_repr=True),
+    ],
+    apply_with_init=False,
+)
 class ParseError(CyCyError):
     def __init__(self, token, source):
         self.token = token
@@ -114,6 +122,12 @@ BoolTrue = BoolWrapper()
 BoolFalse = BoolWrapper()
 
 
+class _Parser(object):
+    @property
+    def input_in_progress(self):
+        return False
+
+
 @attributes(
     [
         Attribute(name="lexer", exclude_from_repr=True),
@@ -121,8 +135,10 @@ BoolFalse = BoolWrapper()
     ],
     apply_with_init=False,
 )
-class Parser(object):
-    def __init__(self, preprocessor, lexer=lexer):
+class Parser(_Parser):
+    def __init__(self, preprocessor=None, lexer=lexer):
+        if preprocessor is None:
+            preprocessor = Preprocessor()
         self.preprocessor = preprocessor
         self.lexer = lexer
 
@@ -495,3 +511,26 @@ class Parser(object):
 class _ParseState(object):
     def __init__(self, source):
         self.source = source
+
+
+class IncrementalParser(_Parser):
+
+    buffer = ""
+
+    def __init__(self, parser=None):
+        if parser is None:
+            parser = Parser(preprocessor=Preprocessor())
+        self.parser = parser
+
+    @property
+    def input_in_progress(self):
+        return bool(self.buffer)
+
+    def parse(self, source):
+        try:
+            ast = self.parser.parse(self.buffer + source)
+        except UnexpectedEnd:
+            self.buffer += source
+        else:
+            self.buffer = ""
+            return ast

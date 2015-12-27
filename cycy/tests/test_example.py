@@ -12,16 +12,15 @@ from cycy.objects import W_Int32
 
 class TestExample(TestCase):
     def setUp(self):
-        self.cycy = CyCy()
+        self.stdout, self.stderr = StringIO(), StringIO()
+        self.cycy = CyCy(stdout=self.stdout, stderr=self.stderr)
 
     @skip("Integration test, will work eventually")
     def test_it_works(self):
-        stdout = StringIO()
-        with patch.object(sys, "stdout", stdout):
-            self.cycy.interpret(
-                [FilePath(__file__).sibling("example.c").getContent()],
-            )
-        self.assertEqual(stdout.getvalue(), "Hello, world!\n")
+        self.cycy.interpret(
+            [FilePath(__file__).sibling("example.c").getContent()],
+        )
+        self.assertEqual(self.stdout.getvalue(), "Hello, world!\n")
 
     def test_it_does_fibonacci(self):
         source = dedent("""\
