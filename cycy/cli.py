@@ -73,7 +73,7 @@ def parse_args(args):
     for argument in arguments:
         if argument in ("-h", "--help"):
             return CommandLine(action=print_help)
-        if argument == "--version":
+        if argument in ("-version", "--version"):
             return CommandLine(action=print_version)
 
         if argument in ("-I", "--include"):
