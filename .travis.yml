@@ -8,4 +8,4 @@ install:
 script:
   - trial cycy
   - rpython --batch --output=cycy-nojit cycy/target.py
-  - rpython --batch --output=cycy --opt=jit cycy/target.py
+  - rpython --batch --output=cycy-jit --opt=jit cycy/target.py
