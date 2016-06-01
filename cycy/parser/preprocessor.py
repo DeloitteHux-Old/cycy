@@ -21,18 +21,15 @@ class Preprocessor(object):
 
         """
 
-        # NOTE: Can't get this to translate as a generator function.
-        preprocessed = []
         for token in tokens:
             if token.name == "INCLUDE":
-                literal = next(tokens)
-                assert isinstance(literal, str) and len(literal) > 2
-                name = literal[1:-1]
-                for token in self.include(name=name, parser=parser).tokens():
-                    preprocessed.append(token)
+                assert False  # XXX: Can't see how to translate the generator
+                name = next(tokens).value[1:-1]
+                included = self.environment.include(name=name, parser=parser)
+                for token in included.tokens():
+                    yield token
             else:
-                preprocessed.append(token)
-        return iter(preprocessed)
+                yield token
 
     def include(self, name, parser):
         for includer in self.includers:
