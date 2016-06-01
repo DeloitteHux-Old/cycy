@@ -13,7 +13,7 @@ class Preprocessor(object):
     def __init__(self, includers=None):
         if includers is None:
             includers = []
-        self.includers = includers + [include.StandardLibraryIncluder()]
+        self.includers = includers + _DEFAULT_INCLUDE
 
     def preprocessed(self, tokens, parser):
         """
@@ -50,3 +50,9 @@ def with_directories(directories):
             for directory in directories
         ],
     )
+
+
+_DEFAULT_INCLUDE = [
+    include.DirectoryIncluder(path="/usr/local/include/"),
+    include.DirectoryIncluder(path="/usr/include/"),
+]
