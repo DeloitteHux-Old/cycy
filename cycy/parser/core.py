@@ -512,6 +512,7 @@ class _ParseState(object):
         self.source = source
 
 
+@attributes([Attribute(name="parser")], apply_with_init=False)
 class IncrementalParser(_Parser):
 
     buffer = ""

@@ -26,7 +26,7 @@ from rpython.rlib.streamio import open_file_as_stream
 from cycy import __version__
 from cycy.interpreter import CyCy
 from cycy.parser import preprocessor
-from cycy.parser.core import Parser
+from cycy.parser.core import IncrementalParser, Parser
 from cycy.repl import REPL
 
 
@@ -102,9 +102,11 @@ def parse_args(args):
             )
 
     cycy = CyCy(
-        parser=Parser(
-            preprocessor=preprocessor.with_directories(
-                directories=include_paths,
+        parser=IncrementalParser(
+            parser=Parser(
+                preprocessor=preprocessor.with_directories(
+                    directories=include_paths,
+                ),
             ),
         )
     )

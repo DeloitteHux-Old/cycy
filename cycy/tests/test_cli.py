@@ -3,7 +3,7 @@ from unittest import TestCase
 from cycy import cli
 from cycy.interpreter import CyCy
 from cycy.parser import preprocessor
-from cycy.parser.core import Parser
+from cycy.parser.core import IncrementalParser, Parser
 
 
 class TestArgumentParsing(TestCase):
@@ -14,9 +14,11 @@ class TestArgumentParsing(TestCase):
                 action=cli.run_source,
                 source_files=["file.c"],
                 cycy=CyCy(
-                    parser=Parser(
-                        preprocessor=preprocessor.with_directories(
-                            ["a/include", "b/include"],
+                    parser=IncrementalParser(
+                        parser=Parser(
+                            preprocessor=preprocessor.with_directories(
+                                ["a/include", "b/include"],
+                            ),
                         ),
                     ),
                 ),
@@ -30,9 +32,11 @@ class TestArgumentParsing(TestCase):
                 action=cli.run_source,
                 source_string="int main (void) {}",
                 cycy=CyCy(
-                    parser=Parser(
-                        preprocessor=preprocessor.with_directories(
-                            ["a/include"],
+                    parser=IncrementalParser(
+                        parser=Parser(
+                            preprocessor=preprocessor.with_directories(
+                                ["a/include"],
+                            ),
                         ),
                     ),
                 ),
@@ -42,7 +46,10 @@ class TestArgumentParsing(TestCase):
     def test_run_repl(self):
         self.assertEqual(
             cli.parse_args([]),
-            cli.CommandLine(action=cli.run_repl, cycy=CyCy()),
+            cli.CommandLine(
+                action=cli.run_repl,
+                cycy=CyCy(parser=IncrementalParser()),
+            ),
         )
 
     def test_unknown_arguments_causes_print_help(self):
