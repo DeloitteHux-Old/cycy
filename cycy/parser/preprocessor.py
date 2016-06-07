@@ -23,8 +23,7 @@ class Preprocessor(object):
 
         for token in tokens:
             if token.name == "INCLUDE":
-                assert False  # XXX: Can't see how to translate the generator
-                name = next(tokens).value[1:-1]
+                name = next(tokens)
                 included = self.environment.include(name=name, parser=parser)
                 for token in included.tokens():
                     yield token
