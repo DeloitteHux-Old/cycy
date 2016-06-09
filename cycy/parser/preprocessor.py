@@ -4,17 +4,6 @@ from cycy import include
 
 
 @attributes(
-    [Attribute(name="tokens")],
-    apply_with_init=False,
-)
-class Included(object):
-    def __init__(self, tokens=None):
-        if tokens is None:
-            tokens = []
-        self.tokens = tokens
-
-
-@attributes(
     [Attribute(name="includers")],
     apply_with_init=False,
 )
@@ -32,7 +21,7 @@ class Preprocessor(object):
 
         for token in tokens:
             if token.name == "INCLUDE":
-                name = tokens.next()
+                name = next(tokens).value.strip('"')
                 included = self.include(name=name, parser=parser)
                 for token in included.tokens:
                     yield token

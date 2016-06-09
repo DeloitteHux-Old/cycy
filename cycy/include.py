@@ -18,6 +18,17 @@ class NotFound(CyCyError):
         )
 
 
+@attributes(
+    [Attribute(name="tokens")],
+    apply_with_init=False,
+)
+class Included(object):
+    def __init__(self, tokens=None):
+        if tokens is None:
+            tokens = []
+        self.tokens = tokens
+
+
 class _Includer(object):
     pass
 
@@ -28,14 +39,15 @@ class DirectoryIncluder(_Includer):
         self.path = os.path.abspath(os.path.normpath(path))
 
     def include(self, name, parser):
-        # XXX: Can't decide on the right interface yet
-        raise NotFound(path=name)
         try:
-            return open_file_as_stream(os.path.join(self.path, name))
+            stream = open_file_as_stream(os.path.join(self.path, name))
         except OSError as error:
             if error.errno != errno.ENOENT:
                 raise
             raise NotFound(path=name)
+        else:
+            # TODO: Probably can get lex to not take the whole str
+            return Included(tokens=parser.lexer.lex(stream.readall()))
 
 
 @attributes(

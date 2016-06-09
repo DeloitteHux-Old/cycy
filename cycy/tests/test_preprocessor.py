@@ -3,7 +3,8 @@ from unittest import TestCase
 from cycy.interpreter import CyCy
 from cycy.objects import W_Int32
 from cycy.parser.core import Parser
-from cycy.parser.preprocessor import Included, Preprocessor
+from cycy.include import Included
+from cycy.parser.preprocessor import Preprocessor
 
 
 class FakeIncluder(object):
