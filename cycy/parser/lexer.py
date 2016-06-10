@@ -24,10 +24,10 @@ RULES = [
     "IDENTIFIER",
     "LEFT_SQUARE_BRACKET",
     "RIGHT_SQUARE_BRACKET",
-    "LEFT_BRACKET",
-    "RIGHT_BRACKET",
-    "LEFT_CURLY_BRACKET",
-    "RIGHT_CURLY_BRACKET",
+    "LEFT_PARENTHESIS",
+    "RIGHT_PARENTHESIS",
+    "LEFT_CURLY_BRACE",
+    "RIGHT_CURLY_BRACE",
     "||",
     "&&",
     "++",
@@ -72,10 +72,10 @@ lg.add("for", "for")
 lg.add("IDENTIFIER", "[_a-zA-Z][_a-zA-Z0-9]*")
 lg.add("LEFT_SQUARE_BRACKET", "\[")
 lg.add("RIGHT_SQUARE_BRACKET", "\]")
-lg.add("LEFT_BRACKET", "\(")
-lg.add("RIGHT_BRACKET", "\)")
-lg.add("LEFT_CURLY_BRACKET", "{")
-lg.add("RIGHT_CURLY_BRACKET", "}")
+lg.add("LEFT_PARENTHESIS", "\(")
+lg.add("RIGHT_PARENTHESIS", "\)")
+lg.add("LEFT_CURLY_BRACE", "{")
+lg.add("RIGHT_CURLY_BRACE", "}")
 lg.add("||", "\|\|")
 lg.add("&&", "&&")
 lg.add("++", "\+\+")

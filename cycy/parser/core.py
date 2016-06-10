@@ -184,7 +184,7 @@ class Parser(_Parser):
     def unit(self, p):
         return p[0]
 
-    @_pg.production("function : type IDENTIFIER LEFT_BRACKET void RIGHT_BRACKET block")
+    @_pg.production("function : type IDENTIFIER LEFT_PARENTHESIS void RIGHT_PARENTHESIS block")
     def function_void_param(self, p):
         return Function(
             return_type=p[0],
@@ -193,7 +193,7 @@ class Parser(_Parser):
             body=p[5]
         )
 
-    @_pg.production("function : type IDENTIFIER LEFT_BRACKET arg_decl_list RIGHT_BRACKET block")
+    @_pg.production("function : type IDENTIFIER LEFT_PARENTHESIS arg_decl_list RIGHT_PARENTHESIS block")
     def function_with_args(self, p):
         return Function(
             return_type=p[0],
@@ -202,7 +202,7 @@ class Parser(_Parser):
             body=p[5]
         )
 
-    @_pg.production("prototype : type IDENTIFIER LEFT_BRACKET void RIGHT_BRACKET ;")
+    @_pg.production("prototype : type IDENTIFIER LEFT_PARENTHESIS void RIGHT_PARENTHESIS ;")
     def function_void_param(self, p):
         return Function(
             return_type=p[0],
@@ -211,7 +211,7 @@ class Parser(_Parser):
             prototype=True
         )
 
-    @_pg.production("prototype : type IDENTIFIER LEFT_BRACKET arg_decl_list RIGHT_BRACKET ;")
+    @_pg.production("prototype : type IDENTIFIER LEFT_PARENTHESIS arg_decl_list RIGHT_PARENTHESIS ;")
     def function_with_args(self, p):
         return Function(
             return_type=p[0],
@@ -220,7 +220,7 @@ class Parser(_Parser):
             prototype=True
         )
 
-    @_pg.production("prototype : type IDENTIFIER LEFT_BRACKET type_list RIGHT_BRACKET ;")
+    @_pg.production("prototype : type IDENTIFIER LEFT_PARENTHESIS type_list RIGHT_PARENTHESIS ;")
     def function_with_args(self, p):
         return Function(
             return_type=p[0],
@@ -238,7 +238,7 @@ class Parser(_Parser):
         p[0].append(p[2])
         return p[0]
 
-    @_pg.production("block : LEFT_CURLY_BRACKET statement_list RIGHT_CURLY_BRACKET")
+    @_pg.production("block : LEFT_CURLY_BRACE statement_list RIGHT_CURLY_BRACE")
     def block_statement_list(self, p):
         return Block(statements=p[1].get_items())
 
@@ -268,7 +268,7 @@ class Parser(_Parser):
     def expr_assignment(self, p):
         return p[0]
 
-    @_pg.production("assembler : ASM LEFT_BRACKET STRING_LITERAL RIGHT_BRACKET")
+    @_pg.production("assembler : ASM LEFT_PARENTHESIS STRING_LITERAL RIGHT_PARENTHESIS")
     def assembler(self, p):
         return Assembler(instruction=String(p[2].getstr().strip("\"")))
 
@@ -280,31 +280,31 @@ class Parser(_Parser):
     def include(self, p):
         return Include(name=p[1].getstr().strip('"'))
 
-    @_pg.production("if_loop : if LEFT_BRACKET expr RIGHT_BRACKET block")
+    @_pg.production("if_loop : if LEFT_PARENTHESIS expr RIGHT_PARENTHESIS block")
     def if_loop(self, p):
         return If(condition=p[2], body=p[4])
 
-    @_pg.production("if_loop : if LEFT_BRACKET expr RIGHT_BRACKET statement")
+    @_pg.production("if_loop : if LEFT_PARENTHESIS expr RIGHT_PARENTHESIS statement")
     def if_loop_single_line(self, p):
         return If(condition=p[2], body=Block(statements=[p[4]]))
 
-    @_pg.production("while_loop : while LEFT_BRACKET expr RIGHT_BRACKET block")
+    @_pg.production("while_loop : while LEFT_PARENTHESIS expr RIGHT_PARENTHESIS block")
     def while_loop(self, p):
         return For(condition=p[2], body=p[4])
 
-    @_pg.production("while_loop : while LEFT_BRACKET expr RIGHT_BRACKET statement")
+    @_pg.production("while_loop : while LEFT_PARENTHESIS expr RIGHT_PARENTHESIS statement")
     def while_loop_single_line(self, p):
         return For(condition=p[2], body=Block(statements=[p[4]]))
 
-    @_pg.production("for_loop : for LEFT_BRACKET expr ; expr ; expr RIGHT_BRACKET statement")
+    @_pg.production("for_loop : for LEFT_PARENTHESIS expr ; expr ; expr RIGHT_PARENTHESIS statement")
     def for_loop_single_line(self, p):
         return For(initial=p[2], condition=p[4], increment=p[6], body=Block(statements=[p[8]]))
 
-    @_pg.production("for_loop : for LEFT_BRACKET expr ; expr ; expr RIGHT_BRACKET block")
+    @_pg.production("for_loop : for LEFT_PARENTHESIS expr ; expr ; expr RIGHT_PARENTHESIS block")
     def for_loop(self, p):
         return For(initial=p[2], condition=p[4], increment=p[6], body=p[8])
 
-    @_pg.production("func_call : IDENTIFIER LEFT_BRACKET param_list RIGHT_BRACKET")
+    @_pg.production("func_call : IDENTIFIER LEFT_PARENTHESIS param_list RIGHT_PARENTHESIS")
     def function_call(self, p):
         return Call(name=p[0].getstr(), args=p[2].get_items())
 
@@ -467,7 +467,7 @@ class Parser(_Parser):
     @_pg.production("primary_expression : const")
     @_pg.production("primary_expression : IDENTIFIER")
     @_pg.production("primary_expression : STRING_LITERAL")
-    @_pg.production("primary_expression : LEFT_BRACKET primary_expression RIGHT_BRACKET")
+    @_pg.production("primary_expression : LEFT_PARENTHESIS primary_expression RIGHT_PARENTHESIS")
     def primary_expression(self, p):
         if isinstance(p[0], Node):
             # const
