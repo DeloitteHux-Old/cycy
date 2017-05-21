@@ -117,7 +117,7 @@ class Bytecode(object):
                 if byte_code in (LOAD_CONST, CALL):
                     line += " => " + self.constants[arg].dump()
                 elif byte_code in (STORE_VARIABLE, LOAD_VARIABLE):
-                    for name, index in self.variables.items():
+                    for name, index in list(self.variables.items()):
                         if index == arg:
                             line += " => " + name
                             break

@@ -3,4 +3,4 @@ def tokens():
 
 
 def printf(format):
-    print format
+    print(format)

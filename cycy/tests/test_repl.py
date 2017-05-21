@@ -1,4 +1,4 @@
-from StringIO import StringIO
+from io import StringIO
 from textwrap import dedent
 from unittest import TestCase
 
