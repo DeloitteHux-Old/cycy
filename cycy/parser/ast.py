@@ -3,9 +3,9 @@ from rply.token import BaseBox
 from rpython.tool.pairtype import extendabletype
 
 
-class Node(BaseBox):
+class Node(BaseBox, metaclass=extendabletype):
     # Allows using __extend__ to extend the type
-    __metaclass__ = extendabletype
+    pass
 
 
 @attributes(

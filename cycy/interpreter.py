@@ -83,7 +83,7 @@ class CyCy(object):
         variables = [None] * len(byte_code.variables)
 
         assert len(byte_code.arguments) == len(arguments)
-        for i in xrange(len(byte_code.arguments)):
+        for i in range(len(byte_code.arguments)):
             name = byte_code.arguments[i]
             index = byte_code.variables[name]
             variables[index] = arguments[i]
@@ -126,7 +126,7 @@ class CyCy(object):
                 w_func = byte_code.constants[arg]
 
                 args = []
-                for _ in xrange(w_func.arity):
+                for _ in range(w_func.arity):
                     args.append(stack.pop())
 
                 return_value = w_func.call(arguments=args, interpreter=self)
